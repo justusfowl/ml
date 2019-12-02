@@ -1,0 +1,65 @@
+@import "../app.component.scss";
+
+.home-container{
+    padding: 20px; 
+
+    mat-grid-tile{
+        height: 70vh; 
+    }
+
+    .insert-form{
+        height: 38vh;
+    }
+}
+
+.insert-container{
+    display: flex; 
+    justify-content: center;
+    flex-direction: row; 
+    height: 80vh;
+    align-items: center;
+}
+
+.card.input-itm{
+    min-width: 30vw;
+    height: 50vh; 
+}
+
+.full-width{
+    width: 100%; 
+}
+
+.textinput-container .mat-form-field-flex{
+    height: 38vh; 
+}
+
+.btn-analyze{
+    width: 200px;
+}
+
+.textinput.mat-input-element{
+    height: 37vh !important; 
+}
+
+.ngx-file-drop__drop-zone{
+    height: auto !important;
+    border: 3px dotted #dbdbdb !important;
+    border-radius: 10px !important;
+}
+
+.ngx-file-drop__content{
+    flex-direction: column; 
+    height: 45vh !important; 
+}
+
+.upload-command{
+    margin: 30px !important; 
+    max-width: 300px;
+    text-align: center;
+    color: black !important; 
+}
+
+.upload-button{
+    margin: 30px !important; 
+}
+

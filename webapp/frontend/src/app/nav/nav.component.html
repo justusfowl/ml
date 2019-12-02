@@ -1,0 +1,54 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #drawer class="sidenav" fixedInViewport
+      [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+      [mode]="(isHandset$ | async) ? 'over' : 'side'"
+      [opened]="api.navOpen">
+    <mat-toolbar class="menu-item-top"></mat-toolbar>
+    <mat-nav-list>
+      <a class="menu-item" mat-list-item routerLink="home" routerLinkActive="active">
+          <mat-icon  aria-hidden="false" >code</mat-icon>
+      </a>
+      <a class="menu-item" mat-list-item routerLink="nlp" routerLinkActive="active">
+          <mat-icon  aria-hidden="false" >memory</mat-icon>
+      </a>
+      <a class="menu-item" mat-list-item routerLink="stats" routerLinkActive="active">
+          <mat-icon  aria-hidden="false" >bar_chart</mat-icon>
+      </a>
+      <a class="menu-item" mat-list-item routerLink="admin/label" (click)="drawer.close()" routerLinkActive="active">
+          <mat-icon  aria-hidden="false" >gamepad</mat-icon>
+          </a>
+      <a class="menu-item" mat-list-item >
+          <mat-icon  aria-hidden="false" >cloud_done</mat-icon>
+          </a>
+        <a class="menu-item" mat-list-item routerLink="settings" routerLinkActive="active" >
+            <mat-icon  aria-hidden="false" >settings</mat-icon>
+            </a>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <mat-toolbar class="the-toolbar" color="primary">
+      <button
+        type="button"
+        aria-label="Toggle sidenav"
+        mat-icon-button
+        (click)="drawer.toggle()"
+        *ngIf="isHandset$ | async">
+        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+      </button>
+      <mat-toolbar-row>
+          <mat-icon class="menu-icon" (click)="drawer.toggle()" aria-hidden="false" aria-label="Menu icon">menu</mat-icon>
+          <span class="example-spacer"></span>
+          <span class="home" routerLink="home" href="#" routerLinkActive="active">
+            <p>medlines.tech</p>
+            <p class="sub-home" >Medizinische Texte nutzen.</p>
+          </span>
+        </mat-toolbar-row>
+    </mat-toolbar>
+    <!-- Add Content Here -->
+
+
+
+    <router-outlet></router-outlet>
+
+  </mat-sidenav-content>
+</mat-sidenav-container>

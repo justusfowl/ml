@@ -1,0 +1,57 @@
+
+
+<div class="insert-container">
+
+
+        <div class="card input-itm">
+            <div class="title">
+                FREITEXT
+            </div>
+            <div class="content" >
+                <div class="textinput-container">
+                    <form class="example-form">
+                        
+                        <mat-form-field class="full-width">
+                                <textarea class="textinput" matInput [(ngModel)]="api.inputText" [ngModelOptions]="{standalone: true}" placeholder="Paste text..."></textarea>
+                        </mat-form-field>
+                    </form>
+                </div>
+            </div>
+            <div class="footer">
+                <button (click)="analyzeItem()" [disabled]="api.inputText.length == 0" mat-flat-button color="primary" class="btn-analyze">Analyze</button>
+            </div>
+        </div>
+
+    <div class="or-container">
+        <div class="or">
+            OR
+        </div>
+    </div>
+
+    <div class="card input-itm">
+        <div class="title">
+            UPLOAD
+        </div>
+        <div class="content" >
+                <div class="upload-container">
+                        <!-- <input (change)="onFileSelected()" type="file" id="file"> -->
+                        <ngx-file-drop dropZoneLabel="Drop files here" (onFileDrop)="dropped($event)" 
+                            (onFileOver)="fileOver($event)" 
+                            (onFileLeave)="fileLeave($event)">
+                            <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector">
+                            <div class="upload-command" *ngIf="!api.fileUploaded">
+                                    Bitte die Datei zum Upload hier hineinziehen...
+                            </div>
+
+                            <div class="upload-command uploaded" *ngIf="api.fileUploaded">
+                                    Folgende Datei hochgeladen: {{api.fileName}}
+                            </div>
+
+                            <button type="button" *ngIf="!api.fileUploaded" class="upload-button" mat-flat-button color="primary"  (click)="openFileSelector()">Durchsuchen...</button>
+                            <button type="button" *ngIf="api.fileUploaded" class="upload-button" mat-flat-button color="primary"   routerLink="/nlp">Dokument analysieren</button>
+                            </ng-template>
+                        </ngx-file-drop>
+                    </div>
+        </div>
+    </div>
+</div>

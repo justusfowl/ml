@@ -1,0 +1,114 @@
+<mat-progress-bar id="tmpLoad" [class.hide]="!isLoading"  mode="indeterminate"></mat-progress-bar>
+
+<div class="no-data" *ngIf="flagIsNoDataAvailable">
+    Ziemlich leer hier, sieht aus, als ob keine weiteren Daten zu labeln wären...
+    <button type="button" mat-flat-button (click)="getLabelObject()">Aktualisieren</button>
+    <span *ngIf="loadedObjects.length > 0"> Oder vorherige nochmal auswählen? </span>
+    <mat-form-field class="obj_select"  *ngIf="loadedObjects.length > 0">
+        <mat-select (selectionChange)="handleSelectObjChange($event)" class="obj_select" [(value)]="selectedObjectId">
+          <mat-option *ngFor="let obj of loadedObjects" [value]="obj">
+            {{obj}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+</div>
+
+<div class="container" *ngIf="!flagIsNoDataAvailable">
+    <div class="response">
+        <div class="card" *ngIf="activePage">
+            <div class="title main">
+                {{labelObject._id}} // {{labelObject.fileName}}
+
+                <button type="button" class="skip-button" mat-flat-button color="error"  (click)="skipLabelPage()">Überspringen</button>
+
+            </div>
+           
+            <div id="resultArea" class="content" >
+                
+               <!-- <canvas id="the-canvas"  [class.hide]="flagIsText" ></canvas> 
+            
+             
+                    
+                    -->
+
+                <div class="item-col">
+
+                    <div class="rectangle" *ngIf="activePage.bbox" [class.select]="false"  [style]="getBboxStyle()" >
+                       
+                    </div>
+
+                    <img class="large-image"  [src]="'data:image/jpg;base64,' + activePage.base64String" 
+                    (mousemove)="imageMouseMove($event)"
+                    (mouseenter)="enterImageMouse($event)"
+                    (mouseleave)="exitImageMouse($event)"
+                    (click)="imageClick($event)"
+                    (dragstart)="dragImage($event)"
+                    (dragover)="dragImage($event)"
+                    (dblclick)="imageDblClick($event)"
+                    >
+                </div>
+                
+            </div>
+
+        </div>
+    </div>
+
+    <div class="settings" *ngIf="activePage">
+        <div class="card">
+            <div hidden class="title">
+                Details
+            </div>
+            <div class="content fileDetails">
+                <mat-form-field class="obj_select">
+                    <mat-select (selectionChange)="handleSelectObjChange($event)" class="obj_select" [(value)]="selectedObjectId">
+                      <mat-option *ngFor="let obj of loadedObjects" [value]="obj">
+                        {{obj}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                <p class="path">{{labelObject.filePath}}</p>
+                </div>
+        </div>
+   
+
+        <div class="card">
+            <div hidden class="title">
+                <p>Vorschau</p>
+                <div class="pages">
+                    Seite {{showPage+1}} von {{numPages}}
+                </div>
+            </div>
+            <div class="content">
+                
+                <div class="preview">
+                    <div class="preview-images" *ngFor="let p of labelObject.pages; let i = index;" [class.hasbbox]="p.bbox"  [class.skipped]="getPageIsSkipped(i)" >
+                        <img  
+                             
+                            [id]="'prev_'+i"
+                            (click)="selectPage(i)" 
+                            [class.selected]="i == showPage" 
+                            [src]="'data:image/jpg;base64,' +  p.base64String"
+                        >
+                            <mat-icon class="bbox-indicator" (click)="selectPage(i)"  aria-hidden="false" *ngIf="p.bbox">playlist_add_check</mat-icon>
+                            <mat-icon class="bbox-skipped" (click)="selectPage(i)"  aria-hidden="false" *ngIf="getPageIsSkipped(i)">pause</mat-icon>
+                    </div>
+                        
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            
+            <div class="content">
+
+                    
+                    <button type="button" class="disregard-button" mat-flat-button color="error"  (click)="disregardObject()">Abbrechen</button>
+                    <button type="button" class="next-button" mat-flat-button color="primary" [disabled]="!getIsFinal()" (click)="approveObject()">OK</button>
+                    <!-- <button type="button" class="next-button" mat-flat-button color="primary"  (click)="test()">TEST</button> -->
+            </div>
+        </div>
+
+    </div>
+
+
+</div>

@@ -1,0 +1,406 @@
+@import "../../app.component.scss";
+
+.container{
+    display: flex; 
+}
+
+
+#annotatedText.hide{
+    display: none;
+}
+
+.page-number .mat-input-element{
+    text-align: center; 
+}
+
+#the-canvas.hide{
+    display: none;
+}
+
+#tmpLoad{
+    width: 100%; 
+}
+
+#tmpLoad.hide{
+    display: none;
+}
+
+#resultArea{
+    display: flex;
+    justify-content: center; 
+    overflow: hidden; 
+}
+
+.response{
+    flex-grow: 4; 
+    max-width: 70vw; 
+}
+
+.settings{
+    flex-grow: 1;
+    max-width: 25vw;
+}
+
+.entities{
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px; 
+}
+
+.content{
+    width: 100%;
+   /*height: 100%;*/
+    overflow: hidden;
+}
+
+.content.fileDetails{
+    .details{
+        padding: 0; 
+        margin: 0; 
+    }
+
+    .path{
+        font-size: 10px; 
+        padding: 0; 
+        margin: 0; 
+    }
+}
+
+.content .inner{
+    letter-spacing: 3px;
+    line-height: 30px;
+}
+
+.entity{
+    transition: 250ms linear;
+    border-radius: 5px;
+}
+
+.entity.hideMe{
+    border: 1px solid rgba(255, 255, 0, 0); 
+    background-color: rgba(255, 255, 0, 0); 
+}
+
+.hl-0, 
+#ent_0 .mat-checkbox-label{
+    border: 1px solid yellow; 
+    background-color: #f1f17f; 
+    padding: 2px; 
+}
+
+.hl-1, 
+#ent_1 .mat-checkbox-label{
+    border: 1px solid red; 
+    background-color: #e19b9b; 
+    padding: 2px; 
+}
+
+.hl-2, 
+#ent_2 .mat-checkbox-label{
+    border: 1px solid blue; 
+    background-color: #a7a7e5; 
+    padding: 2px; 
+}
+
+.hl-3, 
+#ent_3 .mat-checkbox-label{
+    border: 1px solid green; 
+    background-color: #7ff1b3; 
+    padding: 2px; 
+}
+
+.checkbox_diag{
+    margin: 5px; 
+}
+
+.checkbox_diag .mat-checkbox-label{
+    padding: 2px;
+    border-radius: 3px;
+}
+
+.ent-tool-tip {
+    background: #b71c1c;
+  }
+
+.checkbox_diag.mat-checkbox-checked .mat-checkbox-background {
+    background-color: #3f51b5 !important; /* Red background for example */
+}
+
+.mb{
+    display: flex;
+    justify-content: center;
+}
+
+.pages{
+    font-size: 10px; 
+    font-weight: bold; 
+}
+
+.no-data .obj_select{
+    width: 300px;
+}
+
+.obj_select{
+    width: 100%;
+    padding: 0 !important;
+}
+
+.preview{
+    width: 100%;
+    height: 40vh;
+    overflow-y: scroll;
+    padding-right: 17px;
+    box-sizing: content-box;
+    text-align: center;
+}
+
+.preview img{
+    border: 1px solid grey;
+    margin: 10px;
+    display: inline-block;
+    max-width: 100%;
+    max-height: 150px;
+}
+
+.preview img.selected{
+    border: 3px solid #3f51b5;
+    transform: scale(1.05);
+}
+
+.preview-images{
+    position: relative;
+}
+
+.preview-images.hasbbox img{
+    opacity: 0.3;
+}
+
+.preview-images.skipped img{
+    opacity: 0.3;
+}
+
+.preview .bbox-indicator{
+    position: absolute;
+    transform: translate(-50%,-50%);
+    top: 50%;
+    left: 50%;
+    transform: scale(3.5);
+    color: #78a478; 
+}
+
+.preview .bbox-skipped{
+    position: absolute;
+    transform: translate(-50%,-50%);
+    top: 50%;
+    left: 50%;
+    color: #ff3c00; 
+}
+
+
+
+img.large-image{
+    max-height: 70vh; 
+    border: 0.5px solid black; 
+}
+
+.disregard-button{
+
+}
+
+.next-button{
+    float: right; 
+}
+
+.no-data{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    color: #c3c3c3;
+    flex-direction: column;
+
+    button{
+        margin-top: 20px; 
+        margin-bottom: 20px;
+    }
+}
+
+.title.main{
+    position: relative;
+}
+
+.skip-button{
+    position: absolute !important; 
+    right: 5px; 
+    top: 0;
+    margin: 0 !important; 
+    padding: 0 !important;
+}
+
+
+// ########################### LABEL COMFASH ###########################
+
+.mode-button.active{
+    background-color: primary;
+}
+
+.item-container{
+    display: flex;
+}
+
+.item-col{
+    max-width: 50%; 
+}
+
+.item-col.labels{
+    padding:10px;
+    max-height: 70vh;
+    overflow-y: scroll;
+}
+
+.label-row{
+    margin-bottom: 10px; 
+}
+
+.labels-container{
+    display: flex;
+}
+
+.delete-btn,
+.template-btn{
+    cursor: pointer;
+    margin:5px;
+    padding:5px;
+}
+
+.addlabel-btn{
+    cursor: pointer;
+    margin:5px;
+    padding:15px;
+}
+
+.delete-btn:hover,
+.template-btn:hover{
+    background-color:rgba(128, 128, 128, 0.274);
+    border-radius: 4px;
+    color: rgba(255, 0, 0, 0.363);
+}
+
+.template-btn.selected{
+    background-color:#d8a69e;
+    border-radius: 4px;
+    color: white;
+}
+
+.addlabel-btn:hover{
+    background-color: rgba(216, 166, 158, 0.12);
+    border-radius: 4px;
+    color: #d8a69e;
+}
+
+.small-prob{
+    font-size: 10px;
+}
+
+.rectangle{
+    border: 1px solid #FF0000;
+    position: absolute;
+}
+
+.rectangle.select{
+    border: 3px dashed #FF0000;
+}
+
+.rectangle .label-text{
+    position: absolute; 
+    left: 0;
+    top: 0;
+    background-color: red;
+    font-size: 8px;
+    padding: 0px 5px 0px 5px;
+}
+
+#home-section-meta {
+    max-width: 94rem;
+}
+
+.mat-form-field-infix{
+    width: unset !important;
+}
+
+
+.float-left{
+    left: 15px;
+    position: absolute;
+}
+
+.btn-onlytrain.active{
+    border: 1px dashed #d8a69e;
+}
+
+.main-toolbar{
+    height: 100px;
+}
+
+.sub-toolbar{
+    height: 35px;
+    padding: 0px 0px 0px 16px;
+}
+
+.label-info{
+    padding: 0px 50px 0px 50px;
+    font-size: 12px;
+}
+
+.label-info.small-right{
+    padding: 35px 50px 0px 50px;
+}
+
+.border-right{
+    border-right: 1px solid #8e8e8e
+}
+
+.label-info.small-right .kpi{
+    font-size: 30px;
+    color: #707070;
+    float:right;
+}
+
+.label-info.small-right .description{
+    font-size: 10px;
+    color: rgba(0, 0, 0, 0.87);
+    float:right;
+}
+
+.checkbox{
+    padding-right: 20px;
+}
+
+::-webkit-scrollbar {
+    width: 0px;  /* remove scrollbar space */
+    background: transparent;  /* optional: just make scrollbar invisible */
+}
+/* optional: show position indicator in red */
+::-webkit-scrollbar-thumb {
+    background: transparent;
+}
+
+.crosshair{
+    position: absolute;
+    border: 1px solid red;
+}
+
+.crosshair.horizontal{
+    width: 30px;
+    height: 2px;
+
+}
+
+.crosshair.vertical{
+    width: 2px;
+    height: 30px;
+
+}

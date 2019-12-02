@@ -1,0 +1,49 @@
+.spinner-container{
+    z-index: 99;
+    width: 100%;
+    height: 100%;
+    flex-flow: wrap;
+    position: absolute;
+    background-color: #ffffffc2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+mat-spinner{
+    z-index: 3;
+}
+
+app-nav{
+    z-index: 1;
+}
+
+.spinner-container.displayload{
+    display: none;
+}
+
+/* CARD */ 
+
+
+.card .title{
+    padding: 5px;
+    border-bottom: 0.5px solid grey;
+    margin-bottom: 20px; 
+}
+
+.card{
+    box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0,0,0,.12);
+    margin: 20px; 
+    padding: 20px; 
+    background-color: white;
+}
+
+.response .card{
+    overflow: hidden;
+}
+
+
+.card .footer{
+    display: flex;
+    justify-content: center;
+}

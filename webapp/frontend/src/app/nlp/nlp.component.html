@@ -1,0 +1,82 @@
+<div class="container">
+    <div class="response">
+        <div class="card">
+            <div class="title">
+                Auswertung
+            </div>
+            <mat-progress-bar id="tmpLoad" [class.hide]="!tmpLoad"  mode="indeterminate"></mat-progress-bar>
+            <div id="resultArea" class="content" >
+                <div id="annotatedText" 
+                        [style.font-size]="16*scaleFactor + 'px'" 
+                        [style.letter-spacing]="1*scaleFactor + 'px'" 
+                        [class.hide]="!flagIsText" 
+                        [innerHTML]="annotatedText">
+                </div>
+                
+                <canvas id="the-canvas"  [class.hide]="flagIsText" ></canvas>
+            </div>
+
+        </div>
+    </div>
+    
+    <div class="settings">
+        <div class="card">
+            <div class="title">
+                Entitäten
+            </div>
+            <div class="content">
+                <div class="entities">
+                    <mat-checkbox
+                    *ngFor="let item of entities; let i = index;" 
+                    [id]="'ent_'+i"
+                    (change)="toggleEntity(item, i)"
+                    checked="true"
+                    class="checkbox_diag"
+                    > {{item.value}}</mat-checkbox>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="title">
+                Einstellungen
+            </div>
+            <div class="content">
+                <div class="settings">
+
+                        <div class="mb">
+                            <button (click)="incrementZoom(-0.1)" mat-button type="button">
+                                -
+                            </button>
+                        
+                            <mat-form-field class="page-number">
+                                <input matInput type="number" placeholder="Zoom" [(ngModel)]="scaleFactor" pattern="-?[0-9]*(\.[0-9]+)?">
+                                <mat-error>Input is not a number!</mat-error>
+                            </mat-form-field>
+                        
+                            <button (click)="incrementZoom(0.1)" mat-button type="button">
+                                +
+                            </button>
+                        </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="card" *ngIf="!flagIsText">
+            <div class="title">
+                <p>Vorschau</p>
+                <div class="pages">
+                    Seite {{showPage}} von {{numPages}}
+                </div>
+            </div>
+            <div class="content">
+               
+                <div class="preview">
+                        <canvas [id]="'prev_'+(i+1)" (click)="selectPage(p)" [class.selected]="i == showPage-1" *ngFor="let p of pageNumArr; let i = index;"  ></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
