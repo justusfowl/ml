@@ -14,7 +14,7 @@ var routes = require('./app/v01/routes/index.routes');
 
 app.use(cors(corsOptions)); 
 
-app.use('/', express.static('frontend/dist/frontend'));
+app.use('/', express.static('frontend/dist'));
 
 var bodyParser = require('body-parser');
 app.use(bodyParser.json({limit: '50mb'}));

@@ -13,10 +13,7 @@ class PDFInjector:
 
     def __init__(self, file_path, **kwargs):
 
-        self.IN_PATH = os.environ.get("IN_PATH")
         self.TIFF_PATH = os.environ.get("TIFF_PATH")
-        self.OUT_PATH = os.environ.get("OUT_PATH")
-        self.OUT_PATH_TXT = os.environ.get("OUT_PATH_TXT")
 
         self.file_path = file_path
 

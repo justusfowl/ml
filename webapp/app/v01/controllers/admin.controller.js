@@ -15,10 +15,9 @@ config.mongodb.database + "?authSource=" + config.mongodb.database + "&w=1" ;
 
 var mqURL = 'amqp://' + config.mq.mqUser + ':' + config.mq.mqPassword + '@' + config.mq.mqServer + ':' + config.mq.mqPort;
 
-
 function hb(req, res){
 
-    res.json({"message" : "ok"});
+    res.json({"message" : "ok", "cfg" : config.env});
 
 }
 
@@ -63,7 +62,13 @@ function getLabelObject(req, res){
                 if (docs){
                   if (typeof(docs.pages) != "undefined"){
                     docs.pages.forEach(element => {
-                      element.base64String = base64_encode(element.path)
+                      try{
+                        element.base64String = base64_encode(element.path)
+                      }catch(err){
+                        element.base64String = null;
+                        console.log(err);
+                      }
+                      
                     });
                   }
 
