@@ -19,9 +19,17 @@ class OCRProcessor:
 
         self.label_obj = None
 
+
+
         if 'dev' in kwargs:
             print("Run in development mode...")
+
+            self.flagDev = True
+
         else:
+
+            self.flagDev = False
+
             self.connection = pika.BlockingConnection(self.db.mq_conn_params)
             self.channel = self.connection.channel()
             self.channel.queue_declare(queue=os.environ.get("MQ_QUEUE_OCR"), durable=True)
@@ -47,8 +55,13 @@ class OCRProcessor:
                 bottom = top + bbox["relHeight"] * img_height
 
                 cropped_img = img.crop((left, top, right, bottom))
+                
+                if self.flagDev:
+                    # in dev, tesseract 4.00alpha creates issues with dedicated language files
+                    read_text = pytesseract.image_to_string(cropped_img)  # , lang="deu")
+                else:
+                    read_text = pytesseract.image_to_string(cropped_img, lang="deu")
 
-                read_text = pytesseract.image_to_string(cropped_img) # , lang="deu")
                 p["read_text"] = read_text
 
     def dev(self, objId):

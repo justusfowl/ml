@@ -23,6 +23,8 @@ class PDFLoader:
 
     def post_file(self, file_path):
 
+        print("Posting file... %s" % file_path)
+
         multipart_form_data = {
             'file': open(file_path, 'rb')
         }
@@ -33,5 +35,5 @@ class PDFLoader:
             apiEndPoint=os.environ.get("LOADER_API_ENDPOINT")
         ),files=multipart_form_data)
 
-        print(response.status_code)
+        print("Result for %s ends with %s" % (file_path, response.status_code))
 
