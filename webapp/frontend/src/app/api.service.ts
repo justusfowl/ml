@@ -118,6 +118,109 @@ export class ApiService {
   }
   
 
+  // ### admin area : NER LABEL ### 
+
+  getNerLabelObject(objectId?){
+
+    let objId = ""; 
+
+    if (objectId){
+      objId = "/" + objectId
+    }
+
+    const api = this;
+
+    return new Promise(function(resolve, reject) {
+      
+      api.http.get(api.apiURL + '/admin/nerlabel' + objId).subscribe(
+        (data: any) => {
+          resolve(data)
+        },
+        error => {
+          api.handleAPIError(error);
+          reject(error)
+        }
+      )
+    });
+  }
+
+
+  
+
+  approveNerLabelObject(txtLabelObject){
+
+    const api = this;
+
+    return new Promise(function(resolve, reject) {
+      
+      api.http.put(api.apiURL + '/admin/nerlabel', txtLabelObject).subscribe(
+        (data: any) => {
+          resolve(data)
+        },
+        error => {
+          api.handleAPIError(error);
+          reject(error)
+        }
+      )
+    });
+  }
+
+  disregardNerObject(txtLabelObject){
+    
+      const api = this;
+
+      return new Promise(function(resolve, reject) {
+        
+        api.http.put(api.apiURL + '/admin/nerlabel/disregard', txtLabelObject).subscribe(
+          (data: any) => {
+            resolve(data)
+          },
+          error => {
+            api.handleAPIError(error);
+            reject(error)
+          }
+        )
+      });
+    }
+
+  addNerLabelTag(tag){
+
+    const api = this;
+
+    return new Promise(function(resolve, reject) {
+      
+      api.http.post(api.apiURL + '/admin/nerlabel/meta', tag).subscribe(
+        (data: any) => {
+          resolve(data)
+        },
+        error => {
+          api.handleAPIError(error);
+          reject(error)
+        }
+      )
+    });
+  }
+
+  getNerLabelTag(){
+
+    const api = this;
+
+    return new Promise(function(resolve, reject) {
+      
+      api.http.get(api.apiURL + '/admin/nerlabel/meta').subscribe(
+        (data: any) => {
+          resolve(data)
+        },
+        error => {
+          api.handleAPIError(error);
+          reject(error)
+        }
+      )
+    });
+  }
+
+
+
   // ### admin area : LABEL ### 
 
 

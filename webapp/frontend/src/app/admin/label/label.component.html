@@ -25,12 +25,6 @@
            
             <div id="resultArea" class="content" >
                 
-               <!-- <canvas id="the-canvas"  [class.hide]="flagIsText" ></canvas> 
-            
-             
-                    
-                    -->
-
                 <div class="item-col">
 
                     <div class="rectangle" *ngIf="activePage.bbox" [class.select]="false"  [style]="getBboxStyle()" >
@@ -100,11 +94,8 @@
         <div class="card">
             
             <div class="content">
-
-                    
-                    <button type="button" class="disregard-button" mat-flat-button color="error"  (click)="disregardObject()">Abbrechen</button>
-                    <button type="button" class="next-button" mat-flat-button color="primary" [disabled]="!getIsFinal()" (click)="approveObject()">OK</button>
-                    <!-- <button type="button" class="next-button" mat-flat-button color="primary"  (click)="test()">TEST</button> -->
+                <button type="button" class="disregard-button" mat-flat-button color="error"  (click)="disregardObject()">Abbrechen</button>
+                <button type="button" class="next-button" mat-flat-button color="primary" [disabled]="!getIsFinal()" (click)="approveObject()">OK</button>
             </div>
         </div>
 

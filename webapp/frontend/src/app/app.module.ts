@@ -19,6 +19,7 @@ import { StatisticsComponent } from './statistics/statistics.component';
 import { SettingsComponent } from './settings/settings.component';
 
 import { LabelComponent } from './admin/label/label.component';
+import { NerlabelComponent } from './admin/nerlabel/nerlabel.component';
 
 import {ApiService} from './api.service';
 import { NgxFileDropModule } from 'ngx-file-drop';
@@ -32,7 +33,8 @@ import { NgxFileDropModule } from 'ngx-file-drop';
     HomeComponent,
     StatisticsComponent, 
     LabelComponent, 
-    SettingsComponent
+    SettingsComponent, 
+    NerlabelComponent
   ],
   imports: [
     HttpClientModule,

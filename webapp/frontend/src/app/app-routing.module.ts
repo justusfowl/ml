@@ -6,6 +6,7 @@ import {NlpComponent} from './nlp/nlp.component';
 import {StatisticsComponent} from './statistics/statistics.component';
 
 import { LabelComponent } from './admin/label/label.component';
+import { NerlabelComponent } from './admin/nerlabel/nerlabel.component';
 import { SettingsComponent } from './settings/settings.component';
 
 const routes: Routes = [
@@ -14,6 +15,8 @@ const routes: Routes = [
   { path: 'nlp', component: NlpComponent },
   { path: 'settings', component: SettingsComponent },
   { path: 'admin/label', component: LabelComponent },
+  { path: 'admin/nerlabel', component: NerlabelComponent },
+  
   { path: '', redirectTo: '/home', pathMatch: 'full' }
 ];
 

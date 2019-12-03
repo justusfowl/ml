@@ -55,7 +55,7 @@ class OCRProcessor:
                 bottom = top + bbox["relHeight"] * img_height
 
                 cropped_img = img.crop((left, top, right, bottom))
-                
+
                 if self.flagDev:
                     # in dev, tesseract 4.00alpha creates issues with dedicated language files
                     read_text = pytesseract.image_to_string(cropped_img)  # , lang="deu")
@@ -107,9 +107,9 @@ class OCRProcessor:
 
 
     def init_consuming(self):
-
+        print("start consuming...")
         # receive message and complete simulation
         self.channel.basic_consume(on_message_callback=self.callback, queue='medlines')
         self.channel.start_consuming()
-        print("start consuming...")
+
 

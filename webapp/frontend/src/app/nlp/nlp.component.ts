@@ -84,6 +84,7 @@ export class NlpComponent implements OnInit, AfterViewInit {
     self.api.isLoading = true; 
     setTimeout(function(){
       self.api.processText(inText).then( data => {
+        console.log(data)
         self.annotatedText = self.constructHtml(data);
         self.api.isLoading = false; 
       })
@@ -98,7 +99,7 @@ export class NlpComponent implements OnInit, AfterViewInit {
     var offset = 0; 
 
     for (var i=0; i<data.entities.length; i++){
-      var ent = data.entities[i]; 
+      var ent = data.entities[i];
       var s = this.getEntity(ent);
 
       var start = offset + ent.start; 

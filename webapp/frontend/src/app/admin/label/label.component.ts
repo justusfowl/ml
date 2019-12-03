@@ -161,6 +161,7 @@ export class LabelComponent implements OnInit, AfterViewInit {
 
   getLabelObject(objectId?, isActiveClick?){
 
+    this.api.isLoading = true; 
     this.isLoading = true;
 
     if (!isActiveClick){
@@ -191,8 +192,11 @@ export class LabelComponent implements OnInit, AfterViewInit {
             this.selectPage(0);
     
             this.isLoading = false; 
+            
             this.flagIsNoDataAvailable = false; 
         }
+
+        this.api.isLoading = false; 
     
     })
   }
@@ -517,6 +521,9 @@ export class LabelComponent implements OnInit, AfterViewInit {
 
         if (this.getIsFinal()){
 
+            this.isLoading = true;
+            this.api.isLoading = true; 
+
             this.api.approveLabelObject(this.labelObject).then(res => {
 
                 this.snackBar.open('Dokument bestätigt.', null, {
@@ -530,6 +537,8 @@ export class LabelComponent implements OnInit, AfterViewInit {
                 this.snackBar.open('Etwas hat nicht geklappt.', null, {
                     duration: 1500,
                 });
+                this.isLoading = false;
+                this.api.isLoading = false; 
                 console.error(err);
             })
             
