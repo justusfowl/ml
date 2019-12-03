@@ -73,17 +73,25 @@ class OCRProcessor:
     def callback(self, ch, method, properties, body):
 
 
-        requestParams = json.loads(body.decode('utf-8'))
+        try:
+            requestParams = json.loads(body.decode('utf-8'))
 
-        object_id = str(requestParams["_id"])
+            object_id = str(requestParams["_id"])
 
-        print("Processing...%s" % object_id)
+            print("Processing...%s" % object_id)
 
-        self.label_obj = self.db.mongo_db.labels.find_one({"_id": ObjectId(object_id)})
-        self.process_label_object()
-        self.store_obj()
+            self.label_obj = self.db.mongo_db.labels.find_one({"_id": ObjectId(object_id)})
+            self.process_label_object()
+            self.store_obj()
 
-        ch.basic_ack(delivery_tag=method.delivery_tag)
+            ch.basic_ack(delivery_tag=method.delivery_tag)
+
+            print("Completed for %s" % object_id)
+
+        except Exception as e:
+            print("File could not be processed... %s" % object_id, e)
+
+
 
     def init_consuming(self):
 
