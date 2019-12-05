@@ -90,9 +90,14 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
 
     let flagHasEntity = false;
     let flagAbort = false; 
+    let flagRemoveEntity = false;
 
     if (evt.target.classList.contains("entity")){
       flagHasEntity = true;
+    }
+
+    if (evt.target.classList.contains("removeEnt")){
+      flagRemoveEntity = true;
     }
 
     if (!flagHasEntity){
@@ -154,9 +159,12 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
 
 
     }else{
-      let tagId = evt.target.getAttribute("data-ent-id"); 
-      this.removeTag(tagId);
-      console.log("Remove entity: "+ tagId);
+      if (flagRemoveEntity){
+        let tagId = evt.target.getAttribute("data-ent-id"); 
+        this.removeTag(tagId);
+        console.log("Remove entity: "+ tagId);
+      }
+
     }
   }
 
@@ -441,7 +449,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
    }
 
    getEntity(ent){
-    var snippit = '<span class="entity hl-' + this.getEntHlId(ent._id) + '" data-tag-id="' + this.getEntHlId(ent._id) + '" data-ent-id="' + ent.ent_id + '" matTooltip="Info about the action" matTooltipClass="ent-tool-tip">' + ent.value + '</span>'
+    var snippit = '<span class="entity hl-' + this.getEntHlId(ent._id) + '" data-tag-id="' + this.getEntHlId(ent._id) + '" data-ent-id="' + ent.ent_id + '" matTooltip="Info about the action" matTooltipClass="ent-tool-tip">' + ent.value + '<div class="removeEnt">X</div></span>'
     return snippit
    }
 

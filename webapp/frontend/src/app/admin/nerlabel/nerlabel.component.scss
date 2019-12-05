@@ -66,6 +66,28 @@
 .entity{
     transition: 250ms linear;
     border-radius: 5px;
+    cursor: pointer;
+
+}
+
+.removeEnt{
+    background-color: white;
+    width: 15px;
+    border-radius: 50%;
+    display: inline-flex;
+    text-align: center;
+    font-weight: 600;
+    vertical-align: middle;
+    justify-content: center;
+    font-size: 11px;
+    height: 15px;
+    align-items: center;
+}
+
+.entity:focus .removeEnt{
+    
+    display: unset !important;
+    
 }
 
 .entity.hideMe{
