@@ -66,11 +66,12 @@
 .entity{
     transition: 250ms linear;
     border-radius: 5px;
-    cursor: pointer;
+    
 
 }
 
 .removeEnt{
+    cursor: pointer;
     background-color: white;
     width: 15px;
     border-radius: 50%;
@@ -82,12 +83,6 @@
     font-size: 11px;
     height: 15px;
     align-items: center;
-}
-
-.entity:focus .removeEnt{
-    
-    display: unset !important;
-    
 }
 
 .entity.hideMe{

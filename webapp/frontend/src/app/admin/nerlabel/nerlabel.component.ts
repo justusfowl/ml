@@ -97,6 +97,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
     }
 
     if (evt.target.classList.contains("removeEnt")){
+      flagHasEntity = true;
       flagRemoveEntity = true;
     }
 
@@ -449,7 +450,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
    }
 
    getEntity(ent){
-    var snippit = '<span class="entity hl-' + this.getEntHlId(ent._id) + '" data-tag-id="' + this.getEntHlId(ent._id) + '" data-ent-id="' + ent.ent_id + '" matTooltip="Info about the action" matTooltipClass="ent-tool-tip">' + ent.value + '<div class="removeEnt">X</div></span>'
+    var snippit = '<span class="entity hl-' + this.getEntHlId(ent._id) + '" data-tag-id="' + this.getEntHlId(ent._id) + '" data-ent-id="' + ent.ent_id + '" matTooltip="Info about the action" matTooltipClass="ent-tool-tip">' + ent.value + '<div class="removeEnt" data-ent-id="' + ent.ent_id + '">X</div></span>'
     return snippit
    }
 
