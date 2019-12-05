@@ -17,13 +17,14 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
   textObj : any = {}; 
   annotatedText : SafeHtml = "";
   entities : any = []; 
-  scaleFactor : number = 0.7;
+  scaleFactor : number = 1;
 
   flagIsNoDataAvailable : boolean = true; 
 
   pageIdxSelected : number = 0;
 
   newEntText: string = ""; 
+  newEntTextShortCut : string = ""; 
 
   selectedText: string = '';
   tagIdxSelected : number = 0; 
@@ -34,15 +35,22 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
       
     const re = /^[0-9.]+$/
     
-
     if (evt.key.match(re)){
       let number = parseInt(evt.key);
 
       if (number <= this.tags.length){
         this.tagIdxSelected = number - 1;
       }
-      
+    }else{
+      let selIdx = this.tags.findIndex(x => x.shortcut.toUpperCase() == evt.key.toUpperCase()); 
+
+      if (selIdx > -1){
+        this.tagIdxSelected = selIdx; 
+      }
+
     }
+
+
 
   }
 
@@ -206,11 +214,52 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
     })
    }
 
+   updateShortcut(){
+
+
+     if (this.newEntText.length > 0){
+
+      let newShortcut = this.newEntText.substring(0,1); 
+
+      let shortkeyIdx = this.tags.findIndex(x => x.shortcut.toUpperCase() == newShortcut.toUpperCase()); 
+
+      if (shortkeyIdx == -1){
+        this.newEntTextShortCut = newShortcut.toUpperCase(); 
+      }
+
+     }else{
+       this.newEntTextShortCut = ""; 
+     }
+
+
+   }
+
+
+
    
   addNewTag(){
 
+    let shortkeyIdx = this.tags.findIndex(x => x.shortcut.toUpperCase() == this.newEntTextShortCut.toUpperCase()); 
+
+    if (shortkeyIdx != -1){
+
+      this.snackBar.open('Bitte anderen Shortcut wählen.', null, {
+        duration: 1500,
+      });
+      return; 
+
+    }
+
+    if (this.newEntTextShortCut.length > 1 || this.newEntTextShortCut.length == 0){
+      this.snackBar.open('Bitte Shortcut mit einem Zeichen wählen.', null, {
+        duration: 1500,
+      });
+      return; 
+    }
+
     let newTag = {
-      "value" : this.newEntText
+      "value" : this.newEntText, 
+      "shortcut" : this.newEntTextShortCut.toUpperCase()
     }
 
     this.api.isLoading = true;
@@ -222,7 +271,8 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
       }
 
       this.api.isLoading = false;
-      this.newEntText = ""; 
+      this.newEntText = "";
+      this.newEntTextShortCut = ""; 
 
     }).catch(err => {
       console.log(err);

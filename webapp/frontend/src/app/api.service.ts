@@ -283,4 +283,26 @@ export class ApiService {
       )
     });
   }
+
+
+  // ### admin area : STATS ### 
+
+  
+  getStatsWorkflow(){
+    const api = this;
+
+    return new Promise(function(resolve, reject) {
+      
+      api.http.get(api.apiURL + '/admin/stats/workflow').subscribe(
+        (data: any) => {
+          resolve(data)
+        },
+        error => {
+          api.handleAPIError(error);
+          reject(error)
+        }
+      )
+    });
+  }
+
 }

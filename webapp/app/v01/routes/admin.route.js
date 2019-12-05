@@ -2,7 +2,8 @@ var express = require('express');
 var router = express.Router();
 
 var adminCtrl = require('../controllers/admin.controller');
-var nerLabelCtrl = require('../controllers/nerlabel.controller')
+var nerLabelCtrl = require('../controllers/nerlabel.controller');
+var adminLabelStatsCtrl = require('../controllers/label.stats.controller')
 
 router.route('/')
     .post(adminCtrl.hb)
@@ -27,5 +28,8 @@ router.route('/nerlabel/meta')
 
 router.route('/nerlabel/disregard')
     .put(nerLabelCtrl.disregardObject)  
+
+router.route('/stats/workflow')
+    .get(adminLabelStatsCtrl.getWorkflowStats)
 
 module.exports = router;

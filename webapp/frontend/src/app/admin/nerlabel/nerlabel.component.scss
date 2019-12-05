@@ -73,37 +73,6 @@
     background-color: rgba(255, 255, 0, 0); 
 }
 
-.hl-0,
-.ent_0,  
-.ent_0 .mat-checkbox-label{
-    border: 1px solid yellow; 
-    background-color: #f1f17f; 
-    padding: 2px; 
-}
-
-.hl-1, 
-.ent_1,
-.ent_1 .mat-checkbox-label{
-    border: 1px solid red; 
-    background-color: #e19b9b; 
-    padding: 2px; 
-}
-
-.hl-2, 
-.ent_2,
-.ent_2 .mat-checkbox-label{
-    border: 1px solid blue; 
-    background-color: #a7a7e5; 
-    padding: 2px; 
-}
-
-.hl-3, 
-.ent_3,
-.ent_3 .mat-checkbox-label{
-    border: 1px solid green; 
-    background-color: #7ff1b3; 
-    padding: 2px; 
-}
 
 .checkbox_diag{
     margin: 5px; 
@@ -169,7 +138,11 @@
 }
 
 .newEntLabel{
-    width: 100%; 
+    width: 70%; 
+}
+
+.newLabelShortcutInput{
+    width: 30%; 
 }
 
 .entity-select{
@@ -179,6 +152,23 @@
     opacity: 0.3;
     margin: 2px;
     border-radius: 4px;
+    position: relative; 
+
+    .shortcut{
+        background-color: white;
+        padding: 3px;
+        border-radius: 50%;
+        min-width: 20px;
+        text-align: center;
+        font-weight: 600;
+        margin-right: 10px;
+        margin-left: 10px 
+    }
+
+    .selected-icon{
+        position: absolute; 
+        right: 5px; 
+    }
 }
 
 .entity-select.selected{

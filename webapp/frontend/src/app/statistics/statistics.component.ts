@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ApiService } from '../api.service';
 
 @Component({
   selector: 'app-statistics',
@@ -7,9 +8,24 @@ import { Component, OnInit } from '@angular/core';
 })
 export class StatisticsComponent implements OnInit {
 
-  constructor() { }
+  workflowStats : any[] = [];
+
+  constructor(
+    private api: ApiService
+  ) { }
 
   ngOnInit() {
+    this.getWorkflowStats();
+  }
+
+  getWorkflowStats(){
+
+    this.api.getStatsWorkflow().then((result : any) => {
+      this.workflowStats = result; 
+    }).catch(err => {
+      console.log(err);
+    })
+
   }
 
 }

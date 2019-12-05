@@ -66,7 +66,7 @@ function getLabelObject(req, res){
                         res.json(docs);
             
                         if (typeof(docs._id) != "undefined"){
-                            // collection.updateOne({"_id" : ObjectID(docs._id)}, {$set: { wfstatus : 3}, $push: { "wfstatus_change" :changeItem}}) // 
+                          collection.updateOne({"_id" : ObjectID(docs._id)}, {$set: { wfstatus : 3}, $push: { "wfstatus_change" :changeItem}}) // 
                         }
                     }else{
                         res.json({})
