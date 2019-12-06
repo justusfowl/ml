@@ -450,7 +450,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
 
    }
 
-   toggleClassShowEnt(){
+   toggleClassShowEnt(state?){
 
     let tagList = document.getElementsByClassName("entity") as any;
     for (var i=0;i<tagList.length;i++){
