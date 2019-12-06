@@ -30,6 +30,8 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
   tagIdxSelected : number = 0; 
   tags : any[] = [];
 
+  flagShowEntSmall : boolean = true; 
+
   
   @HostListener('document:keydown', ['$event']) onKeydownHandler(evt: KeyboardEvent) {
       
@@ -107,7 +109,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
 
           let sel = window.getSelection(); 
 
-          if ((sel as any).baseOffset == (sel as any).focusOffset){
+          if (sel.type != 'Range'){ // (sel as any).baseOffset == (sel as any).focusOffset){
 
             let textContentClicked = sel.focusNode.textContent;
             let textIndex = this.textObj.pages[this.pageIdxSelected].read_text.indexOf(textContentClicked);
@@ -134,7 +136,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
             // a text area has been selected
             text = window.getSelection().toString();
 
-            startIdx = textAnchorIndex + sel.anchorOffset;
+            startIdx = textAnchorIndex + Math.min(sel.focusOffset,sel.anchorOffset); // textAnchorIndex + sel.anchorOffset;
             endIdx = startIdx + text.length;
 
             if (typeof((sel as any).baseNode.classList) != "undefined"){
@@ -150,7 +152,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
           text = (document as any).selection.createRange().text;
       }
 
-      if (!(/\r|\n/.exec(text))){
+      if (true /* exclude line breaks:!(/\r|\n/.exec(text)) */){
         this.selectedText = text;
         console.log("Add new tag with text: " + text ); 
   
@@ -178,14 +180,13 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
 
       let character = text.substring(it, it+1);
       
-      if (character == " " || character == "," || character == "." || character == ":" || character == "?"|| character == "!"|| character == "{" || /\r|\n/.exec(character)){
+      if (character == " " || character == "," || character == "." || character == ":" || character == "?"|| character == "!" || character == "{"  || /\r|\n/.exec(character)){
         
         if (start){
           resIdx = it+1; 
         }else{
           resIdx = it; 
         }
-        
       }
       
       if (start){
@@ -449,8 +450,27 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
 
    }
 
+   toggleClassShowEnt(){
+
+    let tagList = document.getElementsByClassName("entity") as any;
+    for (var i=0;i<tagList.length;i++){
+      let elem = tagList[i];
+      if (this.flagShowEntSmall){
+        elem.classList.add("showEnt")
+      }else{
+        elem.classList.remove("showEnt")
+      }
+    }
+
+   }
+
+
    getEntity(ent){
-    var snippit = '<span class="entity hl-' + this.getEntHlId(ent._id) + '" data-tag-id="' + this.getEntHlId(ent._id) + '" data-ent-id="' + ent.ent_id + '" matTooltip="Info about the action" matTooltipClass="ent-tool-tip">' + ent.value + '<div class="removeEnt" data-ent-id="' + ent.ent_id + '">X</div></span>'
+     let classShowEnt = ""; 
+     if (this.flagShowEntSmall){
+       classShowEnt = "showEnt";
+     }
+    var snippit = '<span class="entity hl-' + this.getEntHlId(ent._id) + " " + classShowEnt + '" data-tag-id="' + this.getEntHlId(ent._id) + '" data-ent-id="' + ent.ent_id + '">' + ent.value + '<span class="ent-tooltip">' + this.getEntHlValue(ent._id) + '</span><div class="removeEnt" data-ent-id="' + ent.ent_id + '">X</div></span>'
     return snippit
    }
 
@@ -461,6 +481,17 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
       return entInd;
     }else{
       return 9999;
+    }
+    
+   }
+
+   getEntHlValue(tag_id){
+    var entInd = this.tags.findIndex(x => x._id == tag_id); 
+
+    if (entInd > -1){
+      return  this.tags[entInd].value;
+    }else{
+      return "unknown";
     }
     
    }

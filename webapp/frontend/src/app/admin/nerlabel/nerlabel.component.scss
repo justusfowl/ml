@@ -2,6 +2,9 @@
 
 #annotatedText{
     white-space: pre-line;
+    padding: 15px;
+    max-height: 70vh;
+    overflow-y: scroll;
 }
 
 
@@ -46,6 +49,18 @@
     max-width: 450px;
 }
 
+.setting-row{
+    border-bottom: 1px solid #d8d8d8;
+    margin: 5px;
+}
+
+.setting-row.checkbox-itm{
+    display:flex;
+    padding:10px; 
+    justify-content: center;
+    align-items: center;
+}
+
 .entities{
     display: flex;
     flex-direction: column;
@@ -66,9 +81,28 @@
 .entity{
     transition: 250ms linear;
     border-radius: 5px;
-    
-
+    position: relative;
+    padding: 4px; 
 }
+
+.entity.showEnt{
+    .ent-tooltip{
+        display: initial !important;
+    }
+    padding: 8px 1px 2px 2px;
+}
+
+.entity .ent-tooltip{
+    position: absolute;
+    left: 0px;
+    top: -1px;
+    font-size: 8px;
+    width: 100%;
+    text-align: center;
+    color: white;
+    display: none;
+}
+
 
 .removeEnt{
     cursor: pointer;
@@ -99,10 +133,6 @@
     padding: 2px;
     border-radius: 3px;
 }
-
-.ent-tool-tip {
-    background: #b71c1c;
-  }
 
 .checkbox_diag.mat-checkbox-checked .mat-checkbox-background {
     background-color: #3f51b5 !important; /* Red background for example */
@@ -166,10 +196,11 @@
     min-height: 40px;
     display: flex;
     align-items: center;
-    opacity: 0.3;
+    opacity: 0.5;
     margin: 2px;
     border-radius: 4px;
     position: relative; 
+    cursor: pointer;
 
     .shortcut{
         background-color: white;

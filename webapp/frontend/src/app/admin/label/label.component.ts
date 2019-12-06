@@ -148,6 +148,8 @@ export class LabelComponent implements OnInit, AfterViewInit {
         ObjectId : null, 
         pages : []
     }
+
+    this.skipPagesIndex = []; 
   
     this.showPage  = 0;
     this.numPages = 0; 
@@ -558,7 +560,7 @@ export class LabelComponent implements OnInit, AfterViewInit {
             }
         });
 
-        return isFinal; 
+        return isFinal;
     }
 
     disregardObject(){

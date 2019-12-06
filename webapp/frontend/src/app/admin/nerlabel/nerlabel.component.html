@@ -25,7 +25,7 @@
                 
             </div>
            
-            <div id="resultArea" class="content" >
+            <div class="content" >
                 <p *ngIf="!annotatedText">
                     Kein Text auf dieser Seite gefunden
                 </p>
@@ -40,66 +40,62 @@
     </div>
     
     <div class="settings">
-        <div class="card">
-            <div class="title">
-
-                <mat-form-field class="newEntLabel">
-                    <input  (keyup.enter)="addNewTag()" matInput type="text" placeholder="Neues Label" (input)="updateShortcut()" [(ngModel)]="newEntText">
-                </mat-form-field>
-
-                <mat-form-field class="newLabelShortcutInput">
-                    <input (keyup.enter)="addNewTag()" matInput type="text" placeholder="Shortcut" [(ngModel)]="newEntTextShortCut">
-                </mat-form-field>
-
-
-                
-
-                <div [class]="(i == tagIdxSelected) ? ('entity-select selected ent_' + i ) : 'entity-select ent_' + i " *ngFor="let t of tags; let i = index;" (click)="selectEntity(i)" >
+            <div class="card">
+                    <div class="content">
+                        <mat-accordion>
+                            <mat-expansion-panel>
+                                <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    Einstellungen
+                                </mat-panel-title>
+                                <mat-panel-description>
+                                    Darstellung & Labelling
+                                </mat-panel-description>
+                                </mat-expansion-panel-header>
+                            
+                                <div class="mb setting-row">
+                                    <button (click)="incrementZoom(-0.1)" mat-button type="button">
+                                        -
+                                    </button>
+                                
+                                    <mat-form-field class="page-number">
+                                        <input matInput type="number" placeholder="Zoom" [(ngModel)]="scaleFactor" pattern="-?[0-9]*(\.[0-9]+)?">
+                                        <mat-error>Input is not a number!</mat-error>
+                                    </mat-form-field>
+                                    <button (click)="incrementZoom(0.1)" mat-button type="button">
+                                            +
+                                        </button>
+                                </div>
+                                <div class="setting-row checkbox-itm">
+                                    <mat-checkbox [(ngModel)]="flagShowEntSmall" (change)="toggleClassShowEnt($event)">Entitäten einblenden?</mat-checkbox>
+                                </div>
+                                
+                                <div class="setting-row">
+                                    <mat-form-field class="newEntLabel">
+                                        <input  (keyup.enter)="addNewTag()" matInput type="text" placeholder="Neues Label" (input)="updateShortcut()" [(ngModel)]="newEntText">
+                                    </mat-form-field>
                     
-                    <span class="shortcut">{{t.shortcut}}</span>
-                    <span [class.selected]="i == tagIdxSelected">{{t.value}}</span>
-                    <mat-icon class="selected-icon" *ngIf="i == tagIdxSelected" aria-hidden="false" aria-label="Example home icon">done</mat-icon>
-                </div>
-                
-            </div>
-            <div class="content">
-
-                   
-                
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="title">
-                Einstellungen
-            </div>
-            <div class="content">
-                <div class="settings">
-
-                    <div class="mb">
-                        <button (click)="incrementZoom(-0.1)" mat-button type="button">
-                            -
-                        </button>
-                    
-                        <mat-form-field class="page-number">
-                            <input matInput type="number" placeholder="Zoom" [(ngModel)]="scaleFactor" pattern="-?[0-9]*(\.[0-9]+)?">
-                            <mat-error>Input is not a number!</mat-error>
-                        </mat-form-field>
-                    
-                        <button (click)="incrementZoom(0.1)" mat-button type="button">
-                            +
-                        </button>
+                                    <mat-form-field class="newLabelShortcutInput">
+                                        <input (keyup.enter)="addNewTag()" matInput type="text" placeholder="Shortcut" [(ngModel)]="newEntTextShortCut">
+                                    </mat-form-field>
+                                </div>
+                                
+                            </mat-expansion-panel>
+                        </mat-accordion>
                     </div>
-                    
-
                 </div>
-            </div>
-        </div>
 
         <div class="card">
-                <div class="title">
-                    Aktionen
-                </div>
+            <div class="content">
+                    <div [class]="(i == tagIdxSelected) ? ('entity-select selected ent_' + i ) : 'entity-select ent_' + i " *ngFor="let t of tags; let i = index;" (click)="selectEntity(i)" >
+                    
+                            <span class="shortcut">{{t.shortcut}}</span>
+                            <span [class.selected]="i == tagIdxSelected">{{t.value}}</span>
+                            <mat-icon class="selected-icon" *ngIf="i == tagIdxSelected" aria-hidden="false" aria-label="Example home icon">done</mat-icon>
+                        </div>
+            </div>
+        </div>
+        <div class="card">
                 <div class="content">
                     <div class="settings">
     
@@ -109,7 +105,6 @@
                     </div>
                 </div>
             </div>
-
     </div>
 
 </div>
