@@ -32,4 +32,8 @@ router.route('/nerlabel/disregard')
 router.route('/stats/workflow')
     .get(adminLabelStatsCtrl.getWorkflowStats)
 
+
+router.route('/maintain/publishAllOCR')
+    .post(adminCtrl.publishAllToOCR)
+
 module.exports = router;

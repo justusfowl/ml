@@ -52,7 +52,10 @@ def initAPI():
 
             f_ext = get_file_ext(file_path)
 
+            data = {}
+
             if (f_ext == "pdf"):
+
                 pdf_obj = PDFInjector(file_path=file_path)
                 pdf_obj.create_tiff()
                 pdf_obj.create_thumbs()
@@ -60,7 +63,13 @@ def initAPI():
 
                 res_dict = pdf_obj.to_dict()
 
-            data = {'message': 'Created', 'code': 'SUCCESS', 'dict' : res_dict}
+                if pdf_obj.flag_file_exists:
+                    data = {'message': 'skipped', 'code': 'SUCCESS',
+                            'hasExisted': (pdf_obj.flag_file_exists)}
+                else:
+                    data = {'message': 'Created', 'code': 'SUCCESS', 'dict': res_dict,
+                            'hasExisted': (pdf_obj.flag_file_exists)}
+
             return make_response(jsonify(data), 201)
 
     return app

@@ -37,11 +37,11 @@ class OCRProcessor:
 
     def process_label_object(self):
 
-        img = Image.open(self.label_obj["filePath"])
-
         for p in self.label_obj["pages"]:
 
             if "bbox" in p:
+
+                img = Image.open(p["path"])
 
                 bbox = p["bbox"]
 

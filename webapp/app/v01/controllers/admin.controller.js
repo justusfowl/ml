@@ -150,6 +150,63 @@ function approveLabelObject(req, res){
 
 }
 
+function publishAllToOCR(req, res){
+  MongoClient.connect(url, function(err, db) {
+
+    if (err) throw err;
+    
+    let dbo = db.db("medlabels");
+
+    // Get the documents collection
+    const collection = dbo.collection('labels');
+    
+    collection.find(
+      {"wfstatus" : 2, "filePath":{$exists : true}}).toArray(
+      function(err, docs){
+
+        amqp.connect(mqURL, function (err, conn) {
+
+          if (err){
+              console.log(err); 
+              return;
+          }
+    
+          conn.createChannel(function (err, ch) {
+    
+            if(err) throw err;
+    
+            try{
+              ch.assertQueue('medlines', { durable: true });
+
+              for (var i=0; i<docs.length; i++){
+
+                let objId = docs[i]._id.toString();
+
+                let payload = {"_id" :objId }
+
+                console.log("published id: " + objId)
+                ch.sendToQueue('medlines', new Buffer.from(JSON.stringify(payload)));
+              }
+      
+              res.json({"message" : "ok", "data" : docs});
+             
+            }catch(error){
+              console.error("Something went wrong publishing allToOCR")
+              console.error(error);
+              console.error(err)
+            }
+          });
+    
+          setTimeout(function () { 
+              conn.close(); 
+          }, 500); 
+    
+      });
+
+      });    
+  });
+}
+
 function publishToQueue(queue, payload){
 
   amqp.connect(mqURL, function (err, conn) {
@@ -161,15 +218,22 @@ function publishToQueue(queue, payload){
 
       conn.createChannel(function (err, ch) {
 
+        if(err) throw err;
+
+        try{
           ch.assertQueue('medlines', { durable: true });
           
           ch.sendToQueue('medlines', new Buffer.from(JSON.stringify(payload)));
-
+        }catch(error){
+          console.error("Something went wrong publishing : " + payload)
+          console.error(error);
+          console.error(err)
+        }
       });
 
       setTimeout(function () { 
           conn.close(); 
-      }, 1000); 
+      }, 500); 
 
   });
 
@@ -219,4 +283,4 @@ function disregardObject(req, res){
 
 
 
-module.exports = { hb, getLabelObject, approveLabelObject, disregardObject}
+module.exports = { hb, getLabelObject, approveLabelObject, disregardObject, publishAllToOCR}
