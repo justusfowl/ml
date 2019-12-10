@@ -57,6 +57,54 @@ function getWorkflowStats(req, res){
 
 }
 
+function getImgLabelStats(req, res){
+
+    try{
+
+      MongoClient.connect(url, function(err, db) {
+
+        if (err) throw err;
+        
+        let dbo = db.db("medlabels");
+
+        const collection = dbo.collection('labels');
+
+        collection.aggregate([
+            { $unwind: '$pages'},
+            { $match: {'pages.bbox': {$exists: true}}},
+            { $group: { _id: null, count: { $sum: 1 } } }
+        ]).toArray(function(err, results) {
+        
+            try{
+
+                if (!results[0].count){
+                    results[0].count = 0; 
+                }
+
+                let response = {
+                    "bbox_count" : results[0].count
+                }
+
+                res.json(response);
+    
+            
+            }catch(err){
+                console.error(err);
+            res.status(500).send({message : "An error occured requesting label stats"});
+            }
+        
+            db.close();
+                
+        });
+
+      });
+
+}catch(error){
+  res.send(500, "An error occured requesting label Object");
+}
+
+}
 
 
-module.exports = { getWorkflowStats }
+
+module.exports = { getWorkflowStats, getImgLabelStats }

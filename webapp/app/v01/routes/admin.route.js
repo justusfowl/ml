@@ -32,6 +32,8 @@ router.route('/nerlabel/disregard')
 router.route('/stats/workflow')
     .get(adminLabelStatsCtrl.getWorkflowStats)
 
+router.route('/stats/bbox')
+    .get(adminLabelStatsCtrl.getImgLabelStats)
 
 router.route('/maintain/publishAllOCR')
     .post(adminCtrl.publishAllToOCR)

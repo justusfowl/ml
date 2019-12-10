@@ -305,4 +305,21 @@ export class ApiService {
     });
   }
 
+  getBboxLabelStats(){
+    const api = this;
+
+    return new Promise(function(resolve, reject) {
+      
+      api.http.get(api.apiURL + '/admin/stats/bbox').subscribe(
+        (data: any) => {
+          resolve(data)
+        },
+        error => {
+          api.handleAPIError(error);
+          reject(error)
+        }
+      )
+    });
+  }
+
 }
