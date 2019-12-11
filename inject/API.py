@@ -110,7 +110,7 @@ def initAPI():
 
             if (f_ext == "pdf"):
 
-                pdf_obj = PDFInjector(file_path=file_path)
+                pdf_obj = PDFInjector(file_path=file_path, check_no_exist=True)
                 pdf_obj.create_tiff()
                 pdf_obj.create_thumbs()
 
