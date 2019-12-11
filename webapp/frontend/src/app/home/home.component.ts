@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewEncapsulation, EventEmitter, Output, AfterViewInit } from '@angular/core';
-
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { ApiService } from '../api.service';
 import { Router } from "@angular/router";
 
@@ -26,13 +26,20 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   public files: NgxFileDropEntry[] = [];
 
+  uploadForm: FormGroup;
+  uploadFile : any; 
 
   constructor(
     public api: ApiService, 
-    private router: Router
+    private router: Router, 
+    private formBuilder: FormBuilder
   ) { }
 
   ngOnInit() {
+
+    this.uploadForm = this.formBuilder.group({
+      file: ['']
+    });
   
   }
 
@@ -64,12 +71,13 @@ export class HomeComponent implements OnInit, AfterViewInit {
       // Is it a file?
       if (droppedFile.fileEntry.isFile) {
         const fileEntry = droppedFile.fileEntry as FileSystemFileEntry;
+
         fileEntry.file((file: File) => {
  
           // Here you can access the real file
           console.log(droppedFile.relativePath, file);
-          
-          
+
+          self.uploadFile = file;           
       
           if (typeof FileReader !== 'undefined') {
             const reader = new FileReader();
@@ -89,12 +97,39 @@ export class HomeComponent implements OnInit, AfterViewInit {
               var array = self.convertDataURIToBinary(baseString)
       
               self.api.setDocument(array, docType);
-      
-              self.api.processFile(null).then(data => {
+
+              self.analyzeTBody().then((result : any) => {
                 self.api.isLoading = false;
+
+                if (typeof(result.data.pages) == "undefined"){
+                  result.data.pages = []
+                }
+
+                result.data.pages.forEach(element => {
+                  if (typeof(element.entities) == "undefined"){
+                    element.entities = []
+                  }
+                  if (typeof(element.detections) == "undefined"){
+                    element.detections = []
+                  }
+                });
+
+                self.api.fileResData = result.data;
+              })
+              /*
+      
+              self.api.processFile(null).then((data:any) => {
+                self.api.isLoading = false;
+
+                if (typeof(data.entities) == "undefined"){
+                  data.entities = []
+                }
+
                 self.api.fileResData = data;
                 // this.uploadChange.emit(true);
               })
+
+              */
               
             };
       
@@ -128,6 +163,29 @@ export class HomeComponent implements OnInit, AfterViewInit {
     self.api.docType = "text"; 
     self.goToNlp()
     
+  }
+
+  analyzeTBody(){
+    const self = this; 
+
+    return new Promise(function(resolve, reject) {
+
+      console.log("Uploading...")
+
+      self.uploadForm.get('file').setValue(self.uploadFile);
+
+      const formData = new FormData();
+      formData.append('file', self.uploadForm.get('file').value);
+
+      self.api.evaluateFileForBbox(formData).then((res : any) => {
+        resolve(res);
+      }).catch(err => {
+        self.api.handleAPIError(err);
+        reject(err)
+      })
+
+    });
+ 
   }
 
   checkDocType(mime){

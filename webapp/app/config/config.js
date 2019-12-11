@@ -59,6 +59,11 @@ const config = {
       mqUser: process.env.MQ_USER,
       mqPassword: process.env.MQ_PASSWORD,
       mqPort: process.env.MQ_PORT
+    }, 
+
+    procBackend : {
+      host: process.env.PROC_BACKEND_HOST,
+      port : process.env.PROC_BACKEND_PORT,
     }
   };
   

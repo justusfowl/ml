@@ -322,4 +322,25 @@ export class ApiService {
     });
   }
 
+  // ############ DEMO AREA ###############
+
+  evaluateFileForBbox(formData){
+
+    const api = this;
+
+    return new Promise(function(resolve, reject) {
+      
+      api.http.post<any>(api.apiURL + '/demo/tbody', formData).subscribe(
+        (data: any) => {
+          resolve(data)
+        },
+        error => {
+          api.handleAPIError(error);
+          reject(error)
+        }
+      )
+    });
+
+  }
+
 }

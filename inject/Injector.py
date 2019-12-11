@@ -26,7 +26,9 @@ class PDFInjector:
         self._get_file_hash()
 
         self.flag_file_exists = False
-        self.check_file_exists()
+
+        if not "check_no_exist" in kwargs:
+           self.check_file_exists()
 
 
 
@@ -88,6 +90,8 @@ class PDFInjector:
 
                 page = {
                     "idx" : i,
+                    "width" : im.size[0],
+                    "height" : im.size[1],
                     "path" : thumb_path
                 }
 

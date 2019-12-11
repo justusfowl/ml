@@ -75,7 +75,7 @@ export class NlpComponent implements OnInit, AfterViewInit {
     }
 
     selectPage(pageNum){
-      this.showPage = pageNum+1
+      this.showPage = pageNum + 1
       this.drawPdfPage(this.api.docArray)
     }
 
@@ -204,7 +204,7 @@ export class NlpComponent implements OnInit, AfterViewInit {
 
           console.log('Page rendered');
           
-          self.drawEntities()
+          self.drawEntities(self.showPage)
 
         });
       });
@@ -256,14 +256,12 @@ export class NlpComponent implements OnInit, AfterViewInit {
   
   drawEntities(pageNum = 1){
 
-    var resData = this.api.fileResData; 
-
-    var pageEntities = this.api.fileResData[this.api.fileResData.findIndex(x => x.page == pageNum)]
+    var pageObject = this.api.fileResData.pages[this.api.fileResData.pages.findIndex(x => x.idx == pageNum-1)]
 
     var c = document.getElementById("the-canvas");
     var ctx = (c as any).getContext("2d");
 
-    pageEntities.entities.forEach(ent => {
+    pageObject.entities.forEach(ent => {
 
       var entIdx = this.getEntHlId(ent.tag); 
 
@@ -292,6 +290,50 @@ export class NlpComponent implements OnInit, AfterViewInit {
       }
       
     });
+
+    if (typeof(pageObject.detections) != "undefined"){
+
+      let origPageWidth = pageObject.width; 
+      let origPageHeight = pageObject.height; 
+
+      let canvasWidth = parseInt(c.getAttribute("width"));
+      let canvasHeight = parseInt(c.getAttribute("height"));
+
+      let relScaleFactor = canvasWidth/origPageWidth;
+
+      pageObject.detections.forEach(bbox => {
+
+        let conf = bbox[1];
+        let bboxItem = bbox[2];
+
+        let x_mid = bboxItem[0];
+        let y_mid = bboxItem[1];
+        let bbox_width = bboxItem[2];
+        let bbox_height = bboxItem[3];
+
+        var x1, x2, y1, y2;
+
+        x1 = Math.round(Math.round(x_mid-bbox_width/2)*relScaleFactor)
+        y1 = Math.round(Math.round(y_mid-bbox_height/2)*relScaleFactor)
+        let width = Math.round(bbox_width*relScaleFactor)
+        let height  = Math.round(bbox_height*relScaleFactor)
+
+        ctx.rect(x1, y1, width,height);
+        ctx.globalAlpha = 0.1;
+       
+        ctx.fillStyle = "#FF0000";
+        ctx.fill();
+
+        ctx.globalAlpha = 1;
+        ctx.fillText("Textbody: (" + ((Math.round(conf*10000)/100)).toFixed() + ")", x1+20, y1+20);
+        ctx.fillStyle = "#000000";
+
+        ctx.lineWidth = 3;
+        ctx.strokeStyle ="#FF0000";
+        ctx.stroke();
+        
+      });
+    }
 
     this.tmpLoad = false; 
 

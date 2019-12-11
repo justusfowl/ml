@@ -12,13 +12,13 @@
                     <form class="example-form">
                         
                         <mat-form-field class="full-width">
-                                <textarea class="textinput" matInput [(ngModel)]="api.inputText" [ngModelOptions]="{standalone: true}" placeholder="Paste text..."></textarea>
+                                <textarea class="textinput" matInput [(ngModel)]="api.inputText" [ngModelOptions]="{standalone: true}" placeholder="Text einfügen..."></textarea>
                         </mat-form-field>
                     </form>
                 </div>
             </div>
             <div class="footer">
-                <button (click)="analyzeItem()" [disabled]="api.inputText.length == 0" mat-flat-button color="primary" class="btn-analyze">Analyze</button>
+                <button (click)="analyzeItem()" [disabled]="api.inputText.length == 0" mat-flat-button color="primary" class="btn-analyze">Analysieren</button>
             </div>
         </div>
 
@@ -48,7 +48,7 @@
                             </div>
 
                             <button type="button" *ngIf="!api.fileUploaded" class="upload-button" mat-flat-button color="primary"  (click)="openFileSelector()">Durchsuchen...</button>
-                            <button type="button" *ngIf="api.fileUploaded" class="upload-button" mat-flat-button color="primary"   routerLink="/nlp">Dokument analysieren</button>
+                            <button type="button" *ngIf="api.fileUploaded" class="upload-button analysis-button" mat-flat-button color="primary"   routerLink="/nlp">Dokument analysieren</button>
                             </ng-template>
                         </ngx-file-drop>
                     </div>

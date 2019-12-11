@@ -90,7 +90,7 @@ testData = [
 
   var pdfData = [
       {
-          "page" : 1, 
+          "idx" : 1, 
           "entities" : [
               {
                   "pos" : {

@@ -5,6 +5,14 @@ from werkzeug.utils import secure_filename
 from util import md5
 from Injector import PDFInjector
 
+import darknetWrap as dn
+
+net, meta, names = dn.getNetInit(
+    configPath=os.environ.get("DARKNET_CFG_PATH"),
+    weightPath=os.environ.get("DARKNET_WEIGHTS_PATH"),
+    metaPath=os.environ.get("DARKNET_DATA_PATH")
+)
+
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 def initAPI():
@@ -69,6 +77,48 @@ def initAPI():
                 else:
                     data = {'message': 'Created', 'code': 'SUCCESS', 'dict': res_dict,
                             'hasExisted': (pdf_obj.flag_file_exists)}
+
+            return make_response(jsonify(data), 201)
+
+    @app.route('/analytics/tbody', methods=['POST'])
+    def process_tbody_file():
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+
+        file = request.files['file']
+
+        # if user does not select file, browser also
+        # submit an empty part without filename
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+
+        print("Analytics Bbox: %s" % file.filename)
+
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+            file.save(file_path)
+
+            f_ext = get_file_ext(file_path)
+
+            data = {}
+
+            if (f_ext == "pdf"):
+
+                pdf_obj = PDFInjector(file_path=file_path)
+                pdf_obj.create_tiff()
+                pdf_obj.create_thumbs()
+
+                for p in pdf_obj.pages:
+                    darklnet_detect = dn.performDetect(imagePath=p["path"], net=net, meta=meta, names=names)
+                    p["detections"] = darklnet_detect
+
+                data = pdf_obj.to_dict()
 
             return make_response(jsonify(data), 201)
 

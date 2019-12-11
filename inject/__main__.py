@@ -13,7 +13,6 @@ from os.path import join, dirname
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path=dotenv_path)
 
-from API import initAPI
 from DocLoader import PDFLoader
 from OCRProcessor import  OCRProcessor
 
@@ -47,12 +46,13 @@ def main(args=sys.argv[1:]):
     args = parser.parse_args(args)
 
     if 'service' in args.routines:
-        print("service")
+        from API import initAPI
+        print("WEB service started")
         app = initAPI()
         app.run(host=os.environ.get("API_HOST_IP"), port=os.environ.get("API_HOST_PORT"))
 
     elif 'ocr' in args.routines:
-
+        print("OCR service started")
         if args.ocrdev:
             ocr = OCRProcessor(dev=True)
             ocr.dev(objId="5de50c60974a9c876da2c5d1")
@@ -62,7 +62,7 @@ def main(args=sys.argv[1:]):
 
 
     elif 'loader' in args.routines:
-        print("loader")
+        print("LOADER service started")
 
         directories = args.directories
 
