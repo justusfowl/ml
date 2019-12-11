@@ -10,7 +10,8 @@ function processPdfBbox(req, res){
 
     if (path.extname(file.originalname) != ".pdf"){
         console.log("no PDF");
-        res.status(500).json({"message" : "Invalid datatype - only PDFs supported"})
+        res.status(500).json({"message" : "Invalid datatype - only PDFs supported"});
+        deleteTmpFile(file.destination+file.originalname);
     }else{
 
         request({
@@ -21,6 +22,15 @@ function processPdfBbox(req, res){
             }
           }, function(error, response, body) {
 
+            // @TODO: Check response code and implement proper reactions
+
+            if (error){
+                console.error(error);
+                res.status(500).json({"message" : JSON.stringify(error)});
+                 // remove temporary file
+                deleteTmpFile(file.destination+file.originalname)
+            } 
+
             try{
                 console.log(JSON.parse(body));
                 res.json({"message" : "ok", "data": JSON.parse(body)});
@@ -29,19 +39,19 @@ function processPdfBbox(req, res){
             }
 
             // remove temporary file
-            
-            try {
-                fs.unlinkSync(file.destination+file.originalname)
-                
-            } catch(err) {
-                console.error(err)
-            }
+            deleteTmpFile(file.destination+file.originalname)
             
         });
-
-        
     }
 
+}
+
+function deleteTmpFile(path){
+    try {
+        fs.unlinkSync(path)      
+    } catch(err) {
+        console.error(err)
+    }
 }
 
 
