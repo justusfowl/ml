@@ -8,6 +8,8 @@ WORKDIR /app/frontend/src/environments/
 
 COPY frontend/src/environments/* /app/frontend/src/environments/
 
+WORKDIR /app/uploads
+
 WORKDIR /app
 
 RUN npm install
