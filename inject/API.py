@@ -4,6 +4,7 @@ from werkzeug.utils import secure_filename
 
 from util import md5
 from Injector import PDFInjector
+from medlang import LangProcessor
 
 import darknetWrap as dn
 
@@ -12,6 +13,10 @@ net, meta, names = dn.getNetInit(
     weightPath=os.environ.get("DARKNET_WEIGHTS_PATH"),
     metaPath=os.environ.get("DARKNET_DATA_PATH")
 )
+
+
+import spacy
+nlp = spacy.load('de_trf_bertbasecased_lg')
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
@@ -121,5 +126,20 @@ def initAPI():
                 data = pdf_obj.to_dict()
 
             return make_response(jsonify(data), 201)
+
+    @app.route('/medlang/search', methods=["GET"])
+    def search():
+        q = request.args.get('q')
+
+        if q is None or q == "":
+            return make_response(jsonify({}), 201)
+
+        size = request.args.get('size')
+
+        medLangProc = LangProcessor(nlp=nlp, search_size=size)
+
+        search_result = medLangProc.handle_query(q)
+
+        return make_response(jsonify(search_result), 201)
 
     return app

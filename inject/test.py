@@ -1,16 +1,33 @@
-import hashlib
+from datetime import datetime
+from elasticsearch import Elasticsearch
 
-file_path = 'C:\\temp\\test\\fax-20191011160900.pdf'
+client = Elasticsearch(
+    ['192.0.0.119'],
+    scheme="http",
+    port=9200,
+)
 
-BLOCK_SIZE = 6553600000  # The size of each read from the file
+query = input("Enter query: ")
 
-file_hash = hashlib.sha256()  # Create the hash object, can use something other than `.sha256()` if you wish
-with open(file_path, 'rb') as f:  # Open the file to read it's bytes
-    fb = f.read(BLOCK_SIZE)  # Read from the file. Take in the amount declared above
-    while len(fb) > 0:  # While there is still data being read from the file
-        file_hash.update(fb)  # Update the hash
-        fb = f.read(BLOCK_SIZE)  # Read the next block from the file
+script_query = {
+    "script_score": {
+        "query": {"match_all": {}}
+    }
+}
 
-this_file_hash = file_hash.hexdigest()
+response = client.search(
+    index="posts",
+    body={
+        "size": 5,
+        "query": script_query,
+        "_source": {"includes": ["title", "case_text"]}
+    }
+)
 
-print(this_file_hash)
+print()
+print("{} total hits.".format(response["hits"]["total"]["value"]))
+
+for hit in response["hits"]["hits"]:
+    print("id: {}, score: {}".format(hit["_id"], hit["_score"]))
+    print(hit["_source"])
+    print()
