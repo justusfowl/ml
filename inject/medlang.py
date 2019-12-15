@@ -22,7 +22,7 @@ class LangProcessor:
         self.INDEX_NAME =  os.environ.get("ELASTIC_INDEX")
 
 
-        if "search_size" in kwargs and "search_size" is not None:
+        if "search_size" in kwargs and kwargs["search_size"] is not None:
             self.SEARCH_SIZE = kwargs["search_size"]
         else:
             self.SEARCH_SIZE = 5
@@ -34,8 +34,7 @@ class LangProcessor:
             collect_embed.append(test.vector)
         return [vector.tolist() for vector in collect_embed]
 
-    def handle_query(self):
-        query = input("Enter query: ")
+    def handle_query(self, query):
 
         embedding_start = time.time()
         query_vector = self.embed_text([query])[0]
@@ -73,4 +72,4 @@ class LangProcessor:
             print()
 
 
-        return response["hits"]["hits"]
+        return response["hits"]["hits"], (embedding_time * 1000), (search_time * 1000)

@@ -1,12 +1,11 @@
 import os
 from flask import Flask, flash, request, redirect, url_for, jsonify, make_response
 from werkzeug.utils import secure_filename
+import spacy
+import darknetWrap as dn
 
-from util import md5
 from Injector import PDFInjector
 from medlang import LangProcessor
-
-import darknetWrap as dn
 
 net, meta, names = dn.getNetInit(
     configPath=os.environ.get("DARKNET_CFG_PATH"),
@@ -14,8 +13,6 @@ net, meta, names = dn.getNetInit(
     metaPath=os.environ.get("DARKNET_DATA_PATH")
 )
 
-
-import spacy
 nlp = spacy.load('de_trf_bertbasecased_lg')
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
@@ -138,8 +135,14 @@ def initAPI():
 
         medLangProc = LangProcessor(nlp=nlp, search_size=size)
 
-        search_result = medLangProc.handle_query(q)
+        search_result, embed_time, search_time = medLangProc.handle_query(q)
 
-        return make_response(jsonify(search_result), 201)
+        data = {
+            "search_result" : search_result,
+            "embed_time": embed_time,
+            "search_time": search_time
+        }
+
+        return make_response(jsonify(data), 201)
 
     return app
