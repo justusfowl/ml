@@ -17,6 +17,7 @@ import { NlpComponent } from './nlp/nlp.component';
 import { HomeComponent } from './home/home.component';
 import { StatisticsComponent } from './statistics/statistics.component';
 import { SettingsComponent } from './settings/settings.component';
+import { SearchComponent } from './search/search.component';
 
 import { LabelComponent } from './admin/label/label.component';
 import { NerlabelComponent } from './admin/nerlabel/nerlabel.component';
@@ -34,7 +35,8 @@ import { NgxFileDropModule } from 'ngx-file-drop';
     StatisticsComponent, 
     LabelComponent, 
     SettingsComponent, 
-    NerlabelComponent
+    NerlabelComponent, 
+    SearchComponent
   ],
   imports: [
     HttpClientModule,
