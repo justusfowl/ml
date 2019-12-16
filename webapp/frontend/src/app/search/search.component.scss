@@ -1,0 +1,117 @@
+@import "../app.component.scss";
+
+.main_search_container.full{
+    display: flex;
+    flex-direction: column;
+    height: 88%;
+    justify-content: center;
+    align-items: center;
+
+    
+    .medlines-label{
+        text-align: center;
+        font-size: 60px;
+        margin-bottom: 30px;
+        font-family: Ubuntu;
+        color: #3f51b5;
+    }
+
+    .search{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 60vw;
+        background-color: white;
+        padding: 10px;
+        border: 1px solid #ececec;
+        border-radius: 40px;
+        box-shadow: 0 1px 6px 0 rgba(32, 33, 36, .28);
+    }
+
+    ::-webkit-search-cancel-button {
+        -webkit-appearance: none;
+    }
+    
+    ::-webkit-search-cancel-button:after {
+        content: 'X';
+        font-style: italic;
+        color: red;
+    }
+    
+    .search-icon{
+        color: grey;
+        margin-right: 10px;
+    }
+    
+    .main-search{
+        font-size: 24px;
+        width: 45vw;
+        border: none;
+        color: #3f51b5;
+    }
+    
+    input:focus{
+        border: none !important; 
+        outline : none !important;
+    }
+}
+
+
+.filter-container{
+    padding: 10px 10px 10px 90px;
+}
+
+.result-container{
+    padding: 0 0 0 70px;
+    transition: all .25s linear;
+
+    .item{
+        margin-bottom: 20px;
+        width: 60vw; 
+
+        .header{
+            font-weight: 600;
+            color: #3f51b5;
+            margin-bottom: 10px;
+        }
+    
+        .source{
+            color: #479647;
+        }
+    
+        .details{
+            font-size: 10px;
+            margin-top: 10px;
+        }
+    
+        .body{
+            transition: all .25s linear;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+    }    
+
+}
+
+.item.card:hover{
+    cursor: pointer;
+
+    box-shadow: -1px 1px 7px 0px  rgba(71, 71, 71, 0.8);
+
+    .body{
+        -webkit-line-clamp: 999 !important;
+    }
+
+    .header{
+        text-decoration: underline;
+    }
+    
+}
+
+
+.card{
+    border-radius: 4px; 
+}
+

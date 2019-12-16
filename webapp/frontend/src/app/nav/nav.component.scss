@@ -68,3 +68,22 @@
 .mat-drawer-inner-container{
   background-color: #e4e4e4;
 }
+
+.search-icon{
+  margin-left: 20px;
+  margin-right: 10px; 
+  color: white; 
+}
+
+.header-search{
+  border: none;
+  font-size: 23px;
+  color: white;
+  background-color: #3f51b5;
+  border-bottom: 2px solid white;
+  width: 450px;
+}
+
+.header-search:focus{
+  outline : none !important; 
+}

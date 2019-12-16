@@ -1,17 +1,55 @@
-<!--
+<div class="main_search_container full" *ngIf="!api.flagHasSearched">
 
-<mat-form-field class="example-full-width">
-        <mat-icon matPrefix>search</mat-icon>
-    <input 
-    matInput #message 
-    type="search" placeholder="search here"
-    maxlength="256" 
-    [ngModel]='searchText' 
-    (ngModelChange)='changed($event)'>
-</mat-form-field>
--->
+    <div class="medlines-label">medlines</div>
+
+    <div class="search">
+        <mat-icon class="search-icon" matPrefix>search</mat-icon>
+        <input 
+        class="main-search"
+        matInput 
+        type="search" placeholder="Mit medlines Medizintexte durchsuchen"
+        maxlength="256" 
+        [(ngModel)]='api.searchQryString' 
+        (ngModelChange)='changed($event)'
+        (keyup.enter)="execSearch()">
+        <button type="button" class="search-button" mat-flat-button color="primary"  (click)="execSearch()">Los!</button>
+    </div>
+
+</div>
+
+<div class="filter-container" *ngIf="api.flagHasSearched">
+
+    <div class="filters">
+
+    </div>
+
+    <div class="search-meta">
+        Etwa 1.412.021 Ergebnisse (ST: {{api.lastSearchTime | number : '1.2-2'}} ms / ET: {{api.lastEmbedTime | number : '1.2-2'}} ms)
+    </div>
+
+</div>
+
+<div class="result-container"  *ngIf="api.flagHasSearched">
+
+    <div class="item card" *ngFor="let r of api.searchResults; let i = index;">
+
+        <div class="header">
+            {{r._source.title}}
+        </div>
+
+        <div class="source">
+            {{r._type}}
+        </div>
+
+        <div class="body">
+            {{r._source.case_text}}
+        </div>
+
+        <div class="details">
+            Score: {{r._score | number : '1.2-2'}}
+        </div>
+
+    </div>
 
 
-<div class="">
-    
 </div>
