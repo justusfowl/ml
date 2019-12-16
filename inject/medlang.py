@@ -7,8 +7,8 @@ class LangProcessor:
     def __init__(self, nlp, **kwargs):
         """
 
-        :param nlp:
-        :param kwargs:
+        :param nlp: nlp object from spacy including the model
+        :param kwargs: diverse parameters
         """
 
         self.es = Elasticsearch(
@@ -61,15 +61,5 @@ class LangProcessor:
             }
         )
         search_time = time.time() - search_start
-
-        print()
-        print("{} total hits.".format(response["hits"]["total"]["value"]))
-        print("embedding time: {:.2f} ms".format(embedding_time * 1000))
-        print("search time: {:.2f} ms".format(search_time * 1000))
-        for hit in response["hits"]["hits"]:
-            print("id: {}, score: {}".format(hit["_id"], hit["_score"]))
-            print(hit["_source"])
-            print()
-
 
         return response["hits"]["hits"], (embedding_time * 1000), (search_time * 1000)
