@@ -41,6 +41,15 @@
       </button>
       <mat-toolbar-row>
           <mat-icon class="menu-icon" (click)="drawer.toggle()" aria-hidden="false" aria-label="Menu icon">menu</mat-icon>
+          <mat-icon class="search-icon" matPrefix *ngIf="isSearchActive()">search</mat-icon>
+          <input 
+          *ngIf="isSearchActive()"
+          class="header-search"
+          matInput 
+          type="search" placeholder="Mit medlines Medizintexte durchsuchen"
+          maxlength="256" 
+          [(ngModel)]='api.searchQryString' 
+          (keyup.enter)="execSearch()">
           <span class="example-spacer"></span>
           <span class="home" routerLink="home" href="#" routerLinkActive="active">
             <p>medlines.tech</p>

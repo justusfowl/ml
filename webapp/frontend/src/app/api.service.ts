@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { environment } from './../environments/environment';
 
@@ -25,7 +25,14 @@ export class ApiService {
 
   fileResData : any = []; 
 
-  navOpen : boolean = true; 
+  navOpen : boolean = false; 
+
+  searchQryString : string = "";
+  flagHasSearched : boolean = false; 
+
+  searchResults : any[] = [];
+  lastSearchTime : number = 0; 
+  lastEmbedTime : number = 0; 
 
   constructor(
     public http: HttpClient
@@ -86,9 +93,40 @@ export class ApiService {
     });
   }
 
+
+
+  searchQueryHandler(inText){
+
+    const api = this;
+
+    const params = new HttpParams()
+      .set('q', inText);
+
+    return new Promise(function(resolve, reject) {
+      
+      api.http.get(api.apiURL + '/medlang/search',{params}).subscribe(
+        (data: any) => {    
+          resolve(data)
+        },
+        error => {
+          api.handleAPIError(error);
+          reject(error)
+        }
+      )
+    });
+  }
+
+
+
+
+
+
+
   handleAPIError(error){
+
     console.error(error);
-    alert(error)
+    alert(JSON.stringify(error))
+    this.isLoading = false;
   }
 
   setDocument(array, type){
