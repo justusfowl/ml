@@ -227,7 +227,7 @@ export class ApiService {
 
     return new Promise(function(resolve, reject) {
       
-      api.http.post(api.apiURL + '/admin/nerlabel/meta', tag).subscribe(
+      api.http.post(api.apiURL + '/admin/meta/nerlabel', tag).subscribe(
         (data: any) => {
           resolve(data)
         },
@@ -245,7 +245,7 @@ export class ApiService {
 
     return new Promise(function(resolve, reject) {
       
-      api.http.get(api.apiURL + '/admin/nerlabel/meta').subscribe(
+      api.http.get(api.apiURL + '/admin/meta/nerlabel').subscribe(
         (data: any) => {
           resolve(data)
         },

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../api.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-statistics',
@@ -14,12 +15,16 @@ export class StatisticsComponent implements OnInit {
   bboxLabelCount : number = 0; 
 
   constructor(
-    private api: ApiService
+    private api: ApiService, 
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit() {
     this.getWorkflowStats();
     this.getBboxLabelStats(); 
+
+    console.log(this.route.snapshot.paramMap.get('id'));
+    
   }
 
   getWorkflowStats(){

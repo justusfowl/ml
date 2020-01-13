@@ -4,6 +4,7 @@ import {DomSanitizer} from '@angular/platform-browser';
 import { v1 as uuid } from 'uuid';
 import { ApiService } from '../../api.service';
 import { MatSnackBar } from '@angular/material';
+import { Router, ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -13,6 +14,8 @@ import { MatSnackBar } from '@angular/material';
   encapsulation: ViewEncapsulation.None
 })
 export class LabelComponent implements OnInit, AfterViewInit {
+
+  objId : string = ""; 
 
   selectedObjectId : string = ""; 
 
@@ -111,28 +114,39 @@ export class LabelComponent implements OnInit, AfterViewInit {
   groupLabelsInfoChangedItem : any;
 
   constructor(
+    private router: Router,
+    private route: ActivatedRoute,
     private _fb: FormBuilder,
     private api: ApiService,
     public snackBar: MatSnackBar,
     private sanitizer: DomSanitizer) {
 
-
      }
 
   ngOnInit() {
 
-    this.myForm = this._fb.group({
-      ObjectId: "",
-      _childDocuments_: this._fb.array([
-          this.initLabel()
-      ])
-    });
+    let objId = this.route.snapshot.queryParamMap.get('objId'); 
+
+    console.log(objId);
+
+    this.clearView();
+
+    if (objId){
+      this.objId = objId;
+      this.getLabelObject(this.objId);
+    }else{
+        this.myForm = this._fb.group({
+            ObjectId: "",
+            _childDocuments_: this._fb.array([
+                this.initLabel()
+            ])
+          });
+
+          this.getLabelObject();
+    }
 
   this.sessionStartedDate = new Date().getTime();
 
-  this.clearView();
-
-  this.getLabelObject();
 
   }
 
@@ -178,7 +192,9 @@ export class LabelComponent implements OnInit, AfterViewInit {
         }else{
 
             if (!objectId){
-                this.loadedObjects.push(result._id); 
+                this.loadedObjects.push(result._id);
+                this.objId = result._id; 
+                this.updateUrlParams()
             }
 
             this.selectedObjectId = result._id; 
@@ -584,6 +600,19 @@ export class LabelComponent implements OnInit, AfterViewInit {
 
         }
     }
+
+    
+  updateUrlParams(){
+
+    this.router.navigate(
+      [], 
+      {
+        relativeTo: this.route,
+        queryParams: { objId: this.objId },
+        queryParamsHandling: 'merge'
+      });
+    
+  }
 
 
 }

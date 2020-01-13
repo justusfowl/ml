@@ -1,9 +1,10 @@
-import { Component, OnInit, HostListener, AfterViewInit, ViewEncapsulation} from '@angular/core';
+import { Component, OnInit, HostListener, AfterViewInit, ViewEncapsulation, ChangeDetectorRef} from '@angular/core';
 import { ApiService } from 'src/app/api.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 import { v1 as uuid } from 'uuid';
 import { MatSnackBar } from '@angular/material';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-nerlabel',
@@ -13,9 +14,12 @@ import { MatSnackBar } from '@angular/material';
 })
 export class NerlabelComponent implements OnInit, AfterViewInit {
 
+  objId : string = ""; 
+
   totalNumPages : number = 0; 
   textObj : any = {}; 
   annotatedText : SafeHtml = "";
+  rawText : SafeHtml = "";
   entities : any = []; 
   scaleFactor : number = 1;
 
@@ -30,7 +34,8 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
   tagIdxSelected : number = 0; 
   tags : any[] = [];
 
-  flagShowEntSmall : boolean = true; 
+  flagShowEntSmall : boolean = true;
+  flagShowRawText : boolean = false;
 
   
   @HostListener('document:keydown', ['$event']) onKeydownHandler(evt: KeyboardEvent) {
@@ -49,26 +54,41 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
       if (selIdx > -1){
         this.tagIdxSelected = selIdx; 
       }
-
     }
-
-
-
   }
 
   constructor(
+    private router: Router,
     private api: ApiService,
     private sanitizer: DomSanitizer, 
-    public snackBar: MatSnackBar
+    public snackBar: MatSnackBar, 
+    private route: ActivatedRoute, 
+    private cd: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
 
+    this.router.routeReuseStrategy.shouldReuseRoute = () => false;
+    
+    let objId = this.route.snapshot.queryParamMap.get('objId'); 
+
+    console.log(objId);
+
+    if (objId){
+      this.objId = objId; 
+    }
   }
 
   ngAfterViewInit() {
-    this.getNerLabelObject();
+
     this.getTags();
+
+    if (this.objId){
+      this.getNerLabelObject(this.objId);
+    }else{
+      this.getNerLabelObject();
+    }
+    
    }
 
    prevPage(){
@@ -305,12 +325,17 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
           self.flagIsNoDataAvailable = true; 
       }else{
 
+        this.objId = data._id; 
+
+        this.updateUrlParams();
+
         if (typeof(data.pages) != "undefined"){
-          self.pageIdxSelected = 0; 
+          self.pageIdxSelected = 0;
           self.textObj = data;
           data.pages[self.pageIdxSelected].entities = self.sortEntities(data.pages[self.pageIdxSelected].entities);
           self.totalNumPages = data.pages.length; 
           self.annotatedText = self.constructHtml(data.pages);
+          self.rawText = self.getRawText(data.pages);
 
         }else{
           throw "no pages contained in the object";
@@ -445,6 +470,8 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
 
 
     }
+
+    this.cd.detectChanges();
     
     return this.sanitizer.bypassSecurityTrustHtml(text); 
 
@@ -462,6 +489,19 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
       }
     }
 
+   }
+
+   toggleShowRawText(state){
+    this.flagShowRawText = state;
+   }
+
+   getRawText(data){
+
+    if (typeof(data[this.pageIdxSelected].read_text_raw) != "undefined"){
+      return this.sanitizer.bypassSecurityTrustHtml(data[this.pageIdxSelected].read_text_raw); 
+    }else{
+      return ""; 
+    }
    }
 
 
@@ -553,12 +593,20 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
             console.error(err);
         });
 
-    }
-}
+      }
+  }
 
 
+  updateUrlParams(){
 
-
-
+    this.router.navigate(
+      [], 
+      {
+        relativeTo: this.route,
+        queryParams: { objId: this.objId },
+        queryParamsHandling: 'merge'
+      });
+    
+  }
 
 }

@@ -22,7 +22,10 @@ router.route('/nerlabel')
     .get(nerLabelCtrl.getLabelObject)
     .put(nerLabelCtrl.approveLabelObject)
 
-router.route('/nerlabel/meta')
+router.route('/nerlabel/:objectid')
+    .get(nerLabelCtrl.getLabelObject)
+
+router.route('/meta/nerlabel')
     .post(nerLabelCtrl.addTag)
     .get(nerLabelCtrl.getTag)
 

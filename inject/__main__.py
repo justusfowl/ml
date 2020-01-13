@@ -35,12 +35,10 @@ parser.add_argument(
     help='List of routines to run: {}'.format(', '.join(list_of_choices))
 )
 
-
 parser.add_argument("-d", "--directories", nargs='+',
                     help="directories to be user for loader, works with --routines=loader", metavar="STRINGS")
 
 parser.add_argument("-o", '--ocrdev', action='store_true',  help='Execute OCR as development env')
-
 
 def main(args=sys.argv[1:]):
     args = parser.parse_args(args)
@@ -59,7 +57,6 @@ def main(args=sys.argv[1:]):
         else:
             ocr = OCRProcessor()
             ocr.init_consuming()
-
 
     elif 'loader' in args.routines:
         print("LOADER service started")

@@ -19,8 +19,6 @@ class OCRProcessor:
 
         self.label_obj = None
 
-
-
         if 'dev' in kwargs:
             print("Run in development mode...")
 
@@ -85,7 +83,6 @@ class OCRProcessor:
 
     def callback(self, ch, method, properties, body):
 
-
         try:
             requestParams = json.loads(body.decode('utf-8'))
 
@@ -103,8 +100,6 @@ class OCRProcessor:
 
         except Exception as e:
             print("File could not be processed... %s" % object_id, e)
-
-
 
     def init_consuming(self):
         print("start consuming...")

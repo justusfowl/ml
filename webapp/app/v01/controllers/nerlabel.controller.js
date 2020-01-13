@@ -18,6 +18,9 @@ function getLabelObject(req, res){
 
     try{
 
+        // for direct calls of an object, do not update the workflow status so that for demo purposes the object can be called in different views
+        let flagUpdateWFStatus = true; 
+
         // default object: search for workflow items with wfstatus == 2 --> OCR results, contain read_text 
         let filterObj = {
             "wfstatus" : 2
@@ -29,6 +32,8 @@ function getLabelObject(req, res){
             filterObj = {
             "_id" : ObjectID(req.params.objectid)
             }
+
+            flagUpdateWFStatus = false; 
         }
 
         MongoClient.connect(url, function(err, db) {
@@ -65,14 +70,14 @@ function getLabelObject(req, res){
             
                         res.json(docs);
             
-                        if (typeof(docs._id) != "undefined"){
+                        if (typeof(docs._id) != "undefined" && flagUpdateWFStatus){
                           collection.updateOne({"_id" : ObjectID(docs._id)}, {$set: { wfstatus : 3}, $push: { "wfstatus_change" :changeItem}}) // 
                         }
                     }else{
                         res.json({})
                     }
                 }catch(err){
-                res.status(500).send({message : "An error occured requesting label Object"});
+                  res.status(500).send({message : "An error occured requesting label Object"});
                 }
             
                 db.close();

@@ -1,4 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
+
+import { HashLocationStrategy, LocationStrategy } from '@angular/common';
+
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
@@ -53,6 +56,7 @@ import { NgxFileDropModule } from 'ngx-file-drop';
     NgxFileDropModule 
   ],
   providers: [
+    {provide: LocationStrategy, useClass: HashLocationStrategy},
     ApiService
   ],
   bootstrap: [AppComponent]
