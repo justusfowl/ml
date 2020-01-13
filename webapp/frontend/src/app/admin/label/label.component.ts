@@ -371,6 +371,7 @@ export class LabelComponent implements OnInit, AfterViewInit {
             let relY = y/clientRects.height;
 
             let bbox = {
+                origin: "manual",
                 relWidth : relWidth,
                 relHeight : relHeight,
                 width: width, 
