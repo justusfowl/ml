@@ -14,4 +14,4 @@ mongodb_queries.txt
 inject/*.csv
 inject/*.txt
 /testfaxe/*
-
+/inject/medlines_NER_model/*
