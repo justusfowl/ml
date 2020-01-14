@@ -40,6 +40,7 @@ parser.add_argument("-d", "--directories", nargs='+',
 parser.add_argument("-o", '--ocrdev', action='store_true',  help='Execute OCR as development env')
 parser.add_argument('--flagdev', action='store_true',  help='Indicate OCR service to run in dev mode')
 
+
 parser.add_argument('--fromdir', action='store_true',  help='Load files from a local directory')
 parser.add_argument('--fromdb', action='store_true',  help='Load objects from the database into the workflow')
 parser.add_argument('--targetq', action='store_true',  help='Define the target queue to where fromdb loaders load the objects into')
@@ -66,6 +67,7 @@ def main(args=sys.argv[1:]):
         else:
             ocr = OCRProcessor()
             ocr.init_consuming()
+
 
     elif 'pretag' in args.routines:
         from MedLangProcessor import MedLangProcessor
