@@ -46,6 +46,10 @@ def initAPI():
             return redirect(request.url)
 
         file = request.files['file']
+        flag_over_write = False
+
+        if request.args.get('flagoverwrite') is not None:
+            flag_over_write = True
 
         # if user does not select file, browser also
         # submit an empty part without filename
@@ -66,10 +70,11 @@ def initAPI():
 
             if (f_ext == "pdf"):
 
-                pdf_obj = PDFInjector(file_path=file_path)
+                pdf_obj = PDFInjector(file_path=file_path, flagoverwrite=flag_over_write)
                 pdf_obj.create_tiff()
                 pdf_obj.create_thumbs()
                 pdf_obj.store_obj()
+                pdf_obj.publish_to_OCR()
 
                 res_dict = pdf_obj.to_dict()
 

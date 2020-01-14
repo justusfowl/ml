@@ -29,6 +29,9 @@ function base64_encode(file) {
 function getLabelObject(req, res){
 
       try{
+        
+        // for direct calls of an object, do not update the workflow status so that for demo purposes the object can be called in different views
+        let flagUpdateWFStatus = true; 
 
         // default object: search for workflow items without lock
         let filterObj = {
@@ -41,6 +44,8 @@ function getLabelObject(req, res){
             filterObj = {
             "_id" : ObjectID(req.params.objectid)
           }
+
+          flagUpdateWFStatus = false; 
         }
 
         MongoClient.connect(url, function(err, db) {
@@ -78,7 +83,7 @@ function getLabelObject(req, res){
       
                   res.json(docs);
       
-                  if (typeof(docs._id) != "undefined"){
+                  if (typeof(docs._id) != "undefined" && flagUpdateWFStatus){
                     collection.updateOne({"_id" : ObjectID(docs._id)}, {$set: { wfstatus : 1}, $push: { "wfstatus_change" :changeItem}}) // 
                   }
                 }else{
@@ -277,10 +282,6 @@ function disregardObject(req, res){
   }
 
 }
-
-
-
-
 
 
 module.exports = { hb, getLabelObject, approveLabelObject, disregardObject, publishAllToOCR}

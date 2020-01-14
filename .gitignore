@@ -10,3 +10,8 @@
 **/public
 
 mongodb_queries.txt
+
+inject/*.csv
+inject/*.txt
+/testfaxe/*
+

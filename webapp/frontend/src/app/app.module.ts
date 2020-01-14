@@ -1,4 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
+
+import { HashLocationStrategy, LocationStrategy } from '@angular/common';
+
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
@@ -19,6 +22,8 @@ import { StatisticsComponent } from './statistics/statistics.component';
 import { SettingsComponent } from './settings/settings.component';
 import { SearchComponent } from './search/search.component';
 
+import { TrimLongStr } from './pipes/pipes';
+
 import { LabelComponent } from './admin/label/label.component';
 import { NerlabelComponent } from './admin/nerlabel/nerlabel.component';
 
@@ -36,7 +41,8 @@ import { NgxFileDropModule } from 'ngx-file-drop';
     LabelComponent, 
     SettingsComponent, 
     NerlabelComponent, 
-    SearchComponent
+    SearchComponent, 
+    TrimLongStr
   ],
   imports: [
     HttpClientModule,
@@ -50,6 +56,7 @@ import { NgxFileDropModule } from 'ngx-file-drop';
     NgxFileDropModule 
   ],
   providers: [
+    {provide: LocationStrategy, useClass: HashLocationStrategy},
     ApiService
   ],
   bootstrap: [AppComponent]

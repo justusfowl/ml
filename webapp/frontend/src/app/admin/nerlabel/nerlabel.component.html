@@ -6,6 +6,26 @@
 
 <div class="container" *ngIf="!flagIsNoDataAvailable">
     <div class="response">
+        <div class="card" *ngIf="flagShowRawText" >
+            <div class="title nerlabel">
+                <div class="pageInfo">
+                    Roh-Text per OCR
+                    <p class="details">{{textObj._id}}</p>
+                </div>                
+            </div>
+            
+            <div class="content" >
+                <p *ngIf="!annotatedText">
+                    Kein Text auf dieser Seite gefunden
+                </p>
+                <div  id="rawText"  [style.font-size]="16*scaleFactor + 'px'" 
+                        [style.letter-spacing]="1*scaleFactor + 'px'" 
+                        [innerHTML]="rawText">
+                </div>
+            </div>
+
+        </div>
+        
         <div class="card">
             <div class="title nerlabel">
 
@@ -68,6 +88,10 @@
                                 </div>
                                 <div class="setting-row checkbox-itm">
                                     <mat-checkbox [(ngModel)]="flagShowEntSmall" (change)="toggleClassShowEnt($event)">Entitäten einblenden?</mat-checkbox>
+                                </div>
+                                
+                                <div class="setting-row checkbox-itm">
+                                    <mat-checkbox [(ngModel)]="flagShowRawText" (change)="toggleShowRawText($event)">Roh-Text einblenden?</mat-checkbox>
                                 </div>
                                 
                                 <div class="setting-row">
