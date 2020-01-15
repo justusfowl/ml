@@ -101,13 +101,13 @@
 .entity .ent-tooltip{
     position: absolute;
     left: 0px;
-    top: -5px;
+    top: 0px;
     font-size: 8px;
     width: 100%;
     text-align: center;
     color: white;
     display: none;
-
+    line-height: 8px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

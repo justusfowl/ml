@@ -28,6 +28,7 @@ import { LabelComponent } from './admin/label/label.component';
 import { NerlabelComponent } from './admin/nerlabel/nerlabel.component';
 
 import {ApiService} from './api.service';
+import { ProgressService } from './services/progress.service';
 import { NgxFileDropModule } from 'ngx-file-drop';
 
 
@@ -57,6 +58,7 @@ import { NgxFileDropModule } from 'ngx-file-drop';
   ],
   providers: [
     {provide: LocationStrategy, useClass: HashLocationStrategy},
+    ProgressService,
     ApiService
   ],
   bootstrap: [AppComponent]

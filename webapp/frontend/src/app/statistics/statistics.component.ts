@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../api.service';
 import { ActivatedRoute } from '@angular/router';
+import { ProgressService } from '../services/progress.service';
 
 @Component({
   selector: 'app-statistics',
@@ -14,9 +15,13 @@ export class StatisticsComponent implements OnInit {
   bboxLabelStats : any = {}
   bboxLabelCount : number = 0; 
 
+  logs: string[] = ["Hello!"];
+  logMessage : string = "";
+
   constructor(
     private api: ApiService, 
-    private route: ActivatedRoute
+    private route: ActivatedRoute, 
+    private progressService : ProgressService
   ) { }
 
   ngOnInit() {
@@ -24,7 +29,18 @@ export class StatisticsComponent implements OnInit {
     this.getBboxLabelStats(); 
 
     console.log(this.route.snapshot.paramMap.get('id'));
-    
+
+    this.progressService.getMessages()
+      .subscribe((message: string) => {
+        this.logs.push(message);
+      });
+
+
+  }
+
+  sendMessage() {
+    this.progressService.sendMessage(this.logMessage);
+    this.logMessage = "";
   }
 
   getWorkflowStats(){
@@ -50,5 +66,7 @@ export class StatisticsComponent implements OnInit {
       console.log(err);
     })
   }
+
+
 
 }
