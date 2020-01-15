@@ -39,3 +39,12 @@
 
 </div>
 
+
+
+<div *ngFor="let l of logs">
+    {{l}}
+</div>
+
+<input [(ngModel)]="logMessage" (keyup)="$event.keyCode == 13 && sendMessage()" />
+<button (click)="sendMessage()">Send</button>
+

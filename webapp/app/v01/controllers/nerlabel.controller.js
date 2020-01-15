@@ -21,9 +21,9 @@ function getLabelObject(req, res){
         // for direct calls of an object, do not update the workflow status so that for demo purposes the object can be called in different views
         let flagUpdateWFStatus = true; 
 
-        // default object: search for workflow items with wfstatus == 2 --> OCR results, contain read_text 
+        // default object: search for workflow items with wfstatus == 3 --> OCR results, contain read_text which is already spellchecked.
         let filterObj = {
-            "wfstatus" : 2
+            "wfstatus" : 3
         }
 
         // if object ID is provided , search for this item regardless of lock state

@@ -71,7 +71,7 @@ function getImgLabelStats(req, res){
 
         collection.aggregate([
             { $unwind: '$pages'},
-            { $match: {'pages.bbox': {$exists: true}}},
+            { $match: {'pages.bbox': {$exists: true}, 'pages.bbox.origin' : 'manual'}},
             { $group: { _id: null, count: { $sum: 1 } } }
         ]).toArray(function(err, results) {
         

@@ -121,9 +121,13 @@ export class LabelComponent implements OnInit, AfterViewInit {
     public snackBar: MatSnackBar,
     private sanitizer: DomSanitizer) {
 
+
+
      }
 
   ngOnInit() {
+
+    this.router.routeReuseStrategy.shouldReuseRoute = () => false;
 
     let objId = this.route.snapshot.queryParamMap.get('objId'); 
 
