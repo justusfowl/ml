@@ -71,7 +71,6 @@ class LangProcessor:
         )
         search_time = time.time() - search_start
 
-<<<<<<< HEAD
         return response["hits"]["hits"], (embedding_time * 1000), (search_time * 1000)
 
 
@@ -146,6 +145,3 @@ class PreTagger:
         }
 
         return t
-=======
-        return response["hits"]["hits"], (embedding_time * 1000), (search_time * 1000)
->>>>>>> 58d9d6bf7d8a3d4dc8b7245091cb0c44b80ff112
