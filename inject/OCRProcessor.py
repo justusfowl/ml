@@ -10,6 +10,7 @@ import datetime as dt
 import pytz
 
 from dbal import DB
+from SpellChecker import Speller
 
 class OCRProcessor:
 
@@ -23,8 +24,11 @@ class OCRProcessor:
             print("Run in development mode...")
 
             self.flagDev = True
+            self.spellChecker = Speller()
 
         else:
+
+            self.spellChecker = Speller()
 
             self.flagDev = False
 
@@ -58,9 +62,10 @@ class OCRProcessor:
                     # in dev, tesseract 4.00alpha creates issues with dedicated language files
                     read_text = pytesseract.image_to_string(cropped_img)  # , lang="deu")
                 else:
-                    read_text = pytesseract.image_to_string(cropped_img, lang="deu")
+                    read_text = pytesseract.image_to_string(cropped_img, lang="deu", config='--psm 6')
 
-                p["read_text"] = read_text
+                p["read_text_raw"] = read_text
+                p["read_text"] = self.spellChecker.check_string(read_text)
 
     def dev(self, objId):
         self.label_obj = self.db.mongo_db.labels.find_one({"_id": ObjectId(objId)})
@@ -72,14 +77,19 @@ class OCRProcessor:
 
         self.label_obj["wfstatus"] = 2
 
-        self.label_obj["wfstatus_change"] = [
+        self.label_obj["wfstatus_change"].append(
             {
                 "timeChange" : dt.datetime.now(pytz.utc),
                 "wfstatus" : 2
             }
-        ]
+        )
 
         self.db.mongo_db.labels.update({"_id": self.label_obj["_id"]}, self.label_obj, upsert=True)
+
+    def publish_to_pretagging(self):
+        msg = {"_id": str(self.label_obj["_id"])}
+        self.channel.basic_publish(exchange='', routing_key=os.environ.get("MQ_QUEUE_PRETAG"), body=json.dumps(msg))
+
 
     def callback(self, ch, method, properties, body):
 
@@ -93,6 +103,7 @@ class OCRProcessor:
             self.label_obj = self.db.mongo_db.labels.find_one({"_id": ObjectId(object_id)})
             self.process_label_object()
             self.store_obj()
+            self.publish_to_pretagging()
 
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
