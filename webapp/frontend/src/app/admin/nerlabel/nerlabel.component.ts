@@ -358,6 +358,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
    makeText(){
     this.sortEntities();
     this.annotatedText = this.constructHtml(this.textObj.pages);
+    this.rawText = this.getRawText(this.textObj.pages);
    }
 
    sortEntities(entities?){
@@ -492,6 +493,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
    }
 
    toggleShowRawText(state){
+    console.log(state);
     this.flagShowRawText = state;
    }
 

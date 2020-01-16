@@ -29,13 +29,7 @@ export class StatisticsComponent implements OnInit {
     this.getBboxLabelStats(); 
 
     console.log(this.route.snapshot.paramMap.get('id'));
-
-    this.progressService.getMessages()
-      .subscribe((message: string) => {
-        this.logs.push(message);
-      });
-
-
+    
   }
 
   sendMessage() {
