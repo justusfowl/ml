@@ -45,7 +45,8 @@ class MedLangProcessor:
     def process_pretag_object(self):
 
         for p in self.label_obj["pages"]:
-            p["entities"] = self.pre_tagger.get_entities_from_text(p["read_text"])
+            if "read_text" in p:
+                p["entities"] = self.pre_tagger.get_entities_from_text(p["read_text"])
 
     def store_obj(self):
 
