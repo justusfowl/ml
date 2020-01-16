@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 
 import {ApiService} from './api.service';
 import { Title } from '@angular/platform-browser';
+import { ProgressService } from './services/progress.service';
 
 @Component({
   selector: 'app-root',
@@ -13,8 +14,16 @@ export class AppComponent {
 
   constructor(
     public api: ApiService, 
-    private titleService: Title
+    private titleService: Title, 
+    private progressService : ProgressService
   ){
     this.titleService.setTitle( "medlines.tech - Medizinisches Freitextverständnis" );
+
+    this.progressService.getMessages()
+    .subscribe((message: string) => {
+        console.log(message)
+    });
+
+
   }
 }

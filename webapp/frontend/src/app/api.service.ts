@@ -49,11 +49,9 @@ export class ApiService {
     }
 
     this.apiURL= this.apiURL + environment.apiEnd;
+
+    console.log(environment.production);
     
-
-    console.log(environment.production)
-
-
    }
 
   processText(inText){

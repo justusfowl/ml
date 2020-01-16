@@ -18,3 +18,15 @@ docker run -d -p 8000:8000 --env-file=.env --mount type=bind,source=/media/datad
 # textembeddings demo 
 docker run --name text_embeddings  -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node"  -d shantanuo/textembeddings
 XXXX@HOST:~/text-embeddings/trial$ python main_spacy_Fallbuch.py
+
+
+# Demo
+
+5deef4212b1a6126a46ce81d
+5deef42b2b1a6126a46ce825
+5def62e82b1a6126a46ce82f
+
+
+# DEV : 
+
+Webapp: 5def63dd2b1a6126a46ce86d

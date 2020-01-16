@@ -3,6 +3,8 @@ import { Subject } from 'rxjs';
 
 import { debounceTime, distinctUntilChanged} from 'rxjs/operators';
 import { ApiService } from '../api.service';
+import { MatSnackBar } from '@angular/material';
+import { ProgressService } from '../services/progress.service';
 
 
 @Component({
@@ -21,7 +23,9 @@ export class SearchComponent implements OnInit {
    
 
   constructor(
-    public api : ApiService
+    public api : ApiService,
+    public snackBar: MatSnackBar, 
+    public progressService : ProgressService
   ) {
 
     this.modelChanged.pipe(
@@ -34,6 +38,13 @@ export class SearchComponent implements OnInit {
   }
 
   ngOnInit() {
+
+    this.progressService.getMessages()
+    .subscribe((message: string) => {
+
+        console.log("From search: " + message)
+    });
+
 
   }
 

@@ -83,15 +83,15 @@
                                         <mat-error>Input is not a number!</mat-error>
                                     </mat-form-field>
                                     <button (click)="incrementZoom(0.1)" mat-button type="button">
-                                            +
-                                        </button>
+                                        +
+                                    </button>
                                 </div>
                                 <div class="setting-row checkbox-itm">
                                     <mat-checkbox [(ngModel)]="flagShowEntSmall" (change)="toggleClassShowEnt($event)">Entitäten einblenden?</mat-checkbox>
                                 </div>
                                 
                                 <div class="setting-row checkbox-itm">
-                                    <mat-checkbox [(ngModel)]="flagShowRawText" (change)="toggleShowRawText($event)">Roh-Text einblenden?</mat-checkbox>
+                                    <mat-checkbox [(ngModel)]="flagShowRawText" >Roh-Text einblenden?</mat-checkbox>
                                 </div>
                                 
                                 <div class="setting-row">

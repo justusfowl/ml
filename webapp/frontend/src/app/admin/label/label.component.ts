@@ -121,8 +121,6 @@ export class LabelComponent implements OnInit, AfterViewInit {
     public snackBar: MatSnackBar,
     private sanitizer: DomSanitizer) {
 
-
-
      }
 
   ngOnInit() {
@@ -273,6 +271,7 @@ export class LabelComponent implements OnInit, AfterViewInit {
     skipLabelPage(){
 
         this.skipPagesIndex.push(this.showPage);
+        this.activePage.isSkipped = true;
 
         this.detectEscape();
 
@@ -284,7 +283,12 @@ export class LabelComponent implements OnInit, AfterViewInit {
     getPageIsSkipped(i){
 
         if ( this.skipPagesIndex.findIndex(x => x == i) == -1){
-            return false;
+            if (typeof(this.activePage.isSkipped) != "undefined"){
+                return true;
+            }else{
+                return false;
+            }
+            
         }else{
             return true;
         }
@@ -481,6 +485,10 @@ export class LabelComponent implements OnInit, AfterViewInit {
             // remove potential index from skip-list
             if ( this.skipPagesIndex.findIndex(x => x == this.showPage) != -1){
                 this.skipPagesIndex.splice( this.skipPagesIndex.findIndex(x => x == this.showPage), 1)
+            }
+
+            if (typeof(this.activePage.isSkipped) != "undefined"){
+                delete this.activePage.isSkipped;
             }
             
             this.activePage.bbox = bbox;

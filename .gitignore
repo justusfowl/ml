@@ -15,3 +15,4 @@ inject/*.csv
 inject/*.txt
 /testfaxe/*
 /inject/medlines_NER_model/*
+/webapp/assets/
