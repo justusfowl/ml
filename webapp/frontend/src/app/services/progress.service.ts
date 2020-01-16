@@ -19,7 +19,7 @@ export class ProgressService {
 
         this.url = "http://" + environment.apiBase
 
-        if (environment.socketPort != ""){
+        if (typeof(environment.socketPort) != "undefined"){
             this.url= this.url + ":" + environment.socketPort;
         }else{
             this.url = "";
