@@ -18,12 +18,6 @@ export class ProgressService {
         this.ENV = environment.env;
 
         this.url = "http://" + environment.apiBase
-
-        if (typeof(environment.socketPort) != "undefined"){
-            this.url= this.url + ":" + environment.socketPort;
-        }else{
-            this.url = "";
-        }
         
         console.log("SocketIO - env:" + environment.env)
 
