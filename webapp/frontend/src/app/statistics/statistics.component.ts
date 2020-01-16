@@ -21,7 +21,7 @@ export class StatisticsComponent implements OnInit {
   constructor(
     private api: ApiService, 
     private route: ActivatedRoute, 
-    private progressService : ProgressService
+    public progressService : ProgressService
   ) { }
 
   ngOnInit() {
