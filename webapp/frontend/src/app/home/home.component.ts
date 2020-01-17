@@ -143,10 +143,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
   analyzeItem(){
     this.api.isLoading = true;
     const self = this; 
-    console.log("Analzing...")
+    console.log("Analzing input text...")
 
     self.api.docType = "text"; 
-    self.goToNlp()
+    self.tagInputText()
     
   }
 
@@ -256,44 +256,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   onFileSelected(){
-    /*
-    this.api.isLoading = true; 
-    const $pdf: any = document.querySelector('#file');
-    console.log($pdf)
-    const self = this; 
 
-    if (typeof FileReader !== 'undefined') {
-      const reader = new FileReader();
-
-      reader.onload = (e: any) => {
-
-        var baseString = e.target.result;
-
-        var docType = baseString.substring(baseString.indexOf(":")+1,baseString.indexOf(";")); 
-        
-        if (!self.checkDocType(docType)){
-          //@TODO: abort furter do
-        }
-
-        var pdfjsLib = window['pdfjs-dist/build/pdf'];
-
-        this.pdfSrc = baseString;
-
-        var array = self.convertDataURIToBinary(baseString)
-
-        self.api.setDocument(array, docType);
-
-        self.api.processFile(null).then(data => {
-          self.api.isLoading = false;
-          self.api.fileResData = data;
-          self.goToNlp()
-        })
-        
-      };
-
-      reader.readAsDataURL($pdf.files[0]);
-    }
-    */
   }
 
   convertDataURIToBinary(dataURI) {
@@ -310,6 +273,41 @@ export class HomeComponent implements OnInit, AfterViewInit {
     return array;
   }
 
+
+
+  tagInputText(){
+
+    const self = this;
+    self.api.isLoading = true; 
+
+    self.api.tagText(this.api.inputText).then( (data : any) => {
+
+      console.log(data)
+      if (typeof(data.data) != "undefined"){
+        self.api.nerDemoResponse = data;
+        this.toNERLabel();
+      }else{
+        console.error("No attribute data found in response")
+      }
+      
+      self.api.isLoading = false; 
+    })
+    
+  }
+
+
+  // display result of inputtext tagging
+  toNERLabel(){
+    const self = this;
+   
+     self.router.navigate(["/admin/nerlabel"], { queryParams: { demo: 'true'} }).then( (e) => {
+
+      self.api.isLoading = false; 
+    });
+
+  }
+
+  // display result of tbody analysis
   goToNlp(){
 
     const self = this; 
@@ -317,14 +315,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     self.api.isLoading = true; 
 
     self.router.navigate(["/nlp"]).then( (e) => {
-
       self.api.isLoading = false; 
-
-      if (e) {
-        console.log("Navigation is successful!");
-      } else {
-        console.log("Navigation has failed!");
-      }
     });
 
   }

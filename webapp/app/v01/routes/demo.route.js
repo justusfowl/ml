@@ -23,4 +23,7 @@ var upload = multer({ storage: storage });
 router.route('/tbody')
     .post(upload.single('file'), demoCtrl.processPdfBbox)
 
+router.route('/tner')
+    .post(demoCtrl.processNERTags)
+
 module.exports = router;

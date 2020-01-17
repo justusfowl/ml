@@ -55,5 +55,42 @@ function deleteTmpFile(path){
     }
 }
 
+function processNERTags(req, res){
 
-module.exports = { processPdfBbox }
+    var body = req.body;
+
+    if (typeof(body.text) == "undefined"){
+        console.log("no text posted");
+        res.status(500).json({"message" : "No text posted"});
+    }else{
+        try{
+            request({
+                url: 'http://' + config.procBackend.host + ":" + config.procBackend.port + '/analytics/tner',
+                method: 'POST',
+                body: body,
+                json: true
+              }, function(error, response, resbody) {
+    
+                if (error){
+                    console.error(error);
+                    res.status(500).json({"message" : JSON.stringify(error)});
+                    return;
+                } 
+    
+                try{
+                    res.json({"message" : "ok", "data": resbody});
+                }catch(err){
+                    res.status(500).json({"message" : JSON.stringify(err)});
+                }
+                
+            });
+        }catch(err){
+            res.status(500).json({"message" : JSON.stringify(err)});
+        }
+        
+    }
+
+}
+
+
+module.exports = { processPdfBbox, processNERTags}

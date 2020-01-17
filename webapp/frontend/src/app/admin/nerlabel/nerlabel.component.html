@@ -27,7 +27,7 @@
         </div>
         
         <div class="card">
-            <div class="title nerlabel">
+            <div class="title nerlabel" *ngIf="!flagIsDemo">
 
                 <button (click)="prevPage()" mat-button type="button">
                     -
@@ -86,16 +86,22 @@
                                         +
                                     </button>
                                 </div>
-                                <div class="setting-row checkbox-itm">
+
+                                <div class="setting-row checkbox-itm" >
+                                    <mat-checkbox (change)="toggleClassHidePerson($event)">Person schwärzen?</mat-checkbox>
+                                </div>
+
+
+                                <div class="setting-row checkbox-itm" >
                                     <mat-checkbox [(ngModel)]="flagShowEntSmall" (change)="toggleClassShowEnt($event)">Entitäten einblenden?</mat-checkbox>
                                 </div>
                                 
-                                <div class="setting-row checkbox-itm">
+                                <div class="setting-row checkbox-itm" *ngIf="!flagIsDemo">
                                     <mat-checkbox [(ngModel)]="flagShowRawText" >Roh-Text einblenden?</mat-checkbox>
                                 </div>
                                 
-                                <div class="setting-row">
-                                    <mat-form-field class="newEntLabel">
+                                <div class="setting-row" *ngIf="!flagIsDemo">
+                                    <mat-form-field class="newEntLabel" >
                                         <input  (keyup.enter)="addNewTag()" matInput type="text" placeholder="Neues Label" (input)="updateShortcut()" [(ngModel)]="newEntText">
                                     </mat-form-field>
                     
@@ -119,7 +125,7 @@
                         </div>
             </div>
         </div>
-        <div class="card">
+        <div class="card" *ngIf="!flagIsDemo">
                 <div class="content">
                     <div class="settings">
     

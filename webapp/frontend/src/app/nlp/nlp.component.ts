@@ -27,13 +27,14 @@ export class NlpComponent implements OnInit, AfterViewInit {
   scaleFactor : number = 1; 
 
 
-
   colorFillMap = {
     "0" : "#f1f17f", 
     "1" : "#e19b9b", 
     "2" : "#a7a7e5", 
     "3" : "#7ff1b3"
   }
+
+  tags : any[] = [];
 
   constructor(
     private api: ApiService, 
@@ -49,6 +50,8 @@ export class NlpComponent implements OnInit, AfterViewInit {
       this.router.navigate(["/home"]); 
       return;
     }
+
+    this.getTags();
   }
 
   ngAfterViewInit() {
@@ -82,13 +85,12 @@ export class NlpComponent implements OnInit, AfterViewInit {
    processText(inText){
     const self = this;
     self.api.isLoading = true; 
-    setTimeout(function(){
-      self.api.processText(inText).then( data => {
-        console.log(data)
-        self.annotatedText = self.constructHtml(data);
-        self.api.isLoading = false; 
-      })
-    }, 1500)
+
+    self.api.tagText(inText).then( data => {
+      console.log(data)
+      self.annotatedText = self.constructHtml(data);
+      self.api.isLoading = false; 
+    })
    }
 
    constructHtml(data){
@@ -348,6 +350,21 @@ export class NlpComponent implements OnInit, AfterViewInit {
     ctx.restore();
   }
 
+  getTags(){
+    const self = this;
+    self.api.isLoading = true;
+
+    self.api.getNerLabelTag().then( (data : any) => {
+
+      this.tags = data;
+
+      self.api.isLoading = false; 
+
+    }).catch(err => {
+      console.log(err);
+      self.api.isLoading = false; 
+    })
+   }
 
 
 
