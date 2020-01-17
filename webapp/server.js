@@ -32,15 +32,17 @@ let io = socketIO(server);
 const port = process.env.PORT || 3000;
 
 io.on('connection', (socket) => {
-  console.log('user connected');
+  console.log('user connected: ' + socket.id);
 
-  socket.on('new-message', (message) => {
-    console.log(message)
-    io.emit('new-message', message)
+  socket.on('log', (message) => {
+    io.emit('log', message)
+  });
+
+  socket.on('newobj', (objId) => {
+    socket.join(objId);
   });
 
 });
-
 
 server.listen(8000, () => {
   console.log('Server started!');

@@ -4,7 +4,7 @@ var path = require('path');
 var request = require('request');
 const config = require('../../config/config');
 
-function processPdfBbox(req, res){
+function processFile(req, res){
 
     var file = req.file;
 
@@ -15,7 +15,7 @@ function processPdfBbox(req, res){
     }else{
 
         request({
-            url: 'http://' + config.procBackend.host + ":" + config.procBackend.port + '/analytics/tbody',
+            url: 'http://' + config.procBackend.host + ":" + config.procBackend.port + '/file/pdf?flagoverwrite=true',
             method: 'POST',
             formData: {
               'file': fs.createReadStream(file.destination+file.originalname)
@@ -56,4 +56,4 @@ function deleteTmpFile(path){
 }
 
 
-module.exports = { processPdfBbox }
+module.exports = { processFile }
