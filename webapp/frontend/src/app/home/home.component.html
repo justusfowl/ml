@@ -48,7 +48,8 @@
                             </div>
 
                             <button type="button" *ngIf="!api.fileUploaded" class="upload-button" mat-flat-button color="primary"  (click)="openFileSelector()">Durchsuchen...</button>
-                            <button type="button" *ngIf="api.fileUploaded" class="upload-button analysis-button" mat-flat-button color="primary"   routerLink="/nlp">Dokument analysieren</button>
+                            <button type="button" *ngIf="api.fileUploaded" class="upload-button analysis-button" mat-flat-button color="primary"  (click)="sendDocumentForProcessing()">Demo: Textkörper</button>
+                            <button type="button" *ngIf="api.fileUploaded" class="upload-button analysis-button" mat-flat-button color="primary"  (click)="sendDocumentForWF()">Dokument@WF</button>
                             </ng-template>
                         </ngx-file-drop>
                     </div>

@@ -17,7 +17,14 @@ export class ProgressService {
 
         this.ENV = environment.env;
 
-        this.url = "http://" + environment.apiBase
+        if (environment.env == "dev"){
+            this.url = "http://" + environment.apiBase + ":8000"
+
+        }else{
+            this.url = "http://" + environment.apiBase
+        }
+
+        
         
         console.log("SocketIO - env:" + environment.env)
 
@@ -39,5 +46,17 @@ export class ProgressService {
         });
     }
 
+    public getProgressLog = () => {
+        console.log("get logs...")
+        return Observable.create((observer) => {
+            this.socket.on("log", (message) => {
+                observer.next(message);
+            });
+        });
+    }
+
+    public subscribeLogs(objId) {
+        this.socket.emit('newobj', objId);
+    }
 
 }

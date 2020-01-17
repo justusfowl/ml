@@ -72,25 +72,8 @@ export class ApiService {
     });
   }
 
-  processFile(inFile){
-    const api = this;
 
-    return new Promise(function(resolve, reject) {
-      
-      api.http.get(api.apiURL + '/process/file').subscribe(
-        (data: any) => {
-          setTimeout(function(){
-            resolve(data)
-          }, 1500) 
-        },
-        error => {
-          api.handleAPIError(error);
-          reject(error)
-        }
-      )
-    });
-  }
-
+  
 
 
   searchQueryHandler(inText){
@@ -377,6 +360,23 @@ export class ApiService {
       )
     });
 
+  }
+
+  processFileIntoWorkflow(formData){
+    const api = this;
+
+    return new Promise(function(resolve, reject) {
+      
+      api.http.post(api.apiURL + '/wf/file', formData).subscribe(
+        (data: any) => {
+          resolve(data)
+        },
+        error => {
+          api.handleAPIError(error);
+          reject(error)
+        }
+      )
+    });
   }
 
 }
