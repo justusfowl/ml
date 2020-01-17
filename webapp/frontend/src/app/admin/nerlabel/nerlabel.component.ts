@@ -36,25 +36,33 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
 
   flagShowEntSmall : boolean = true;
   flagShowRawText : boolean = false;
+  flagHidePerson : boolean = false;
+
+  flagIsDemo : boolean = false;
 
   
   @HostListener('document:keydown', ['$event']) onKeydownHandler(evt: KeyboardEvent) {
       
     const re = /^[0-9.]+$/
-    
-    if (evt.key.match(re)){
-      let number = parseInt(evt.key);
 
-      if (number <= this.tags.length){
-        this.tagIdxSelected = number - 1;
-      }
-    }else{
-      let selIdx = this.tags.findIndex(x => x.shortcut.toUpperCase() == evt.key.toUpperCase()); 
-
-      if (selIdx > -1){
-        this.tagIdxSelected = selIdx; 
+    // disable shortkeys for demo
+    if (!this.flagIsDemo){
+      if (evt.key.match(re)){
+        let number = parseInt(evt.key);
+  
+        if (number <= this.tags.length){
+          this.tagIdxSelected = number - 1;
+        }
+      }else{
+        let selIdx = this.tags.findIndex(x => x.shortcut.toUpperCase() == evt.key.toUpperCase()); 
+  
+        if (selIdx > -1){
+          this.tagIdxSelected = selIdx; 
+        }
       }
     }
+    
+    
   }
 
   constructor(
@@ -70,24 +78,50 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
 
     this.router.routeReuseStrategy.shouldReuseRoute = () => false;
     
-    let objId = this.route.snapshot.queryParamMap.get('objId'); 
+    let objId = this.route.snapshot.queryParamMap.get('objId');
+    let flagIsDemo = this.route.snapshot.queryParamMap.get('demo'); 
 
-    console.log(objId);
+    if (flagIsDemo){
+      this.flagIsDemo = true;
+
+      if (!this.api.nerDemoResponse || this.api.docType != 'text'){
+        this.router.navigate(["/home"]); 
+        return;
+      }
+    }
 
     if (objId){
       this.objId = objId; 
     }
   }
 
-  ngAfterViewInit() {
+  async ngAfterViewInit() {
 
-    this.getTags();
+    this.api.isLoading = true;
 
-    if (this.objId){
-      this.getNerLabelObject(this.objId);
+    // use async to wait for labels to load first
+    await this.api.getNerLabelTag().then( (data : any) => {
+      this.tags = data;
+      if (this.flagIsDemo){
+        this.api.isLoading = false; 
+      }
+    }).catch(err => {
+      console.log(err);
+      this.api.isLoading = false; 
+    })
+
+
+    if (this.flagIsDemo){
+      this.getNerDemoObject();
     }else{
-      this.getNerLabelObject();
+      if (this.objId){
+        this.getNerLabelObject(this.objId);
+      }else{
+        this.getNerLabelObject();
+      }
     }
+
+    
     
    }
 
@@ -228,21 +262,6 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
   
   }
 
-  getTags(){
-    const self = this;
-    self.api.isLoading = true;
-
-    self.api.getNerLabelTag().then( (data : any) => {
-
-      this.tags = data;
-
-      self.api.isLoading = false; 
-
-    }).catch(err => {
-      console.log(err);
-      self.api.isLoading = false; 
-    })
-   }
 
    updateShortcut(){
 
@@ -313,6 +332,35 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
 
   }
 
+  getNerDemoObject(){
+    const self = this; 
+    let nerResponse = self.api.nerDemoResponse.data;
+    
+    // create a demo doc letter document from input text
+
+    self.flagIsDemo = true;
+    self.flagIsNoDataAvailable = false; 
+
+    self.totalNumPages = 1;
+    self.pageIdxSelected = 0;
+
+    let docObject = {
+      "_id" : "Demo",
+      "pages" : [
+        {
+          "entities" :  self.sortEntities(nerResponse.entities),
+          "read_text" : nerResponse.text, 
+          "read_text_raw" : nerResponse.text
+        }
+      ]
+
+    }
+
+    this.textObj = docObject;
+
+    this.makeText();
+
+  }
 
   getNerLabelObject(objectId?){
     const self = this;
@@ -445,7 +493,8 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
 
    constructHtml(data){
 
-    data = data[this.pageIdxSelected];
+    // make deep copy of the object so that the hiding of personal information is not overwriting results.
+    data = JSON.parse(JSON.stringify(data[this.pageIdxSelected]));
 
     if (typeof(data.read_text) == "undefined"){
       this.annotatedText = null; 
@@ -497,6 +546,11 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
     this.flagShowRawText = state;
    }
 
+   toggleClassHidePerson(state){
+     this.flagHidePerson = state.checked;
+     this.makeText(); 
+   }
+
    getRawText(data){
 
     if (typeof(data[this.pageIdxSelected].read_text_raw) != "undefined"){
@@ -511,6 +565,14 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
      let classShowEnt = ""; 
      if (this.flagShowEntSmall){
        classShowEnt = "showEnt";
+     }
+
+     if (this.flagHidePerson && this.getEntHlValue(ent._id) == "PER"){
+
+        let origLen = ent.value.length;
+        let hidden_val = new Array( origLen ).fill( 1 ).map( ( _, i ) => String.fromCharCode( 65 + 23 ) ).join(""); 
+        ent.value = hidden_val;
+
      }
     var snippit = '<span class="entity hl-' + this.getEntHlId(ent._id) + " " + classShowEnt + '" data-tag-id="' + this.getEntHlId(ent._id) + '" data-ent-id="' + ent.ent_id + '">' + ent.value + '<span class="ent-tooltip">' + this.getEntHlValue(ent._id) + '</span><div class="removeEnt" data-ent-id="' + ent.ent_id + '">X</div></span>'
     return snippit

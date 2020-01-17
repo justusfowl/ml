@@ -34,6 +34,12 @@ export class ApiService {
   lastSearchTime : number = 0; 
   lastEmbedTime : number = 0; 
 
+  // ## DEMO ## 
+
+  nerDemoResponse : any; 
+
+  // ## DEMO END ## 
+
   constructor(
     public http: HttpClient
   ) {
@@ -342,6 +348,29 @@ export class ApiService {
   }
 
   // ############ DEMO AREA ###############
+
+  tagText(inputText){
+
+    const api = this;
+
+    let body = {
+      "text" : inputText
+    }
+
+    return new Promise(function(resolve, reject) {
+      
+      api.http.post<any>(api.apiURL + '/demo/tner', body).subscribe(
+        (data: any) => {
+          resolve(data)
+        },
+        error => {
+          api.handleAPIError(error);
+          reject(error)
+        }
+      )
+    });
+
+  }
 
   evaluateFileForBbox(formData){
 
