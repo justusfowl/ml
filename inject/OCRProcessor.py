@@ -33,7 +33,7 @@ class OCRProcessor:
 
         else:
 
-            self.spellChecker = Speller(dev=True)
+            self.spellChecker = Speller()
 
             self.flagDev = False
 

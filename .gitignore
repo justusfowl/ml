@@ -13,6 +13,7 @@ mongodb_queries.txt
 
 inject/*.csv
 inject/*.txt
+inject/*.pyc
 /testfaxe/*
 /inject/medlines_NER_model/*
 /webapp/assets/

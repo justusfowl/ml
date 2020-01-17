@@ -5,7 +5,7 @@ import spacy
 import darknetWrap as dn
 
 from Injector import PDFInjector
-from medlang import LangProcessor
+from medlang import LangProcessor, PreTagger
 
 from ProgressHandler import PH
 
@@ -20,6 +20,8 @@ nlp = spacy.load('de_trf_bertbasecased_lg')
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 progressHandler = PH()
+
+nerTagger = PreTagger()
 
 def initAPI():
 
@@ -82,7 +84,6 @@ def initAPI():
                 pdf_obj.store_obj()
                 pdf_obj.publish_to_OCR()
 
-                progressHandler.test_pub("PDF OCRerd ... ")
 
                 res_dict = pdf_obj.to_dict()
 
@@ -112,8 +113,6 @@ def initAPI():
 
         print("Analytics Bbox: %s" % file.filename)
 
-        progressHandler.pub_to("new-message", file.filename)
-
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
 
@@ -138,6 +137,22 @@ def initAPI():
                 data = pdf_obj.to_dict()
 
             return make_response(jsonify(data), 201)
+
+    @app.route('/analytics/tner', methods=['POST'])
+    def process_tner_str():
+        # check if the post request has the file part
+        try:
+            body = request.get_json(force=True)
+        except :
+            flash('No body sent')
+            return redirect(request.url)
+
+        print("Analytics NER demo called")
+
+        if "text" in body:
+            body["entities"] = nerTagger.get_entities_from_text(body["text"])
+
+        return make_response(jsonify(body), 201)
 
     @app.route('/medlang/search', methods=["GET"])
     def search():

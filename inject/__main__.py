@@ -53,6 +53,7 @@ def main(args=sys.argv[1:]):
 
     if 'service' in args.routines:
         from API import initAPI
+
         print("WEB service started")
         app = initAPI()
         app.run(host=os.environ.get("API_HOST_IP"), port=os.environ.get("API_HOST_PORT"))
