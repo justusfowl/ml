@@ -12,6 +12,9 @@ import pytz
 from dbal import DB
 from SpellChecker import Speller
 
+from ProgressHandler import PH
+
+
 class OCRProcessor:
 
     def __init__(self, **kwargs):
@@ -19,6 +22,8 @@ class OCRProcessor:
         self.db = DB()
 
         self.label_obj = None
+
+        self.progressHandler = PH()
 
         if 'dev' in kwargs:
             print("Run in development mode...")
@@ -28,7 +33,7 @@ class OCRProcessor:
 
         else:
 
-            self.spellChecker = Speller()
+            self.spellChecker = Speller(dev=True)
 
             self.flagDev = False
 
@@ -39,9 +44,13 @@ class OCRProcessor:
 
     def process_label_object(self):
 
+        cnt_p = 1
+
         for p in self.label_obj["pages"]:
 
             if "bbox" in p:
+
+                self.progressHandler.pub_to(str(self.label_obj["_id"]), "Page " + str(cnt_p))
 
                 img = Image.open(p["path"])
 
@@ -67,6 +76,8 @@ class OCRProcessor:
                 p["read_text_raw"] = read_text
                 p["read_text"] = self.spellChecker.check_string(read_text)
 
+                cnt_p = cnt_p + 1
+
     def dev(self, objId):
         self.label_obj = self.db.mongo_db.labels.find_one({"_id": ObjectId(objId)})
         self.process_label_object()
@@ -74,6 +85,8 @@ class OCRProcessor:
         self.store_obj()
 
     def store_obj(self):
+
+
 
         self.label_obj["wfstatus"] = 2
 
@@ -86,9 +99,12 @@ class OCRProcessor:
 
         self.db.mongo_db.labels.update({"_id": self.label_obj["_id"]}, self.label_obj, upsert=True)
 
+
+
     def publish_to_pretagging(self):
         msg = {"_id": str(self.label_obj["_id"])}
         self.channel.basic_publish(exchange='', routing_key=os.environ.get("MQ_QUEUE_PRETAG"), body=json.dumps(msg))
+
 
 
     def callback(self, ch, method, properties, body):
@@ -100,17 +116,26 @@ class OCRProcessor:
 
             print("Processing...%s" % object_id)
 
+            self.progressHandler.pub_to(object_id, "OCR Processing started")
+
             self.label_obj = self.db.mongo_db.labels.find_one({"_id": ObjectId(object_id)})
             self.process_label_object()
+
+            self.progressHandler.pub_to(str(self.label_obj["_id"]), "Update workflow status == 2 ")
             self.store_obj()
+            self.progressHandler.pub_to(str(self.label_obj["_id"]), "Object stored")
+
             self.publish_to_pretagging()
+            self.progressHandler.pub_to(str(self.label_obj["_id"]), "Published to pretagging")
 
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
             print("Completed for %s" % object_id)
 
+
         except Exception as e:
             print("File could not be processed... %s" % object_id, e)
+            ch.basic_reject(delivery_tag=method.delivery_tag, requeue=True)
 
     def init_consuming(self):
         print("start consuming...")

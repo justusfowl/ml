@@ -7,6 +7,8 @@ import darknetWrap as dn
 from Injector import PDFInjector
 from medlang import LangProcessor
 
+from ProgressHandler import PH
+
 net, meta, names = dn.getNetInit(
     configPath=os.environ.get("DARKNET_CFG_PATH"),
     weightPath=os.environ.get("DARKNET_WEIGHTS_PATH"),
@@ -16,6 +18,8 @@ net, meta, names = dn.getNetInit(
 nlp = spacy.load('de_trf_bertbasecased_lg')
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+
+progressHandler = PH()
 
 def initAPI():
 
@@ -71,10 +75,14 @@ def initAPI():
             if (f_ext == "pdf"):
 
                 pdf_obj = PDFInjector(file_path=file_path, flagoverwrite=flag_over_write)
+
+
                 pdf_obj.create_tiff()
                 pdf_obj.create_thumbs()
                 pdf_obj.store_obj()
                 pdf_obj.publish_to_OCR()
+
+                progressHandler.test_pub("PDF OCRerd ... ")
 
                 res_dict = pdf_obj.to_dict()
 
@@ -104,6 +112,8 @@ def initAPI():
 
         print("Analytics Bbox: %s" % file.filename)
 
+        progressHandler.pub_to("new-message", file.filename)
+
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
 
@@ -117,7 +127,7 @@ def initAPI():
 
             if (f_ext == "pdf"):
 
-                pdf_obj = PDFInjector(file_path=file_path, check_no_exist=True)
+                pdf_obj = PDFInjector(file_path=file_path, flagoverwrite=True)
                 pdf_obj.create_tiff()
                 pdf_obj.create_thumbs()
 

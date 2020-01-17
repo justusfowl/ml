@@ -12,6 +12,8 @@ import pytz
 from dbal import DB
 from medlang import PreTagger
 
+from ProgressHandler import PH
+
 class MedLangProcessor:
 
     def __init__(self, **kwargs):
@@ -21,6 +23,8 @@ class MedLangProcessor:
         self.label_obj = None
 
         self.pre_tagger = PreTagger()
+
+        self.progressHandler = PH()
 
         if 'dev' in kwargs:
             print("Run in development mode...")
@@ -43,10 +47,12 @@ class MedLangProcessor:
         self.store_obj()
 
     def process_pretag_object(self):
-
+        cnt_p = 1
         for p in self.label_obj["pages"]:
             if "read_text" in p:
+                self.progressHandler.pub_to(str(self.label_obj["_id"]), "Pretagging page: " + str(cnt_p))
                 p["entities"] = self.pre_tagger.get_entities_from_text(p["read_text"])
+                cnt_p = cnt_p +1
 
     def store_obj(self):
 
@@ -69,10 +75,13 @@ class MedLangProcessor:
             object_id = str(requestParams["_id"])
 
             print("Processing...%s" % object_id)
-
+            self.progressHandler.pub_to(str(object_id), "Pretagging initiated")
             self.label_obj = self.db.mongo_db.labels.find_one({"_id": ObjectId(object_id)})
             self.process_pretag_object()
+            self.progressHandler.pub_to(str(object_id), "Pretagging completed")
+            self.progressHandler.pub_to(str(object_id), "Update workflow status == 3")
             self.store_obj()
+            self.progressHandler.pub_to(str(object_id), "Object stored")
 
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
@@ -80,6 +89,7 @@ class MedLangProcessor:
 
         except Exception as e:
             print("File could not be processed... %s" % object_id, e)
+            ch.basic_reject(delivery_tag=method.delivery_tag, requeue=True)
 
 
 
