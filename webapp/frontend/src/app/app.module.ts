@@ -27,9 +27,11 @@ import { TrimLongStr } from './pipes/pipes';
 import { LabelComponent } from './admin/label/label.component';
 import { NerlabelComponent } from './admin/nerlabel/nerlabel.component';
 
-import {ApiService} from './api.service';
+import { ApiService } from './api.service';
 import { ProgressService } from './services/progress.service';
+
 import { NgxFileDropModule } from 'ngx-file-drop';
+import { ToastrModule } from 'ngx-toastr';
 
 
 @NgModule({
@@ -54,7 +56,8 @@ import { NgxFileDropModule } from 'ngx-file-drop';
     MaterialModule, 
     FormsModule, 
     ReactiveFormsModule,
-    NgxFileDropModule 
+    NgxFileDropModule, 
+    ToastrModule.forRoot()
   ],
   providers: [
     {provide: LocationStrategy, useClass: HashLocationStrategy},

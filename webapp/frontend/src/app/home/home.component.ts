@@ -5,7 +5,11 @@ import { Router } from "@angular/router";
 
 import { PDFJS, PDFJSStatic } from 'pdfjs-dist'; 
 import { NgxFileDropEntry, FileSystemFileEntry, FileSystemDirectoryEntry } from 'ngx-file-drop';
+import { MatSnackBar } from '@angular/material';
+import { ProgressService } from '../services/progress.service';
 
+import { ToastrService } from 'ngx-toastr';
+import { timeout } from 'q';
 
 @Component({
   selector: 'app-home',
@@ -29,16 +33,33 @@ export class HomeComponent implements OnInit, AfterViewInit {
   uploadForm: FormGroup;
   uploadFile : any; 
 
+  currentObjId : string = ""; 
+
   constructor(
     public api: ApiService, 
     private router: Router, 
-    private formBuilder: FormBuilder
+    public snackBar: MatSnackBar,
+    private formBuilder: FormBuilder, 
+    public progressService : ProgressService, 
+    private toastr: ToastrService
   ) { }
 
   ngOnInit() {
 
     this.uploadForm = this.formBuilder.group({
       file: ['']
+    });
+
+    this.progressService.getProgressLog().subscribe((message: string) => {
+
+      let itm = {
+        "_id" : this.currentObjId,
+        "message": message
+      };
+
+      this.progressService.logs.push(itm);
+
+      this.toastr.info(this.currentObjId, message, {timeOut: 6000});
     });
   
   }
@@ -52,8 +73,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
 
-
-
   public dropped(files: NgxFileDropEntry[]) {
 
     // first file only: 
@@ -63,7 +82,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.api.fileUploaded = true;
 
     this.files = files;
-    this.api.isLoading = true; 
     const self = this; 
 
     for (const droppedFile of files) {
@@ -97,39 +115,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
               var array = self.convertDataURIToBinary(baseString)
       
               self.api.setDocument(array, docType);
-
-              self.analyzeTBody().then((result : any) => {
-                self.api.isLoading = false;
-
-                if (typeof(result.data.pages) == "undefined"){
-                  result.data.pages = []
-                }
-
-                result.data.pages.forEach(element => {
-                  if (typeof(element.entities) == "undefined"){
-                    element.entities = []
-                  }
-                  if (typeof(element.detections) == "undefined"){
-                    element.detections = []
-                  }
-                });
-
-                self.api.fileResData = result.data;
-              })
-              /*
-      
-              self.api.processFile(null).then((data:any) => {
-                self.api.isLoading = false;
-
-                if (typeof(data.entities) == "undefined"){
-                  data.entities = []
-                }
-
-                self.api.fileResData = data;
-                // this.uploadChange.emit(true);
-              })
-
-              */
               
             };
       
@@ -163,6 +148,83 @@ export class HomeComponent implements OnInit, AfterViewInit {
     self.api.docType = "text"; 
     self.goToNlp()
     
+  }
+
+  sendDocumentForWF(){
+    this.api.isLoading = true;
+
+    this.inputDocToWF().then((res : any) => {
+
+      this.api.isLoading = false;
+
+      this.snackBar.open('Dokument bestätigt.', null, {
+        duration: 1500,
+      });
+
+      if (typeof(res.data.dict._id) != "undefined"){
+
+        let objId = res.data.dict._id;
+
+        this.currentObjId = objId;
+
+        this.progressService.subscribeLogs(objId);
+
+      }
+
+      
+    }).catch(err => {
+
+    })
+  }
+  
+  
+  inputDocToWF(){
+
+    const self = this; 
+
+    return new Promise(function(resolve, reject) {
+
+      console.log("Uploading...")
+
+      self.uploadForm.get('file').setValue(self.uploadFile);
+
+      const formData = new FormData();
+      formData.append('file', self.uploadForm.get('file').value);
+
+      self.api.processFileIntoWorkflow(formData).then((res : any) => {
+        
+        resolve(res);
+      }).catch(err => {
+        self.api.handleAPIError(err);
+        reject(err)
+      })
+
+    });
+
+  }
+
+  sendDocumentForProcessing(){
+    this.api.isLoading = true;
+    this.analyzeTBody().then((result : any) => {
+      this.api.isLoading = false;
+
+      if (typeof(result.data.pages) == "undefined"){
+        result.data.pages = []
+      }
+
+      result.data.pages.forEach(element => {
+        if (typeof(element.entities) == "undefined"){
+          element.entities = []
+        }
+        if (typeof(element.detections) == "undefined"){
+          element.detections = []
+        }
+      });
+
+      this.api.fileResData = result.data;
+
+      this.goToNlp()
+    })
   }
 
   analyzeTBody(){
