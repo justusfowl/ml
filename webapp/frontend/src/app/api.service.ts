@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { environment } from './../environments/environment';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Injectable({
@@ -41,7 +42,8 @@ export class ApiService {
   // ## DEMO END ## 
 
   constructor(
-    public http: HttpClient
+    public http: HttpClient, 
+    private toastr: ToastrService
   ) {
 
     this.ENV = environment.env;
@@ -111,8 +113,10 @@ export class ApiService {
 
   handleAPIError(error){
 
+    this.toastr.error("Netzwerk", "Etwas ist schief gelaufen. Bitte Console prüfen.", {timeOut: 6000});
+
     console.error(error);
-    alert(JSON.stringify(error))
+    // alert(JSON.stringify(error))
     this.isLoading = false;
   }
 

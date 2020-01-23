@@ -595,6 +595,9 @@ export class LabelComponent implements OnInit, AfterViewInit {
     disregardObject(){
         if (confirm('Dieses Objekt für die weitere Bearbeitung aussortieren?')) {
 
+            this.isLoading = true;
+            this.api.isLoading = true; 
+
             this.api.disregardObject(this.labelObject).then(res => {
 
                 this.snackBar.open('Dokument wurde deaktiviert.', null, {
@@ -603,6 +606,9 @@ export class LabelComponent implements OnInit, AfterViewInit {
     
                 this.clearView(); 
                 this.getLabelObject();
+
+                this.isLoading = false;
+                this.api.isLoading = false; 
 
             }).catch(err => {
                 this.snackBar.open('Etwas hat nicht geklappt.', null, {

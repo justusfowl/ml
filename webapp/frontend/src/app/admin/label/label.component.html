@@ -17,7 +17,13 @@
     <div class="response">
         <div class="card" *ngIf="activePage">
             <div class="title main">
-                {{labelObject._id}} // {{labelObject.fileName}}
+                
+                <span class="details linktoobj" [matMenuTriggerFor]="menu">{{labelObject._id}} // {{labelObject.fileName}} [status:{{labelObject.wfstatus}} ] </span> 
+                   <!-- <a class="details linktoobj" routerLink="/admin/label" [queryParams]="{ objId: textObj._id}" routerLinkActive="active" >{{textObj._id}} [status:{{textObj.wfstatus}} ]</a>-->
+                   <mat-menu #menu="matMenu">
+                    <a mat-menu-item *ngIf="labelObject.wfstatus>1" routerLink="/admin/nerlabel" [queryParams]="{ objId: labelObject._id}" routerLinkActive="active">Text/NER</a>
+                    <a mat-menu-item routerLink="/logs" [queryParams]="{ objId: labelObject._id}" routerLinkActive="active">Logs</a>
+                  </mat-menu>
 
                 <button type="button" class="skip-button" mat-flat-button color="error"  (click)="skipLabelPage()">Überspringen</button>
 

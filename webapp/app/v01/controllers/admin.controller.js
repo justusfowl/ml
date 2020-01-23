@@ -33,19 +33,34 @@ function getLabelObject(req, res){
         // for direct calls of an object, do not update the workflow status so that for demo purposes the object can be called in different views
         let flagUpdateWFStatus = true; 
 
-        // default object: search for workflow items without lock
-        let filterObj = {
-          "wfstatus" : 0
-        }
+        let filterArray = [];
 
         // if object ID is provided , search for this item regardless of lock state
 
         if (req.params.objectid){
-            filterObj = {
+            let filterObj = {
             "_id" : ObjectID(req.params.objectid)
+            }
+
+            filterArray.push(filterObj);
+
+            flagUpdateWFStatus = false; 
+        }else{
+
+           // default object: search for workflow items with wfstatus == 1 --> item is injected into pipeline as PDF
+           // only include objects that have a lockTime greater than 24hrs
+
+          let filterObj = {
+              "wfstatus" : 0
           }
 
-          flagUpdateWFStatus = false; 
+          filterArray.push(filterObj);
+
+          filterArray.push( {$or: [
+              {lockTime : {$exists: false}},
+              {lockTime:  {$lt: new Date((new Date())-1000*60*60*24)}}
+              ]
+          });
         }
 
         MongoClient.connect(url, function(err, db) {
@@ -58,7 +73,7 @@ function getLabelObject(req, res){
           const collection = dbo.collection('labels');
           // Find some documents
           collection.findOne(
-            filterObj
+            {$and : filterArray}
           , function(err, docs) {
 
               if (err) throw err;
@@ -76,15 +91,12 @@ function getLabelObject(req, res){
                       
                     });
                   }
-
-                  docs["wfstatus"] = 1;
-                  let changeItem = {"timeChange": new Date(), "wfstatus" : 1 }
-                  docs.wfstatus_change.push(changeItem)
       
                   res.json(docs);
       
                   if (typeof(docs._id) != "undefined" && flagUpdateWFStatus){
-                    collection.updateOne({"_id" : ObjectID(docs._id)}, {$set: { wfstatus : 1}, $push: { "wfstatus_change" :changeItem}}) // 
+                    // collection.updateOne({"_id" : ObjectID(docs._id)}, {$set: { wfstatus : 1}, $push: { "wfstatus_change" :changeItem}})
+                    collection.update({"id" : ObjectID(docs._id)}, {$set: { lockTime: new Date() } })
                   }
                 }else{
                   res.json({})
@@ -121,6 +133,16 @@ function approveLabelObject(req, res){
       throw "No _id provided.";
     }else{
 
+      // set wfstatus == 1 -> bbox is created; ready for OCR further processing
+
+      labelObject["wfstatus"] = 1;
+      let changeItem = {"timeChange": new Date(), "wfstatus" : 1 };
+      labelObject.wfstatus_change.push(changeItem);
+
+      if (typeof(labelObject.lockTime) != "undefined"){
+        delete labelObject.lockTime;
+      }
+
       MongoClient.connect(url, function(err, db) {
 
         if (err) throw err;
@@ -142,7 +164,7 @@ function approveLabelObject(req, res){
           function(err, docs){
             res.json({"message" : "ok"});
             publishToQueue("medlines", {"_id" :objId }); 
-            console.log("published id: " + objId)
+            console.log("published id: " + objId);
           });
 
         

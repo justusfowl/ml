@@ -22,10 +22,11 @@ import { StatisticsComponent } from './statistics/statistics.component';
 import { SettingsComponent } from './settings/settings.component';
 import { SearchComponent } from './search/search.component';
 
-import { TrimLongStr } from './pipes/pipes';
+import { TrimLongStr, LogFilterPipe } from './pipes/pipes';
 
 import { LabelComponent } from './admin/label/label.component';
 import { NerlabelComponent } from './admin/nerlabel/nerlabel.component';
+import { LogsComponent } from './admin/logs/logs.component';
 
 import { ApiService } from './api.service';
 import { ProgressService } from './services/progress.service';
@@ -41,11 +42,13 @@ import { ToastrModule } from 'ngx-toastr';
     NlpComponent,
     HomeComponent,
     StatisticsComponent, 
+    LogsComponent,
     LabelComponent, 
     SettingsComponent, 
     NerlabelComponent, 
     SearchComponent, 
-    TrimLongStr
+    TrimLongStr, 
+    LogFilterPipe
   ],
   imports: [
     HttpClientModule,

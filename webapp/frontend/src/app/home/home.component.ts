@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, EventEmitter, Output, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewEncapsulation, EventEmitter, Output, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ApiService } from '../api.service';
 import { Router } from "@angular/router";
@@ -17,7 +17,7 @@ import { timeout } from 'q';
   styleUrls: ['./home.component.scss'], 
   encapsulation: ViewEncapsulation.None
 })
-export class HomeComponent implements OnInit, AfterViewInit {
+export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Output() uploadChange = new EventEmitter();
 
@@ -50,26 +50,25 @@ export class HomeComponent implements OnInit, AfterViewInit {
       file: ['']
     });
 
-    this.progressService.getProgressLog().subscribe((message: string) => {
-
-      let itm = {
-        "_id" : this.currentObjId,
-        "message": message
-      };
-
-      this.progressService.logs.push(itm);
-
-      this.toastr.info(this.currentObjId, message, {timeOut: 6000});
-    });
-  
   }
 
   ngAfterViewInit(){
 
     this.uploadChange.subscribe((data) => {
       this.goToNlp()
-    })
+    });
 
+    this.progressService.getObjectProgressLog().subscribe((message: any) => {
+      if (typeof(message.message) != "undefined"){
+        this.toastr.info(this.currentObjId, message.message, {timeOut: 6000});
+      }
+      
+    });
+
+  }
+
+  ngOnDestroy(){
+    this.progressService.leaveObjLogRoom(this.currentObjId);
   }
 
 
@@ -167,10 +166,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
         this.currentObjId = objId;
 
-        this.progressService.subscribeLogs(objId);
+        this.progressService.joinObjLogRoom(objId);
 
       }
-
       
     }).catch(err => {
 

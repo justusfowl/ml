@@ -203,6 +203,16 @@ img.large-image{
 
 .title.main{
     position: relative;
+    
+    .details.linktoobj{
+        color: #3f51b5;
+    }
+
+    .details.linktoobj:hover{
+        cursor: pointer;
+        text-decoration: underline;
+        font-weight: 600;
+    }
 }
 
 .skip-button{

@@ -257,6 +257,15 @@
     .pageInfo{
         text-align: center;
 
+        .linktoobj{
+            color: #3f51b5;
+        }
+
+        .linktoobj:hover{
+            cursor: pointer;
+            text-decoration: underline;
+            font-weight: 600;
+        }
     }
 
     p{

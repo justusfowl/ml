@@ -34,10 +34,15 @@
                 </button>
                <div class="pageInfo">
                    Seite {{pageIdxSelected+1}} von {{totalNumPages}}
-                   <p class="details">{{textObj._id}}</p>
+                   <p class="details linktoobj" [matMenuTriggerFor]="menu">{{textObj._id}} [status:{{textObj.wfstatus}} ] </p> 
+                   <!-- <a class="details linktoobj" routerLink="/admin/label" [queryParams]="{ objId: textObj._id}" routerLinkActive="active" >{{textObj._id}} [status:{{textObj.wfstatus}} ]</a>-->
+                   <mat-menu #menu="matMenu">
+                    <a mat-menu-item routerLink="/admin/label" [queryParams]="{ objId: textObj._id}" routerLinkActive="active">Bbox label</a>
+                    <a mat-menu-item routerLink="/logs" [queryParams]="{ objId: textObj._id}" routerLinkActive="active">Logs</a>
+                  </mat-menu>
                 </div>
             
-                <button (click)="nextPage()" mat-button type="button">
+                <button (click)="nextPage()" #tooltip="matTooltip" matTooltip="Bitte alle Seiten labeln." matTooltipPosition="right"  mat-button type="button">
                     +
                 </button>
 

@@ -1,9 +1,9 @@
-import { Component, OnInit, HostListener, AfterViewInit, ViewEncapsulation, ChangeDetectorRef} from '@angular/core';
+import { Component, OnInit, HostListener, AfterViewInit, ViewEncapsulation, ChangeDetectorRef, ViewChild , ElementRef} from '@angular/core';
 import { ApiService } from 'src/app/api.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 import { v1 as uuid } from 'uuid';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar, MatTooltip } from '@angular/material';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -40,6 +40,8 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
 
   flagIsDemo : boolean = false;
 
+  pagesReVisited : any[] = [];
+
   
   @HostListener('document:keydown', ['$event']) onKeydownHandler(evt: KeyboardEvent) {
       
@@ -65,6 +67,10 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
     
   }
 
+ 
+
+
+
   constructor(
     private router: Router,
     private api: ApiService,
@@ -73,6 +79,8 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
     private route: ActivatedRoute, 
     private cd: ChangeDetectorRef
   ) { }
+
+  
 
   ngOnInit() {
 
@@ -95,8 +103,11 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
     }
   }
 
-  async ngAfterViewInit() {
+  @ViewChild('tooltip', {static: false}) tooltip: MatTooltip;
 
+
+  async ngAfterViewInit() {
+   
     this.api.isLoading = true;
 
     // use async to wait for labels to load first
@@ -126,6 +137,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
    }
 
    prevPage(){
+
      if (this.pageIdxSelected-1 >= 0){
        this.pageIdxSelected =  this.pageIdxSelected - 1; 
        this.makeText(); 
@@ -135,7 +147,11 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
    nextPage(){
      if(this.pageIdxSelected+1 < this.textObj.pages.length){
       this.pageIdxSelected =  this.pageIdxSelected + 1; 
-      this.makeText(); 
+      this.makeText();
+
+      // insert pageIdx to the pages that have been presented to the user.
+      this.pagesReVisited.push(this.pageIdxSelected);
+
      }
    }
 
@@ -265,7 +281,6 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
 
    updateShortcut(){
 
-
      if (this.newEntText.length > 0){
 
       let newShortcut = this.newEntText.substring(0,1); 
@@ -279,11 +294,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
      }else{
        this.newEntTextShortCut = ""; 
      }
-
-
    }
-
-
 
    
   addNewTag(){
@@ -367,23 +378,39 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
     self.api.isLoading = true;
     self.flagIsNoDataAvailable = false; 
 
+    // reset the pages visited for the new object
+    self.pagesReVisited = [];
+
     self.api.getNerLabelObject(objectId).then( (data : any) => {
 
       if (typeof(data._id) == "undefined"){
-          self.flagIsNoDataAvailable = true; 
+          self.flagIsNoDataAvailable = true;
+          self.updateUrlParams(true);
       }else{
 
-        this.objId = data._id; 
+        self.objId = data._id; 
 
-        this.updateUrlParams();
+        console.log(this.objId);
+
+      
+
+        self.updateUrlParams();
 
         if (typeof(data.pages) != "undefined"){
+
           self.pageIdxSelected = 0;
+
+          self.pagesReVisited.push(self.pageIdxSelected);
+
           self.textObj = data;
           data.pages[self.pageIdxSelected].entities = self.sortEntities(data.pages[self.pageIdxSelected].entities);
           self.totalNumPages = data.pages.length; 
           self.annotatedText = self.constructHtml(data.pages);
           self.rawText = self.getRawText(data.pages);
+
+          if (data.pages.length > 1){
+            setTimeout(() => { self.tooltip.show(); }, 2500);
+          }
 
         }else{
           throw "no pages contained in the object";
@@ -516,8 +543,6 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
 
       offset = offset + (s.length - ent.value.length);
 
-      console.log("word: " + ent.value + ", offset: " + offset)
-
 
     }
 
@@ -605,14 +630,37 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
     }
 
     getIsFinal(){
-      return true; 
+
+      if (typeof(this.textObj.pages) == "undefined"){
+        return false;
+      }
+
+      let flagHasVisitedAllPages = true;
+
+      for (var i=0;i<this.textObj.pages.length;i++){
+        if (this.pagesReVisited.indexOf(i) == -1){
+          flagHasVisitedAllPages = false;
+        }
+      }
+      return flagHasVisitedAllPages; 
     }
 
 
     approveObject(){
 
+      let flagApproveItem = true; 
+
       if (this.getIsFinal()){
 
+        if (this.textObj.wfstatus > 3){
+          if (confirm('Das Objekt wurde bereits bestätigt - sollen die Änderungen überschrieben werden?')) {
+            flagApproveItem = true;
+          }else{
+            flagApproveItem = false;
+          }
+        }
+        
+        if (flagApproveItem){
           this.api.isLoading = true; 
 
           this.api.approveNerLabelObject(this.textObj).then(res => {
@@ -630,7 +678,8 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
               this.api.isLoading = false; 
               console.error(err);
           })
-          
+        }
+         
       }else{
           this.snackBar.open('Bitte erst alle Seiten labeln.', 'OK', {
               duration: 3000
@@ -640,37 +689,67 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
   }
 
   disregardNerObject(){
-    if (confirm('Dieses Objekt für die weitere Bearbeitung aussortieren?')) {
 
-        this.api.disregardNerObject(this.textObj).then(res => {
+    let flagEnsureDisregardObject = true; 
 
-            this.snackBar.open('Dokument wurde deaktiviert.', null, {
-                duration: 1500,
-              });
-
-            this.getNerLabelObject();
-
-        }).catch(err => {
-            this.snackBar.open('Etwas hat nicht geklappt.', null, {
-                duration: 1500,
-            });
-            console.error(err);
-        });
-
+    if (this.textObj.wfstatus > 3){
+      if (confirm('Das Objekt wurde bereits bestätigt - sollen die Änderungen überschrieben werden?')) {
+        flagEnsureDisregardObject = true;
+      }else{
+        flagEnsureDisregardObject = false;
       }
+    }
+    if (flagEnsureDisregardObject){
+
+      if (confirm('Dieses Objekt für die weitere Bearbeitung aussortieren (bspw. enthält Textfehler)?')) {
+
+          this.api.disregardNerObject(this.textObj).then(res => {
+
+              this.snackBar.open('Dokument wurde deaktiviert.', null, {
+                  duration: 1500,
+                });
+
+              this.getNerLabelObject();
+
+          }).catch(err => {
+              this.snackBar.open('Etwas hat nicht geklappt.', null, {
+                  duration: 1500,
+              });
+              console.error(err);
+          });
+
+        }
+    }
   }
 
 
-  updateUrlParams(){
+  updateUrlParams(flagNoObjId=false){
 
-    this.router.navigate(
-      [], 
-      {
-        relativeTo: this.route,
-        queryParams: { objId: this.objId },
-        queryParamsHandling: 'merge'
-      });
+    if (flagNoObjId){
+      this.router.navigate(
+        [], 
+        {
+          relativeTo: this.route,
+          queryParamsHandling: 'merge'
+        });
+    }else{
+      this.router.navigate(
+        [], 
+        {
+          relativeTo: this.route,
+          queryParams: { objId: this.objId },
+          queryParamsHandling: 'merge'
+        });
+    }
+   
     
+  }
+
+  navToLabelObj(){
+
+    this.router.navigate(["/admin/label"], { queryParams: { objId: this.objId } }).then( (e) => {
+    });
+
   }
 
 }

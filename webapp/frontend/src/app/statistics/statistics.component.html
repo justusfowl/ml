@@ -36,23 +36,4 @@
         </div>
         
     </div>
-
-    <div class="container" >
-        <div class="card">
-            <div class="title">
-                Logs der aktuellen Session
-            </div>
-            <div class="content">
-                <table id="workflow" style="width:100%">
-                    <tr>
-                    <th>ObjId</th>
-                    <th>Message</th>
-                    </tr>
-                    <tr *ngFor="let l of progressService.logs; let i = index;">
-                    <td>{{l._id}}</td>
-                    <td>{{l.message}}</td>
-                    </tr>
-                </table>
-            </div>
-    </div>
 </div>

@@ -19,10 +19,7 @@ export class AppComponent {
   ){
     this.titleService.setTitle( "medlines.tech - Medizinisches Freitextverständnis" );
 
-    this.progressService.getMessages()
-    .subscribe((message: string) => {
-        console.log(message)
-    });
+    this.progressService.init();
 
 
   }
