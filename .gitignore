@@ -9,7 +9,7 @@
 **/node_modules
 **/public
 
-mongodb_queries.txt
+*.txt
 
 inject/*.csv
 inject/*.txt
@@ -18,3 +18,4 @@ inject/*.pyc
 /inject/medlines_NER_model/*
 /webapp/assets/
 /webapp/uploads/
+

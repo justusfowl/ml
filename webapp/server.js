@@ -35,11 +35,23 @@ io.on('connection', (socket) => {
   console.log('user connected: ' + socket.id);
 
   socket.on('log', (message) => {
-    io.emit('log', message)
+    socket.broadcast.emit('log', message);
+
+    if (typeof(message._id) != "undefined"){
+      let objId = message._id;
+      if (socket.rooms.hasOwnProperty(objId)){
+        socket.to(objId.toString()).emit("objlog", message);
+      }
+    }
+    
   });
 
   socket.on('newobj', (objId) => {
     socket.join(objId);
+  });
+
+  socket.on('leaveobj', (objId) => {
+    socket.leave(objId);
   });
 
 });

@@ -9,11 +9,15 @@ docker run -d -p 8000:8000 --env-file=.env --mount type=bind,source=/media/datad
 - python -m inject -r pretag [pretagging for NER]
 
 # Workflow status: 
-* 0 = Document is stored on the server
-* 1 = Document is pre-processed (PDF -> TIFF / thumbnails)
-* 2 = Document is processed to detect the text-body with CV-model
-* 3 = Document is OCR`ed and spellchecked. 
-* 4 = Document is pre-labeled.
+* 0 : PDF / File injected, thumbnails created and stored into the mongoDB (PDF -> TIFF / thumbnails)
+* 1 : Pages have bounding boxes for text body (either manually or through the CV model)
+* --> [-1] --> Object disregarded, no doc letter / relevant text for model training
+* 2 : Text has been extracted per page based on the bounding boxes (read_text_raw); spell checking has been applied (read_text)
+* 3 : Prelabeling NER has been applied
+* --> [-3] --> Object disregarded, e.g. because of text spell check errors / irrelevance
+* 4 : Approved NER labeling
+
+
 
 # textembeddings demo 
 docker run --name text_embeddings  -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node"  -d shantanuo/textembeddings

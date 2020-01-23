@@ -15,8 +15,7 @@ export class StatisticsComponent implements OnInit {
   bboxLabelStats : any = {}
   bboxLabelCount : number = 0; 
 
-  logs: string[] = ["Hello!"];
-  logMessage : string = "";
+
 
   constructor(
     private api: ApiService, 
@@ -28,13 +27,8 @@ export class StatisticsComponent implements OnInit {
     this.getWorkflowStats();
     this.getBboxLabelStats(); 
 
-    console.log(this.route.snapshot.paramMap.get('id'));
+    console.log(this.route.snapshot.paramMap.get('objId'));
     
-  }
-
-  sendMessage() {
-    this.progressService.sendMessage(this.logMessage);
-    this.logMessage = "";
   }
 
   getWorkflowStats(){

@@ -9,11 +9,13 @@ import { LabelComponent } from './admin/label/label.component';
 import { NerlabelComponent } from './admin/nerlabel/nerlabel.component';
 import { SettingsComponent } from './settings/settings.component';
 import { SearchComponent } from './search/search.component';
+import { LogsComponent } from './admin/logs/logs.component';
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'search', component: SearchComponent },
   { path: 'stats', component: StatisticsComponent },
+  { path: 'logs', component: LogsComponent },
   { path: 'nlp', component: NlpComponent },
   { path: 'settings', component: SettingsComponent },
   { path: 'admin/label', component: LabelComponent },

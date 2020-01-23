@@ -21,19 +21,34 @@ function getLabelObject(req, res){
         // for direct calls of an object, do not update the workflow status so that for demo purposes the object can be called in different views
         let flagUpdateWFStatus = true; 
 
-        // default object: search for workflow items with wfstatus == 3 --> OCR results, contain read_text which is already spellchecked.
-        let filterObj = {
-            "wfstatus" : 3
-        }
+        let filterArray = [];
 
         // if object ID is provided , search for this item regardless of lock state
 
         if (req.params.objectid){
-            filterObj = {
+            let filterObj = {
             "_id" : ObjectID(req.params.objectid)
             }
 
+            filterArray.push(filterObj);
+
             flagUpdateWFStatus = false; 
+        }else{
+
+           // default object: search for workflow items with wfstatus == 3 --> OCR results, contain read_text which is already spellchecked.
+           // only include objects that have a lockTime greater than 24hrs
+
+          let filterObj = {
+              "wfstatus" : 3
+          }
+
+          filterArray.push(filterObj);
+
+          filterArray.push( {$or: [
+              {lockTime : {$exists: false}},
+              {lockTime:  {$lt: new Date((new Date())-1000*60*60*24)}}
+              ]
+          });
         }
 
         MongoClient.connect(url, function(err, db) {
@@ -46,7 +61,7 @@ function getLabelObject(req, res){
             const collection = dbo.collection('labels');
             // Find some documents
             collection.findOne(
-            filterObj
+              {$and : filterArray}
             , function(err, docs) {
 
                 if (err) throw err;
@@ -63,16 +78,15 @@ function getLabelObject(req, res){
                             
                             });
                         }
-
-                        docs["wfstatus"] = 3; // status == 3 --> within nerlabel process
-                        let changeItem = {"timeChange": new Date(), "wfstatus" : 3 }
-                        docs.wfstatus_change.push(changeItem)
             
                         res.json(docs);
             
                         if (typeof(docs._id) != "undefined" && flagUpdateWFStatus){
-                          collection.updateOne({"_id" : ObjectID(docs._id)}, {$set: { wfstatus : 3}, $push: { "wfstatus_change" :changeItem}}) // 
+                          // collection.updateOne({"_id" : ObjectID(docs._id)}, {$set: { wfstatus : 3}, $push: { "wfstatus_change" :changeItem}})
+                          collection.update({"_id" : ObjectID(docs._id)}, {$set: { lockTime: new Date() } })
                         }
+
+
                     }else{
                         res.json({})
                     }
@@ -108,7 +122,17 @@ function approveLabelObject(req, res){
       if (typeof(labelObject._id) == "undefined"){
         throw "No _id provided.";
       }else{
-  
+
+        // set wfstatus == 4 -> NER approved files 
+
+        labelObject["wfstatus"] = 4;
+        let changeItem = {"timeChange": new Date(), "wfstatus" : 4 };
+        labelObject.wfstatus_change.push(changeItem);
+
+        if (typeof(labelObject.lockTime) != "undefined"){
+          delete labelObject.lockTime;
+        }
+        
         MongoClient.connect(url, function(err, db) {
   
           if (err) throw err;

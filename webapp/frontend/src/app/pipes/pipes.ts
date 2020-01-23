@@ -14,3 +14,32 @@ export class TrimLongStr implements PipeTransform {
     
   }
 }
+
+@Pipe({
+  name: 'logFilter',
+  pure: false
+})
+export class LogFilterPipe implements PipeTransform {
+  transform(items: any[], filter: any): any {
+      if (!items || !filter) {
+          return items;
+      }
+
+      if (filter._id == ""){
+        return items;
+      }
+      // filter items array, items which match and return true will be
+      // kept, false will be filtered out
+
+      let result = []; //  items.filter((item : any) => item._id == filter.objId);
+
+
+      items.forEach(x => {
+        if (x._id == filter._id){
+          result.push(x)
+        }
+      });
+
+      return result;
+  }
+}

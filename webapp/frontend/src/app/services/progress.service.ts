@@ -24,16 +24,20 @@ export class ProgressService {
             this.url = "http://" + environment.apiBase
         }
 
-        
-        
-        console.log("SocketIO - env:" + environment.env)
-
-        this.socket = io(this.url);
 
     }
 
-    public sendMessage(message) {
-        this.socket.emit('new-message', message);
+    public init(){
+        console.log("SocketIO - env:" + environment.env)
+        this.socket = io(this.url);
+
+        this.getProgressLog()
+        .subscribe((message: string) => {
+            console.log(message);
+            
+            // add message at beginning of array
+            this.logs.unshift(message);
+        });
     }
 
     public getMessages = () => {
@@ -55,8 +59,22 @@ export class ProgressService {
         });
     }
 
-    public subscribeLogs(objId) {
+    // process the logs 
+    public getObjectProgressLog = () => {
+        console.log("get object individual logs...")
+        return Observable.create((observer) => {
+            this.socket.on("objlog", (message) => {
+                observer.next(message);
+            });
+        });
+    }
+
+    public joinObjLogRoom(objId) {
         this.socket.emit('newobj', objId);
+    }
+
+    public leaveObjLogRoom(objId) {
+        this.socket.emit('leaveobj', objId);
     }
 
 }
