@@ -42,16 +42,26 @@ class MedLangProcessor:
 
     def dev(self, objId):
         self.label_obj = self.db.mongo_db.labels.find_one({"_id": ObjectId(objId)})
-        self.process_pretag_object()
 
-        self.store_obj()
+        # in_text = "Für den unten stehenden Versicherten benötigen wir neue Verordnungen. Versicherter: Heinz Lorch (geb120.09.1936; ROSenstraße 9. 65343 Eltville am Rhein; Versichertennummer: V221991825) Auslaufende VO: Verordnung 21.10.2019 s 1.11.2019 Verordnete Behandlungspflege Wundversorgung Präparate Verband. Diagnose ist {Z32.3I}."
+
+        # in_text = "Für den unten stehenden Versicherten benötigen wir neue Verordnungen. Versicherter: Heinz Lorch (geb120.09.1936; ROSenstraße 9. 65343 Eltville am Rhein; Versichertennummer: V221991825) Auslaufende VO: Verordnung 21.10.2019 s 1.11.2019 Verordnete Behandlungspflege Wundversorgung Präparate Verband. Diagnose ist {Z32.3I}."
+        in_text = self.label_obj["pages"][0]["read_text"]
+        out_text, entities = self.pre_tagger.get_entities_from_text(in_text)
+
+        print(out_text)
+        print(entities)
+
+        # self.process_pretag_object()
+
+        # self.store_obj()
 
     def process_pretag_object(self):
         cnt_p = 1
         for p in self.label_obj["pages"]:
             if "read_text" in p:
                 self.progressHandler.pub_to(str(self.label_obj["_id"]), "Pretagging page: " + str(cnt_p))
-                p["entities"] = self.pre_tagger.get_entities_from_text(p["read_text"])
+                p["read_text"], p["entities"] = self.pre_tagger.get_entities_from_text(p["read_text"])
                 cnt_p = cnt_p +1
 
     def store_obj(self):
@@ -75,11 +85,11 @@ class MedLangProcessor:
             object_id = str(requestParams["_id"])
 
             print("Processing...%s" % object_id)
-            self.progressHandler.pub_to(str(object_id), "Pretagging initiated")
+            self.progressHandler.pub_to(str(object_id), "Pretagging initiated", "Pretag")
             self.label_obj = self.db.mongo_db.labels.find_one({"_id": ObjectId(object_id)})
             self.process_pretag_object()
-            self.progressHandler.pub_to(str(object_id), "Pretagging completed")
-            self.progressHandler.pub_to(str(object_id), "Update workflow status == 3")
+            self.progressHandler.pub_to(str(object_id), "Pretagging completed", "Pretag")
+            self.progressHandler.pub_to(str(object_id), "Update workflow status == 3", "Pretag")
             self.store_obj()
             self.progressHandler.pub_to(str(object_id), "Object stored")
 
@@ -90,6 +100,7 @@ class MedLangProcessor:
         except Exception as e:
             print("File could not be processed... %s" % object_id, e)
             ch.basic_reject(delivery_tag=method.delivery_tag, requeue=True)
+            self.progressHandler.pub_to(str(self.label_obj["_id"]), "File rejected", "Pretag", details=e)
 
 
 

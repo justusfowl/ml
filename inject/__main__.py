@@ -76,7 +76,7 @@ def main(args=sys.argv[1:]):
         print("Pretagging service started")
         if args.flagdev:
             pretagging = MedLangProcessor(dev=True)
-            pretagging.dev(objId="5deef3f92b1a6126a46ce805")
+            pretagging.dev(objId="5deef3d52b1a6126a46ce7ef")
         else:
             pretagging = MedLangProcessor()
             pretagging.init_consuming()

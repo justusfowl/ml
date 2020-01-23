@@ -116,17 +116,17 @@ class OCRProcessor:
 
             print("Processing...%s" % object_id)
 
-            self.progressHandler.pub_to(object_id, "OCR Processing started")
+            self.progressHandler.pub_to(object_id, "OCR Processing started", "OCR")
 
             self.label_obj = self.db.mongo_db.labels.find_one({"_id": ObjectId(object_id)})
             self.process_label_object()
 
-            self.progressHandler.pub_to(str(self.label_obj["_id"]), "Update workflow status == 2 ")
+            self.progressHandler.pub_to(str(self.label_obj["_id"]), "Update workflow status == 2 ", "OCR")
             self.store_obj()
-            self.progressHandler.pub_to(str(self.label_obj["_id"]), "Object stored")
+            self.progressHandler.pub_to(str(self.label_obj["_id"]), "Object stored", "OCR")
 
             self.publish_to_pretagging()
-            self.progressHandler.pub_to(str(self.label_obj["_id"]), "Published to pretagging")
+            self.progressHandler.pub_to(str(self.label_obj["_id"]), "Published to pretagging", "OCR")
 
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
@@ -136,6 +136,7 @@ class OCRProcessor:
         except Exception as e:
             print("File could not be processed... %s" % object_id, e)
             ch.basic_reject(delivery_tag=method.delivery_tag, requeue=True)
+            self.progressHandler.pub_to(str(self.label_obj["_id"]), "File rejected", "OCR", details=e)
 
     def init_consuming(self):
         print("start consuming...")

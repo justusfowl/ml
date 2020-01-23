@@ -15,7 +15,7 @@ net, meta, names = dn.getNetInit(
     metaPath=os.environ.get("DARKNET_DATA_PATH")
 )
 
-nlp = spacy.load('de_trf_bertbasecased_lg')
+# nlp = spacy.load('de_trf_bertbasecased_lg')
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
@@ -150,7 +150,7 @@ def initAPI():
         print("Analytics NER demo called")
 
         if "text" in body:
-            body["entities"] = nerTagger.get_entities_from_text(body["text"])
+            body["text"], body["entities"] = nerTagger.get_entities_from_text(body["text"])
 
         return make_response(jsonify(body), 201)
 
@@ -163,9 +163,9 @@ def initAPI():
 
         size = request.args.get('size')
 
-        medLangProc = LangProcessor(nlp=nlp, search_size=size)
+        # medLangProc = LangProcessor(nlp=nlp, search_size=size)
 
-        search_result, embed_time, search_time = medLangProc.handle_query(q)
+        search_result, embed_time, search_time = "", "", []  # medLangProc.handle_query(q)
 
         data = {
             "search_result" : search_result,

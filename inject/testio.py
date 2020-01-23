@@ -10,10 +10,10 @@ from os.path import join, dirname
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path=dotenv_path)
 
+
 class PH:
 
     def __init__(self):
-
         sio = socketio.Client()
 
         @sio.event
@@ -25,19 +25,18 @@ class PH:
             print('ProgressHandler | disconnected from server')
 
         sio.connect("http://{sockethost}:{socketport}".format(
-                sockethost=os.environ.get('SOCKET_HOST'),
-                socketport=os.environ.get('SOCKET_PORT')
-            ))
+            sockethost="CL18",
+            socketport=8000
+        ))
 
         self.sio = sio
 
     def pub_to(self, obj_id, message, category="", details=None):
-
         message_obj = {
-            "_id" : obj_id,
-            "message" : message,
-            "category" : category,
-            "datetime" : dt.datetime.now(pytz.utc)
+            "_id": obj_id,
+            "message": message,
+            "category": category,
+            "datetime": str(dt.datetime.now(pytz.utc))
         }
 
         if details:
@@ -46,4 +45,24 @@ class PH:
         self.sio.emit('log', message_obj);
 
     def new_room(self, obj_id):
-        self.sio.emit(obj_id, "message")
+        self.sio.emit("newobj", obj_id)
+
+ph = PH()
+
+ph.new_room("1234")
+
+
+def run(p):
+    while True:
+        try:
+            try:
+                msg = input("Enter query: ")
+                er = 1/0
+            except Exception as e:
+
+                p.pub_to("1234", msg, details=e)
+
+        except KeyboardInterrupt:
+            return
+
+run(ph)
