@@ -26,7 +26,7 @@ import { TrimLongStr, LogFilterPipe } from './pipes/pipes';
 
 import { LabelComponent } from './admin/label/label.component';
 import { NerlabelComponent } from './admin/nerlabel/nerlabel.component';
-import { LogsComponent } from './admin/logs/logs.component';
+import { LogsComponent } from './admin/applogs/logs.component';
 
 import { ApiService } from './api.service';
 import { ProgressService } from './services/progress.service';

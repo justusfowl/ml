@@ -1,0 +1,27 @@
+  
+<div class="container" >
+    
+    <div class="card logs-container">
+        <div class="title">
+            <form class="example-form">
+                <mat-form-field class="large">
+                        <input class="textinput" matInput [value]="currentObjId" (keydown.enter)="changeObjId($event.target.value)" placeholder="ObjectID...">
+                </mat-form-field>
+            </form>
+        </div>
+        <div class="content">
+            <table id="workflow" style="width:100%">
+                <tr>
+                <th>ObjectID</th>
+                <th>Kategorie</th>
+                <th>Message</th>
+                </tr>
+                <tr *ngFor="let l of progressService.logs | logFilter:getFilterArgs(); let i = index;">
+                <td>{{l._id}}</td>
+                <td>{{l.category}}</td>
+                <td>{{l.message}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
