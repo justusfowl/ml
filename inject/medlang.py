@@ -109,13 +109,14 @@ class NERItem:
                  start_char,
                  end_char,
                  text,
-                 NERTag
+                 NERTag,
+                 score=99
                  ):
 
         self.start_char = start_char
         self.end_char = end_char
         self.value = text
-
+        self.score = score
         self.tag = NERTag
 
     def _to_dict(self):
@@ -126,17 +127,16 @@ class NERItem:
             "ent_id":  str(uuid.uuid1()),
             "start": self.start_char,
             "_id": str(self.tag["_id"]),
-            "value": self.value
+            "value": self.value,
+            "score" : self.score
         }
 
 
 class PreTagger:
 
     def __init__(self):
-        print("Instantiating NER model...")
-        self.nlp =  spacy.blank('de') # as of now, load blank model spacy.load(os.environ.get("NER_MODEL_PATH"))
-        print("Instantiating NER model complete")
-        # self.ruler = EntityRuler(self.nlp)
+
+        self._init_nlp()
 
         self.lookup = pd.read_csv(os.environ.get("PRETAG_LOOKUP_TABLE_PATH"), sep=",", encoding = 'utf8', keep_default_na=False)
 
@@ -147,6 +147,12 @@ class PreTagger:
         self.tag_cache = []
 
         self._init_phrase_matcher()
+
+
+    def _init_nlp(self):
+        print("Instantiating NER model...")
+        self.nlp = spacy.load(os.environ.get("NER_MODEL_PATH")) # instead: spacy.blank('de') load blank model
+        print("Instantiating NER model complete")
 
     def _init_phrase_matcher(self):
 
@@ -168,11 +174,13 @@ class PreTagger:
 
     def get_entities_from_text(self, intext):
 
-        string = intext.replace("\n", ' break ')  # problems with processing '\n'
+        line_break_locs = self._find_all_occ_in_string(intext.lower(), "\n")
+
+        string = intext.replace("\n", ' ')  # problems with processing '\n'
 
         doc = self.nlp(string)
 
-        # STEP 1: get all the pattern-/shape wise matches
+        # STEP 1: NLP Model: get all entities + all pattern-/shape wise matches
 
         shape_matches = self.shape_matcher(doc)
 
@@ -180,6 +188,22 @@ class PreTagger:
 
         entities = []
 
+        # process recognized entities PER and Negations
+        for entity in doc.ents:
+            if entity.label_ == 'PER' or entity.label_ == 'Negation':
+
+                words_detected.append(self._clean_text(entity.text))
+
+                ner_item = NERItem(
+                    start_char=entity.start_char,
+                    end_char=entity.end_char,
+                    text=entity.text,
+                    NERTag=self.get_tag(entity.label_)
+                )
+
+                entities.append(ner_item._to_dict())
+
+        # process shape / pattern matches
         for m_id, start, end in shape_matches:
             entity = doc[start: end]
             words_detected.append(self._clean_text(entity.text))
@@ -201,13 +225,13 @@ class PreTagger:
             if len(t.text) > 2 and t.text != "break" and not t.is_stop and not self._clean_text(t.text) in words_detected:
                 req_words.append(t.text.lower())
 
-
         matches_raw = self._get_lookup_matches(req_words)
 
         fuz_matches = self._get_theme_for_lookup(matches_raw)
 
         for m in fuz_matches:
             term = m[0]
+            score = m[2]
             label = m[3]
             all_start_idx = self._find_all_occ_in_string(string.lower(), term)
 
@@ -218,24 +242,16 @@ class PreTagger:
                     start_char=occ,
                     end_char=occ + len(term),
                     text=val,
-                    NERTag=self.get_tag(label)
+                    NERTag=self.get_tag(label),
+                    score=score
                 )
 
                 entities.append(ner_item._to_dict())
 
-        # adjust for line breaks
+        # adjust for line breaks: since the ídx / locations of breaks have been collected up front,
+        # no adjustment of the tags is necessary
 
-        line_break_locs = self._find_all_occ_in_string(string.lower(), " break ")
-
-        #for br in line_break_locs:
-
-        #    for i in range(len(entities)):
-        #        ent = entities[i]
-        #        if ent["start"] > br:
-        #            ent["start"] = ent["start"]- (len(" break ") - len("\n"))
-        #            ent["end"] = ent["end"] - (len(" break ") - len("\n"))
-
-        # string = string.replace(' break ', "\n")
+        string = self._return_breaks(string, line_break_locs)
 
         entities = sorted(entities, key = lambda i: i["start"])
 
@@ -297,6 +313,13 @@ class PreTagger:
             fuzzy_matches.append((w, most_similar_word, term_most_sim, self._lookup_theme(most_similar_word)))
 
         return fuzzy_matches
+
+    @staticmethod
+    def _return_breaks(instring, break_idx):
+        for b in break_idx:
+            instring = instring[:b] + "\n" + instring[b + 1:]
+
+        return instring
 
     @staticmethod
     def _clean_text(string):

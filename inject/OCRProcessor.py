@@ -33,7 +33,7 @@ class OCRProcessor:
 
         else:
 
-            self.spellChecker = Speller()
+            self.spellChecker = Speller(dev=True)
 
             self.flagDev = False
 
@@ -50,7 +50,7 @@ class OCRProcessor:
 
             if "bbox" in p:
 
-                self.progressHandler.pub_to(str(self.label_obj["_id"]), "Page " + str(cnt_p))
+                self.progressHandler.pub_to(str(self.label_obj["_id"]), "Page " + str(cnt_p), category="OCR")
 
                 img = Image.open(p["path"])
 

@@ -37,7 +37,7 @@ class PH:
             "_id" : obj_id,
             "message" : message,
             "category" : category,
-            "datetime" : dt.datetime.now(pytz.utc)
+            "datetime" : str(dt.datetime.now(pytz.utc))
         }
 
         if details:

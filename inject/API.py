@@ -6,7 +6,7 @@ import darknetWrap as dn
 
 from Injector import PDFInjector
 from medlang import LangProcessor, PreTagger
-
+from SpellChecker import Speller
 from ProgressHandler import PH
 
 net, meta, names = dn.getNetInit(
@@ -19,9 +19,9 @@ net, meta, names = dn.getNetInit(
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
-progressHandler = PH()
-
 nerTagger = PreTagger()
+
+spellChecker = Speller()
 
 def initAPI():
 
@@ -150,6 +150,16 @@ def initAPI():
         print("Analytics NER demo called")
 
         if "text" in body:
+
+            corrected_text = spellChecker.check_string(body["text"])
+
+            if not body["text"] == corrected_text:
+                body["corrected"] = True
+                body["text_raw"] = body["text"]
+                body["text"] = corrected_text
+            else:
+                body["corrected"] = False
+
             body["text"], body["entities"] = nerTagger.get_entities_from_text(body["text"])
 
         return make_response(jsonify(body), 201)

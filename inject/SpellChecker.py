@@ -77,15 +77,15 @@ class Speller:
                 word = 'Arbeitsunfähigkeit'
             if (word == "P:"):
                 word = 'Patient:'
-            if word not in ('', ',', '!', '.', ';', ':', '?') and word.lower().strip(".,") not in list(
+            if word not in ('', ',', '!', '.', ';', ':', '?', '-', '') and word.lower().strip(".,") not in list(
                     self.Abkuerzungen['lower_case']):
                 input_term = word
                 if input_term[-1] in ("?", "!", ".", ",", ":", ";"):
                     input_term = input_term[:-1]
                 # max edit distance per lookup (per single word, not per whole input string)
                 suggestions = self.sym_spell.lookup(input_term, Verbosity.CLOSEST,
-                                               max_edit_distance=2, transfer_casing=True,
-                                               include_unknown=True)  ### angepasst 03.01.2020
+                                               max_edit_distance=2, transfer_casing=True, ignore_token=r".*[()].*",
+                                               include_unknown=True)  # display suggestion term, edit distance, and term frequency
 
                 if word[-1] in ("?", "!", ".", ",", ":", ";"):
                     suggestion = str(suggestions[0].term) + word[-1]
@@ -101,37 +101,6 @@ class Speller:
         string_corr = ' '.join(string_corr)
 
         string_corr = string_corr.replace("break", '\n')
-
-        # focus on main part on the doctor's letter
-        start = []
-        start.append(find_near_matches("Kollegin", string_corr, max_l_dist=1))
-        start.append(find_near_matches("Kollege", string_corr, max_l_dist=1))
-        start.append(find_near_matches("sehr geehrt", string_corr, max_l_dist=1))
-        start.append(find_near_matches("Patient", string_corr, max_l_dist=1))
-        start.append(find_near_matches("Name", string_corr, max_l_dist=1))
-        start = list(filter(None, start))
-
-        end = []
-        end.append(find_near_matches("Gruß", string_corr, max_l_dist=1))
-        end.append(find_near_matches("Grüßen", string_corr, max_l_dist=1))
-        end.append(find_near_matches("kollegial", string_corr, max_l_dist=1))
-        end = list(filter(None, end))
-
-        try:
-            start_f = min(start)[0][0]
-            end_f = max(end)[0][0]
-            string_corr = string_corr[start_f:end_f]
-        except:
-            try:
-                start_f = min(start)[0][0]
-                string_corr = string_corr[start_f:]
-            except:
-                try:
-                    end_f = max(end)[0][0]
-                    string_corr = string_corr[:end_f]
-                except:
-                    pass
-        # print(string_corr)
 
         return string_corr
 

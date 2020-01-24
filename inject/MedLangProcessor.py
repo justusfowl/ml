@@ -60,7 +60,7 @@ class MedLangProcessor:
         cnt_p = 1
         for p in self.label_obj["pages"]:
             if "read_text" in p:
-                self.progressHandler.pub_to(str(self.label_obj["_id"]), "Pretagging page: " + str(cnt_p))
+                self.progressHandler.pub_to(str(self.label_obj["_id"]), "Pretagging page: " + str(cnt_p), category="Pretag")
                 p["read_text"], p["entities"] = self.pre_tagger.get_entities_from_text(p["read_text"])
                 cnt_p = cnt_p +1
 
