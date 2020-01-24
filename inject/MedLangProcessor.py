@@ -47,10 +47,11 @@ class MedLangProcessor:
 
         # in_text = "Für den unten stehenden Versicherten benötigen wir neue Verordnungen. Versicherter: Heinz Lorch (geb120.09.1936; ROSenstraße 9. 65343 Eltville am Rhein; Versichertennummer: V221991825) Auslaufende VO: Verordnung 21.10.2019 s 1.11.2019 Verordnete Behandlungspflege Wundversorgung Präparate Verband. Diagnose ist {Z32.3I}."
         in_text = self.label_obj["pages"][0]["read_text"]
-        out_text, entities = self.pre_tagger.get_entities_from_text(in_text)
+        out_text, entities, details = self.pre_tagger.get_entities_from_text(in_text)
 
         print(out_text)
         print(entities)
+        print(details)
 
         # self.process_pretag_object()
 
@@ -61,8 +62,8 @@ class MedLangProcessor:
         for p in self.label_obj["pages"]:
             if "read_text" in p:
                 self.progressHandler.pub_to(str(self.label_obj["_id"]), "Pretagging page: " + str(cnt_p), category="Pretag")
-                p["read_text"], p["entities"] = self.pre_tagger.get_entities_from_text(p["read_text"])
-                cnt_p = cnt_p +1
+                p["read_text"], p["entities"], p["details"] = self.pre_tagger.get_entities_from_text(p["read_text"])
+                cnt_p = cnt_p + 1
 
     def store_obj(self):
 

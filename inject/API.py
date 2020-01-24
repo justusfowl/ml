@@ -21,7 +21,7 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 nerTagger = PreTagger()
 
-spellChecker = Speller()
+spellChecker = Speller(dev=True)
 
 def initAPI():
 
@@ -160,7 +160,7 @@ def initAPI():
             else:
                 body["corrected"] = False
 
-            body["text"], body["entities"] = nerTagger.get_entities_from_text(body["text"])
+            body["text"], body["entities"], body["details"] = nerTagger.get_entities_from_text(body["text"])
 
         return make_response(jsonify(body), 201)
 

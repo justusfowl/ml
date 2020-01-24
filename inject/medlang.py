@@ -99,7 +99,7 @@ class NERTag:
     def make_new_db_tag(self):
         #@TODO: Make sure to make shortcut unique!
 
-        res = self.db.mongo_client.medlabels.metalabels.insert_one({"value": self.label, "shortcut": self.label[:1].upper()})
+        res = self.db.mongo_client.medlabels.metalabels.insert_one({"value": self.label, "shortcut": self.label[:1].upper(), "prod" : True})
         tag = self.db.mongo_client.medlabels.metalabels.find_one({"_id": ObjectId(res.inserted_id)})
 
         return tag
@@ -185,23 +185,30 @@ class PreTagger:
         shape_matches = self.shape_matcher(doc)
 
         words_detected = []
-
         entities = []
+
+        details_ner_ent = []
+        details_match_ent = []
+        details_fuzz_ent = []
 
         # process recognized entities PER and Negations
         for entity in doc.ents:
+
+            ner_item = NERItem(
+                start_char=entity.start_char,
+                end_char=entity.end_char,
+                text=entity.text,
+                NERTag=self.get_tag(entity.label_)
+            )
+
+            details_ner_ent.append(ner_item._to_dict())
+
+            # for consolidated tags, only refer to PER / Negations
             if entity.label_ == 'PER' or entity.label_ == 'Negation':
 
                 words_detected.append(self._clean_text(entity.text))
-
-                ner_item = NERItem(
-                    start_char=entity.start_char,
-                    end_char=entity.end_char,
-                    text=entity.text,
-                    NERTag=self.get_tag(entity.label_)
-                )
-
                 entities.append(ner_item._to_dict())
+
 
         # process shape / pattern matches
         for m_id, start, end in shape_matches:
@@ -216,6 +223,7 @@ class PreTagger:
             )
 
             entities.append(ner_item._to_dict())
+            details_match_ent.append(ner_item._to_dict())
 
         # STEP 2: get all tokens that are relevant within the input text (excluding stopwords + breaks + previously detected words)
 
@@ -247,6 +255,7 @@ class PreTagger:
                 )
 
                 entities.append(ner_item._to_dict())
+                details_fuzz_ent.append(ner_item._to_dict())
 
         # adjust for line breaks: since the ídx / locations of breaks have been collected up front,
         # no adjustment of the tags is necessary
@@ -291,7 +300,16 @@ class PreTagger:
                 else:
                     final_entities.append(entities[i])
 
-        return string, final_entities
+        # provide all the detailed information about the different steps to the frontend
+
+        details = {
+            "details_ner_ent": details_ner_ent,
+            "details_match_ent": details_match_ent,
+            "details_fuzz_ent": details_fuzz_ent,
+            "consolidated_ent" : final_entities
+        }
+
+        return string, final_entities, details
 
     def _get_lookup_matches(self, requested_words):
         # Create a small set of artifical company names
