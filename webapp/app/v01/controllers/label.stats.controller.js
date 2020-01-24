@@ -99,12 +99,104 @@ function getImgLabelStats(req, res){
 
       });
 
-}catch(error){
-  res.send(500, "An error occured requesting label Object");
-}
+    }catch(error){
+    res.send(500, "An error occured requesting label Object");
+    }
 
 }
 
+async function getNERTags(){
+    return new Promise(
+        (resolve, reject) => {
+
+            try{
+
+                MongoClient.connect(url, function(err, db) {
+          
+                  if (err) throw err;
+                  
+                  let dbo = db.db("medlabels");
+          
+                  const collection = dbo.collection('metalabels');
+          
+                  collection.find(
+                    {}
+                  ).toArray(function(err, results) {
+                  
+                    resolve(results);
+                  
+                    db.close();
+                          
+                  });
+          
+                });
+          
+              }catch(error){
+                resolve(error);
+              }
+        }
+    );
+}
 
 
-module.exports = { getWorkflowStats, getImgLabelStats }
+async function getNERLabelStats(req, res){
+
+    try{
+
+        let tags = await getNERTags();
+
+        MongoClient.connect(url, function(err, db) {
+  
+          if (err) throw err;
+          
+          let dbo = db.db("medlabels");
+  
+          const collection = dbo.collection('labels');
+  
+          collection.aggregate(
+            [
+                { $match : {"wfstatus" : 3}}, {$unwind: '$pages'}, {$unwind: '$pages.entities'},
+                { $group: { _id: "$pages.entities._id", count: { $sum: 1 } } }
+            ]
+          ).toArray(function(err, results) {
+          
+              try{
+  
+
+                results.forEach(element => {
+                      let tag = tags.filter(t => t._id.toString() == element._id.toString());
+                      if (tag.length > 0){
+                        element["value"] = tag[0].value;
+                      }else{
+                        element["value"] = null;
+                      }
+                      
+                });
+
+                  let response = {
+                        "nertags" : results
+                    }
+    
+                  res.json(response);
+      
+              
+              }catch(err){
+                  console.error(err);
+                  res.status(500).send({message : "An error occured requesting label stats"});
+              }
+          
+              db.close();
+                  
+          });
+  
+        });
+  
+      }catch(error){
+         res.send(500, "An error occured requesting label Object");
+      }
+
+
+}
+
+
+module.exports = { getWorkflowStats, getImgLabelStats, getNERLabelStats }

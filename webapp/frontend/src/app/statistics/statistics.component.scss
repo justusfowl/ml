@@ -1,25 +1,29 @@
 @import "../app.component.scss";
 
-#workflow {
+.statstable {
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
     border-collapse: collapse;
     width: 100%;
     min-width: 300px;
   }
   
-#workflow td, #workflow th {
+  .statstable td, .statstable th {
 border: 1px solid #ddd;
 padding: 8px;
 }
 
-#workflow tr:nth-child(even){background-color: #f2f2f2;}
+.statstable tr:nth-child(even){background-color: #f2f2f2;}
 
-#workflow tr:hover {background-color: #ddd;}
+.statstable tr:hover {background-color: #ddd;}
 
-#workflow th {
+.statstable th {
 padding-top: 12px;
 padding-bottom: 12px;
 text-align: left;
 background-color: #6c797e;
 color: white;
+}
+
+table{
+  width: 100%;
 }

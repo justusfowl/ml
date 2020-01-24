@@ -661,23 +661,27 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
         }
         
         if (flagApproveItem){
-          this.api.isLoading = true; 
+          if (confirm('Alle Seiten korrekt gelabelt?')) {
+           
+            this.api.isLoading = true; 
 
-          this.api.approveNerLabelObject(this.textObj).then(res => {
+            this.api.approveNerLabelObject(this.textObj).then(res => {
 
-              this.snackBar.open('Dokument bestätigt.', null, {
-                  duration: 1500,
+                this.snackBar.open('Dokument bestätigt.', null, {
+                    duration: 1500,
+                  });
+    
+                this.getNerLabelObject();
+
+            }).catch(err => {
+                this.snackBar.open('Etwas hat nicht geklappt.', null, {
+                    duration: 1500,
                 });
-  
-              this.getNerLabelObject();
-
-          }).catch(err => {
-              this.snackBar.open('Etwas hat nicht geklappt.', null, {
-                  duration: 1500,
-              });
-              this.api.isLoading = false; 
-              console.error(err);
-          })
+                this.api.isLoading = false; 
+                console.error(err);
+            })
+              
+          }
         }
          
       }else{
