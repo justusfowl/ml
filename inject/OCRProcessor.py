@@ -33,7 +33,7 @@ class OCRProcessor:
 
         else:
 
-            self.spellChecker = Speller(dev=True)
+            self.spellChecker = Speller()
 
             self.flagDev = False
 
@@ -116,7 +116,7 @@ class OCRProcessor:
 
             print("Processing...%s" % object_id)
 
-            self.progressHandler.pub_to(object_id, "OCR Processing started", "OCR")
+            self.progressHandler.pub_to(object_id, "OCR Processing started", "OCR", details={"start" : True})
 
             self.label_obj = self.db.mongo_db.labels.find_one({"_id": ObjectId(object_id)})
             self.process_label_object()
@@ -126,7 +126,7 @@ class OCRProcessor:
             self.progressHandler.pub_to(str(self.label_obj["_id"]), "Object stored", "OCR")
 
             self.publish_to_pretagging()
-            self.progressHandler.pub_to(str(self.label_obj["_id"]), "Published to pretagging", "OCR")
+            self.progressHandler.pub_to(str(self.label_obj["_id"]), "Published to pretagging", "OCR", details={"complete" : True})
 
             ch.basic_ack(delivery_tag=method.delivery_tag)
 

@@ -86,13 +86,13 @@ class MedLangProcessor:
             object_id = str(requestParams["_id"])
 
             print("Processing...%s" % object_id)
-            self.progressHandler.pub_to(str(object_id), "Pretagging initiated", "Pretag")
+            self.progressHandler.pub_to(str(object_id), "Pretagging initiated", "Pretag", details={"start" : True})
             self.label_obj = self.db.mongo_db.labels.find_one({"_id": ObjectId(object_id)})
             self.process_pretag_object()
             self.progressHandler.pub_to(str(object_id), "Pretagging completed", "Pretag")
             self.progressHandler.pub_to(str(object_id), "Update workflow status == 3", "Pretag")
             self.store_obj()
-            self.progressHandler.pub_to(str(object_id), "Object stored")
+            self.progressHandler.pub_to(str(object_id), "Object stored", details={"complete" : True})
 
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
