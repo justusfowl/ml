@@ -1,17 +1,15 @@
 @import "../../app.component.scss";
 
-#annotatedText{
+#annotatedText, #rawText{
     white-space: pre-line;
     padding: 15px;
-    max-height: 70vh;
+    max-height: 56vh;
     overflow-y: scroll;
     line-height: 25px;
 }
 
-#rawText{
-    white-space: pre-line;
-    padding: 15px;
-    overflow-y: scroll;
+#annotatedText.largetext{
+    line-height: 35px;
 }
 
 .container{
@@ -46,14 +44,25 @@
 }
 
 .response{
+    display: flex; 
     flex-grow: 4; 
-    max-width: 60vw; 
 }
 
-.settings{
-    flex-grow: 1;
-    max-width: 450px;
+.card{
+    margin: 10px; 
+    padding: 10px; 
 }
+
+.card.textbody{
+    max-width: 53vw;
+    max-height:70vh;
+}
+
+.card.textbody.large{
+    max-width: 100%;
+}
+
+
 
 .setting-row{
     border-bottom: 1px solid #d8d8d8;
@@ -83,6 +92,8 @@
     letter-spacing: 3px;
     line-height: 30px;
 }
+
+
 
 .entity{
     transition: 250ms linear;
@@ -203,9 +214,13 @@
 .newLabelShortcutInput{
     width: 30%; 
 }
+.entitiyselect-row{
+    display: flex; 
+    flex-wrap: wrap;
+}
+
 
 .entity-select{
-    min-height: 40px;
     display: flex;
     align-items: center;
     opacity: 0.5;
@@ -213,6 +228,12 @@
     border-radius: 4px;
     position: relative; 
     cursor: pointer;
+
+    .label{
+        margin-right: 5px;
+        font-size: 12px;
+        font-weight: 600;
+    }
 
     .shortcut{
         background-color: white;
@@ -233,6 +254,10 @@
 
 .entity-select.selected{
     opacity: 1; 
+
+    .label{
+        margin-right: 30px;
+    }
 }
 
 .no-data{
@@ -280,4 +305,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.nerheader{
+    display:flex; 
 }

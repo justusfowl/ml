@@ -3,6 +3,8 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../environments/environment';
 
+import { MatTableDataSource } from '@angular/material/table';
+
 export class ProgressService {
 
     ENV : string = ""; 
@@ -11,7 +13,7 @@ export class ProgressService {
 
     private socket;
 
-    public logs = [];
+    public logs = new MatTableDataSource()
 
     constructor() {
 
@@ -36,7 +38,8 @@ export class ProgressService {
             console.log(message);
             
             // add message at beginning of array
-            this.logs.unshift(message);
+            this.logs.data.unshift(message);
+            this.logs._updateChangeSubscription();
         });
     }
 
@@ -44,7 +47,8 @@ export class ProgressService {
         console.log("get message")
         return Observable.create((observer) => {
             this.socket.on('new-message', (message) => {
-                this.logs.push(message);
+                this.logs.data.unshift(message);
+                this.logs._updateChangeSubscription();
                 observer.next(message);
             });
         });

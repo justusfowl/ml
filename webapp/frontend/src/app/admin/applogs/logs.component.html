@@ -2,26 +2,34 @@
 <div class="container" >
     
     <div class="card logs-container">
-        <div class="title">
-            <form class="example-form">
-                <mat-form-field class="large">
-                        <input class="textinput" matInput [value]="currentObjId" (keydown.enter)="changeObjId($event.target.value)" placeholder="ObjectID...">
-                </mat-form-field>
-            </form>
-        </div>
         <div class="content">
-            <table id="workflow" style="width:100%">
-                <tr>
-                <th>ObjectID</th>
-                <th>Kategorie</th>
-                <th>Message</th>
-                </tr>
-                <tr *ngFor="let l of progressService.logs | logFilter:getFilterArgs(); let i = index;">
-                <td>{{l._id}}</td>
-                <td>{{l.category}}</td>
-                <td>{{l.message}}</td>
-                </tr>
-            </table>
+
+            <mat-form-field>
+                    <input matInput (keyup)="applyFilter($event.target.value)" [value]="currentObjId" placeholder="Filter">
+                  </mat-form-field>
+                  
+                  <table mat-table [dataSource]="progressService.logs" class="mat-elevation-z8">
+                  
+                    <ng-container matColumnDef="_id">
+                      <th mat-header-cell *matHeaderCellDef> ObjectID </th>
+                      <td mat-cell *matCellDef="let element"> {{element._id}} </td>
+                    </ng-container>
+                  
+                    <ng-container matColumnDef="category">
+                      <th mat-header-cell *matHeaderCellDef> Kategorie </th>
+                      <td mat-cell *matCellDef="let element"> {{element.category}} </td>
+                    </ng-container>
+                  
+                    <ng-container matColumnDef="message">
+                      <th mat-header-cell *matHeaderCellDef> Message </th>
+                      <td mat-cell *matCellDef="let element"> {{element.message}} </td>
+                    </ng-container>
+                  
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                  </table>
+                <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+                
         </div>
     </div>
 </div>

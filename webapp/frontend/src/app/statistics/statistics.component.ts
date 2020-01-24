@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ApiService } from '../api.service';
 import { ActivatedRoute } from '@angular/router';
 import { ProgressService } from '../services/progress.service';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatSort } from '@angular/material/sort';
 
 @Component({
   selector: 'app-statistics',
@@ -10,12 +12,17 @@ import { ProgressService } from '../services/progress.service';
 })
 export class StatisticsComponent implements OnInit {
 
-  workflowStats : any[] = [];
+  displayedColumnsWorkflow: string[] = ['_id', 'count'];
+  workflowStats : any = [];
 
-  bboxLabelStats : any = {}
+  displayedColumnsBbox: string[] = ['bboxcount'];
+
+  bboxLabelStats : any = []
   bboxLabelCount : number = 0; 
 
 
+  displayedColumnsNER: string[] = ['_id', 'value', 'count'];
+  nerLabelStats : any;
 
   constructor(
     private api: ApiService, 
@@ -23,9 +30,15 @@ export class StatisticsComponent implements OnInit {
     public progressService : ProgressService
   ) { }
 
+  @ViewChild('sortWF', {static: false}) sortWF: MatSort;
+  @ViewChild('sortNER', {static: false}) sortNER: MatSort;
+  @ViewChild('sortBbox', {static: false}) sortBbox: MatSort;
+  
+
   ngOnInit() {
     this.getWorkflowStats();
     this.getBboxLabelStats(); 
+    this.getNerLabelStats();
 
     console.log(this.route.snapshot.paramMap.get('objId'));
     
@@ -34,7 +47,8 @@ export class StatisticsComponent implements OnInit {
   getWorkflowStats(){
 
     this.api.getStatsWorkflow().then((result : any) => {
-      this.workflowStats = result; 
+      this.workflowStats = new MatTableDataSource(result);
+      this.workflowStats.sort = this.sortWF;
     }).catch(err => {
       console.log(err);
     })
@@ -44,15 +58,30 @@ export class StatisticsComponent implements OnInit {
   getBboxLabelStats(){
     this.api.getBboxLabelStats().then((result : any) => {
       this.bboxLabelStats = result;
-      console.log(result.bbox_count)
+      console.log(result.bbox_count);
       try{
         this.bboxLabelCount = result.bbox_count; 
+        this.bboxLabelStats = new MatTableDataSource([{"bboxcount" : result.bbox_count}]); 
+        this.bboxLabelStats.sort = this.sortBbox; 
       }catch(err){
         console.error(err);
       }
     }).catch(err => {
       console.log(err);
     })
+  }
+
+  getNerLabelStats(){
+
+    this.api.getNERStats().then((result : any) => {
+
+      this.nerLabelStats = new MatTableDataSource(result.nertags); 
+      this.nerLabelStats.sort = this.sortNER;
+
+    }).catch(err => {
+      console.log(err);
+    })
+
   }
 
 

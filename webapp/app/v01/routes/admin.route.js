@@ -38,6 +38,9 @@ router.route('/stats/workflow')
 router.route('/stats/bbox')
     .get(adminLabelStatsCtrl.getImgLabelStats)
 
+router.route('/stats/nertags')
+    .get(adminLabelStatsCtrl.getNERLabelStats)
+
 router.route('/maintain/publishAllOCR')
     .post(adminCtrl.publishAllToOCR)
 
