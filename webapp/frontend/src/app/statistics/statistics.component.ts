@@ -21,7 +21,7 @@ export class StatisticsComponent implements OnInit {
   bboxLabelCount : number = 0; 
 
 
-  displayedColumnsNER: string[] = ['_id', 'value', 'count'];
+  displayedColumnsNER: string[] = ['value', 'count'];
   nerLabelStats : any;
 
   constructor(

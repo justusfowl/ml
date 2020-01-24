@@ -1,10 +1,13 @@
-import { Component, OnInit, HostListener, AfterViewInit, ViewEncapsulation, ChangeDetectorRef, ViewChild , ElementRef} from '@angular/core';
-import { ApiService } from 'src/app/api.service';
+import { Component, OnInit, OnDestroy, HostListener, AfterViewInit, ViewEncapsulation, ChangeDetectorRef, ViewChild , ElementRef} from '@angular/core';
+import { ApiService } from '../../api.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 import { v1 as uuid } from 'uuid';
 import { MatSnackBar, MatTooltip } from '@angular/material';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { ProgressService } from '../../services/progress.service';
+import { NERTagFilterPipe } from '../../pipes/pipes';
 
 @Component({
   selector: 'app-nerlabel',
@@ -12,7 +15,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrls: ['./nerlabel.component.scss'], 
   encapsulation: ViewEncapsulation.None
 })
-export class NerlabelComponent implements OnInit, AfterViewInit {
+export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
 
   objId : string = ""; 
 
@@ -31,7 +34,8 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
   newEntTextShortCut : string = ""; 
 
   selectedText: string = '';
-  tagIdxSelected : number = 0; 
+  tagIdxSelected : number = 0;
+
   tags : any[] = [];
 
   flagShowEntSmall : boolean = true;
@@ -41,6 +45,31 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
   flagIsDemo : boolean = false;
 
   pagesReVisited : any[] = [];
+
+  selectedEntityTypeId: number = 0;
+
+  entityTypes : any[] = [
+    {
+      "id" : 0, 
+      "val" : "konsolidiert", 
+      "target_obj" : "consolidated_ent"
+    },
+    {
+      "id" : 1, 
+      "val" : "NLP", 
+      "target_obj" : "details_ner_ent"
+    },
+    {
+      "id" : 2, 
+      "val" : "Matcher", 
+      "target_obj" : "details_match_ent"
+    },
+    {
+      "id" : 3, 
+      "val" : "Fuzzy", 
+      "target_obj" : "details_fuzz_ent"
+    }
+  ]
 
   
   @HostListener('document:keydown', ['$event']) onKeydownHandler(evt: KeyboardEvent) {
@@ -57,19 +86,17 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
         }
       }else{
         let selIdx = this.tags.findIndex(x => x.shortcut.toUpperCase() == evt.key.toUpperCase()); 
-  
-        if (selIdx > -1){
-          this.tagIdxSelected = selIdx; 
+        
+        // if selected tag exists but is not visible, due to non-prod, set selIdx == -1
+        if (selIdx > -1 && !this.getIncludeNonProdTags() && !this.tags[selIdx].prod ){
+          selIdx = -1;
         }
+
+        this.tagIdxSelected = selIdx; 
       }
     }
     
-    
   }
-
- 
-
-
 
   constructor(
     private router: Router,
@@ -77,7 +104,10 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
     private sanitizer: DomSanitizer, 
     public snackBar: MatSnackBar, 
     private route: ActivatedRoute, 
-    private cd: ChangeDetectorRef
+    private cd: ChangeDetectorRef, 
+    private toastr: ToastrService, 
+    public progressService : ProgressService, 
+    private nerTagFilterPipe: NERTagFilterPipe
   ) { }
 
   
@@ -101,6 +131,26 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
     if (objId){
       this.objId = objId; 
     }
+
+    this.progressService.getObjectProgressLog().subscribe((message: any) => {
+      if (typeof(message.message) != "undefined"){
+        this.toastr.info(this.objId, message.message, {timeOut: 6000});
+        if (typeof(message.details) != "undefined"){
+          if (typeof(message.details.complete) != "undefined"){
+            this.api.isLoading = false;
+          }
+
+          if (typeof(message.details.start) != "undefined"){
+            this.api.isLoading = true;
+          }
+        }
+      }
+    });
+
+  }
+
+  ngOnDestroy(){
+    this.progressService.leaveObjLogRoom(this.objId);
   }
 
   @ViewChild('tooltip', {static: false}) tooltip: MatTooltip;
@@ -131,8 +181,6 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
         this.getNerLabelObject();
       }
     }
-
-    
     
    }
 
@@ -243,8 +291,11 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
 
   getWordBound(idx, text, start=false){
 
+    let maxIterations = 99999; 
+
     let resIdx = -1;
     let it = idx;
+    let iteration = 0
     
     while (resIdx < 0){
 
@@ -272,7 +323,17 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
           resIdx = text.length;
         }
       }
+
+      iteration++;
+
+      if (iteration >= maxIterations){
+        this.toastr.error("getWord()", "Es ist etwas mit dem Wort '" + text + "' schief gelaufen.", {timeOut: 6000});
+        resIdx = 0;
+      }
+
     }
+
+    console.log("iterations:" + iteration)
     
     return resIdx;
   
@@ -360,6 +421,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
       "pages" : [
         {
           "entities" :  self.sortEntities(nerResponse.entities),
+          "details" : nerResponse.details,
           "read_text" : nerResponse.text, 
           "read_text_raw" : nerResponse.text
         }
@@ -389,10 +451,6 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
       }else{
 
         self.objId = data._id; 
-
-        console.log(this.objId);
-
-      
 
         self.updateUrlParams();
 
@@ -426,8 +484,8 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
 
    }
 
-   selectEntity(index){
-     this.tagIdxSelected = index; 
+   selectEntity(index, _id){
+     this.tagIdxSelected = index;
    }
 
    makeText(){
@@ -505,6 +563,13 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
      let entID = uuid(); 
 
      console.log(entID);
+
+     if (this.tagIdxSelected < 0){
+      this.snackBar.open('Bitte eine gültige Kategorie auswählen.', null, {
+        duration: 1500,
+      });
+      return;
+     }
      
      return {
         "created_at": new Date(),
@@ -512,7 +577,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
         "ent_id":  entID,
         "start": startIdx,
         "tag": this.tags[this.tagIdxSelected].value,
-        "_id":this.tags[this.tagIdxSelected]._id,
+        "_id": this.tags[this.tagIdxSelected]._id,
         "value": textVal
      };
    }
@@ -599,8 +664,8 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
         ent.value = hidden_val;
 
      }
-    var snippit = '<span class="entity hl-' + this.getEntHlId(ent._id) + " " + classShowEnt + '" data-tag-id="' + this.getEntHlId(ent._id) + '" data-ent-id="' + ent.ent_id + '">' + ent.value + '<span class="ent-tooltip">' + this.getEntHlValue(ent._id) + '</span><div class="removeEnt" data-ent-id="' + ent.ent_id + '">X</div></span>'
-    return snippit
+    var snippit = '<span class="entity hl-' + this.getEntHlId(ent._id) + " " + classShowEnt + " " + this.getEntIsProdClass(ent._id) +'" data-tag-id="' + this.getEntHlId(ent._id) + '" data-ent-id="' + ent.ent_id + '">' + ent.value + '<span class="ent-tooltip">' + this.getEntHlValue(ent._id) + '</span><div class="removeEnt" data-ent-id="' + ent.ent_id + '">X</div></span>'
+    return snippit;
    }
 
    getEntHlId(tag_id){
@@ -621,6 +686,21 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
       return  this.tags[entInd].value;
     }else{
       return "unknown";
+    }
+    
+   }
+
+   getEntIsProdClass(tag_id){
+    var entInd = this.tags.findIndex(x => x._id == tag_id); 
+
+    if (entInd > -1){
+      if (this.tags[entInd].prod){
+        return ""
+      }else{
+        return "non-prod"
+      }
+    }else{
+      return "non-prod";
     }
     
    }
@@ -726,6 +806,36 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
     }
   }
 
+  handleDisplayEntityChange(evt){
+    
+     if (this.selectedEntityTypeId > 0) {
+      this.snackBar.open('Es werden nun alle Tags angezeigt. Nicht produktive sind rot-umrandet.', null, {
+        duration: 1500,
+      });
+    }
+
+    let target_obj_meta = this.entityTypes[this.entityTypes.findIndex(x => x.id == this.selectedEntityTypeId)]; 
+
+    let target_obj_name = target_obj_meta.target_obj;
+
+    let target_obj = this.textObj.pages[this.pageIdxSelected].details[target_obj_name]
+
+    this.textObj.pages[this.pageIdxSelected].entities = this.sortEntities(target_obj);
+
+    this.makeText();
+
+   
+
+  }
+
+  getIncludeNonProdTags(){
+    if (this.selectedEntityTypeId == 0){
+      return false;
+    }else{
+      return true;
+    }
+  }
+
 
   updateUrlParams(flagNoObjId=false){
 
@@ -745,8 +855,26 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
           queryParamsHandling: 'merge'
         });
     }
-   
-    
+  
+  }
+
+  issueObjToWf(targetWf){
+
+    let body = {
+      "targetWf" : targetWf, 
+      "objectIds" : [this.objId]
+    }
+
+    this.api.issueObjIdsToWf(body).then( (res : any) => {
+
+      this.toastr.info("Das Objekt wurde '" + targetWf + "' zugefügt.");
+      this.progressService.joinObjLogRoom(this.objId);
+
+    }).catch(err => {
+      console.error(err);
+      this.api.isLoading = false; 
+    })
+
   }
 
   navToLabelObj(){
@@ -755,5 +883,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit {
     });
 
   }
+
+
 
 }

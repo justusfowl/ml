@@ -10,12 +10,12 @@
             {{obj}}
           </mat-option>
         </mat-select>
-      </mat-form-field>
+    </mat-form-field>
 </div>
 
 <div class="container" *ngIf="!flagIsNoDataAvailable">
     <div class="response">
-        <div class="card" *ngIf="activePage">
+        <div class="card labelview" *ngIf="activePage">
             <div class="title main">
                 
                 <span class="details linktoobj" [matMenuTriggerFor]="menu">{{labelObject._id}} // {{labelObject.fileName}} [status:{{labelObject.wfstatus}} ] </span> 

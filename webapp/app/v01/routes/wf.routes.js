@@ -26,4 +26,8 @@ router.route('/')
 router.route('/file')
     .post(upload.single('file'),wfCtrl.processFile)
 
+
+router.route('/objIds')
+    .post(wfCtrl.issueObjIdToWf)
+
 module.exports = router;

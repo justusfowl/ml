@@ -8,13 +8,15 @@
 
         <div class="card">
             <div class="content entitiyselect-row">
-                    <div [class]="(i == tagIdxSelected) ? ('entity-select selected ent_' + i ) : 'entity-select ent_' + i " *ngFor="let t of tags; let i = index;" (click)="selectEntity(i)" 
+                    <div 
+                    *ngFor="let t of tags; let i = index;" 
+                    [class]="((i == tagIdxSelected) ? ('entity-select selected ent_' + i ) : 'entity-select ent_' + i) + ((!t.prod) ? ' non-prod' : '') + ((!getIncludeNonProdTags()) ? ' hide' : '')" 
+                    (click)="selectEntity(i, t._id)" 
                     >
-                    
-                            <span class="shortcut">{{t.shortcut}}</span>
-                            <span class="label" [class.selected]="i == tagIdxSelected">{{t.value | trimLongStr:15}}</span>
-                            <mat-icon class="selected-icon" *ngIf="i == tagIdxSelected" aria-hidden="false" aria-label="Example home icon">done</mat-icon>
-                        </div>
+                        <span class="shortcut">{{t.shortcut}}</span>
+                        <span class="label" [class.selected]="i == tagIdxSelected">{{t.value | trimLongStr:15}}</span>
+                        <mat-icon class="selected-icon" *ngIf="i == tagIdxSelected" aria-hidden="false" aria-label="Example home icon">done</mat-icon>
+                    </div>
             </div>
         </div>
 
@@ -68,6 +70,19 @@
                                             <input (keyup.enter)="addNewTag()" matInput type="text" placeholder="Shortcut" [(ngModel)]="newEntTextShortCut">
                                         </mat-form-field>
                                     </div>
+
+                                    <div class="setting-row">
+
+                                        <mat-form-field class="entity-types" >
+                                                <mat-label>Entitätsmatcher</mat-label>
+                                            <mat-select (selectionChange)="handleDisplayEntityChange($event)" [(value)]="selectedEntityTypeId">
+                                                <mat-option *ngFor="let ent of entityTypes" [value]="ent.id">
+                                                {{ent.val}}
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+
+                                    </div>
                                     
                                 </mat-expansion-panel>
                             </mat-accordion>
@@ -84,7 +99,7 @@
 
 
 
-        <div class="response">
+        <div class="">
 
             
             <div class="card textbody" [class.large]="!flagShowRawText">
@@ -97,10 +112,23 @@
                     Seite {{pageIdxSelected+1}} von {{totalNumPages}}
                     <p class="details linktoobj" [matMenuTriggerFor]="menu">{{textObj._id}} [status:{{textObj.wfstatus}} ] </p> 
                     <!-- <a class="details linktoobj" routerLink="/admin/label" [queryParams]="{ objId: textObj._id}" routerLinkActive="active" >{{textObj._id}} [status:{{textObj.wfstatus}} ]</a>-->
+
                     <mat-menu #menu="matMenu">
-                        <a mat-menu-item routerLink="/admin/label" [queryParams]="{ objId: textObj._id}" routerLinkActive="active">Bbox label</a>
-                        <a mat-menu-item routerLink="/logs" [queryParams]="{ objId: textObj._id}" routerLinkActive="active">Logs</a>
+                        <button mat-menu-item [matMenuTriggerFor]="viewObjMenu">Ansehen</button>
+                        <button mat-menu-item [matMenuTriggerFor]="execObjMenu">Workflow</button>
                     </mat-menu>
+                    
+                    <mat-menu #viewObjMenu="matMenu" >
+                            <a mat-menu-item routerLink="/admin/label" [queryParams]="{ objId: textObj._id}" routerLinkActive="active">Bbox label</a>
+                            <a mat-menu-item routerLink="/logs" [queryParams]="{ objId: textObj._id}" routerLinkActive="active">Logs</a>
+                    </mat-menu>
+
+                    <mat-menu #execObjMenu="matMenu">
+                        <button mat-menu-item (click)="issueObjToWf('pretag')">Pretag</button>
+                        <button mat-menu-item (click)="issueObjToWf('ocr')">OCR+Spellcheck+Pretag</button>
+                    </mat-menu>
+
+                    
                     </div>
                 
                     <button (click)="nextPage()" #tooltip="matTooltip" matTooltip="Bitte alle Seiten labeln." matTooltipPosition="right"  mat-button type="button">
@@ -115,7 +143,7 @@
                     </p>
                     <div id="annotatedText" *ngIf="annotatedText" (mouseup)="showSelectedText($event)"
                             [class.largetext]="!flagShowRawText"
-                            [style.font-size]="16*scaleFactor + 'px'" 
+                            [style.font-size]="14*scaleFactor + 'px'" 
                             [style.letter-spacing]="1*scaleFactor + 'px'" 
                             [innerHTML]="annotatedText">
                     </div>
@@ -135,7 +163,7 @@
                         <p *ngIf="!annotatedText">
                             Kein Text auf dieser Seite gefunden
                         </p>
-                        <div  id="rawText"  [style.font-size]="16*scaleFactor + 'px'" 
+                        <div  id="rawText"  [style.font-size]="14*scaleFactor + 'px'" 
                                 [style.letter-spacing]="1*scaleFactor + 'px'" 
                                 [innerHTML]="rawText">
                         </div>
@@ -149,9 +177,9 @@
 
     <div class="card" *ngIf="!flagIsDemo">
         <div class="content">
-            <div class="settings">
+            <div class="">
 
-                <button type="button" class="disregard-button" mat-flat-button color="error"  (click)="disregardNerObject()">Abbrechen</button>
+                <button type="button" class="disregard-button" mat-flat-button color="error"  (click)="disregardNerObject()">Aussortieren</button>
                 <button type="button" class="next-button" mat-flat-button color="primary" [disabled]="!getIsFinal()" (click)="approveObject()">Bestätigen</button>
 
             </div>

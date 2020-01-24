@@ -3,6 +3,8 @@ var fs = require('fs');
 var path = require('path');
 var request = require('request');
 const config = require('../../config/config');
+var amqp = require('amqplib/callback_api');
+
 
 function processFile(req, res){
 
@@ -55,5 +57,78 @@ function deleteTmpFile(path){
     }
 }
 
+function issueObjIdToWf(req, res){
 
-module.exports = { processFile }
+    let objectIds = req.body.objectIds; 
+    let targetWfStatus = req.body.targetWf;
+
+    let allowedWfTargets = ["ocr" , "pretag"]
+    let wfQueues = ["medlines", "pretag"];
+
+    let isValid = true; 
+
+    if (!objectIds || !targetWfStatus){
+        isValid = false;
+    }else{
+        try{
+            if (objectIds.length < 1){
+                isValid = false;
+            }
+
+            if (allowedWfTargets.indexOf(targetWfStatus) == -1){
+                isValid = false;
+            }
+        }catch(err){
+            isValid = false;
+        }
+    }
+
+    if (!isValid){
+        res.status(500).json({"message" : "Please provide an array objectIds:[]"});
+        return
+    }
+
+    let targetQueue = wfQueues[allowedWfTargets.indexOf(targetWfStatus)];
+
+    amqp.connect(config.getMqURL(), function (err, conn) {
+
+      if (err){
+          console.log(err); 
+          return;
+      }
+
+      conn.createChannel(function (err, ch) {
+
+        if(err) throw err;
+
+        try{
+
+            ch.assertQueue(targetQueue, { durable: true });
+
+            objectIds.forEach(objId => {
+
+                let payload = {"_id" : objId }
+          
+                ch.sendToQueue(targetQueue, new Buffer.from(JSON.stringify(payload)));
+
+            });
+
+            res.json({"message" : "ok - the following objIds have been added for " + targetWfStatus, "data": objectIds});
+
+            setTimeout(function () { 
+                conn.close(); 
+            }, 500); 
+
+        }catch(error){
+          console.error("Something went wrong publishing : " + payload)
+          console.error(error);
+          console.error(err)
+        }
+      });
+
+  });
+
+}
+
+
+module.exports = { processFile, issueObjIdToWf}

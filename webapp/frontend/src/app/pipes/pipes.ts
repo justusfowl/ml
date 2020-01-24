@@ -46,3 +46,30 @@ export class LogFilterPipe implements PipeTransform {
       return result;
   }
 }
+
+@Pipe({
+  name: 'nerTagFilter',
+  pure: false
+})
+export class NERTagFilterPipe implements PipeTransform {
+  transform(items: any[], includeNonProdItems=false): any {
+      if (!items) {
+          return items;
+      }
+
+      let result = [];
+
+
+      items.forEach(x => {
+
+        if (x.prod){
+          result.push(x)
+        }else if(includeNonProdItems){
+          result.push(x)
+        }
+
+      });
+
+      return result;
+  }
+}
