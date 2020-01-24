@@ -430,4 +430,21 @@ export class ApiService {
     });
   }
 
+  issueObjIdsToWf(body){
+    const api = this;
+
+    return new Promise(function(resolve, reject) {
+      
+      api.http.post(api.apiURL + '/wf/objIds', body).subscribe(
+        (data: any) => {
+          resolve(data)
+        },
+        error => {
+          api.handleAPIError(error);
+          reject(error)
+        }
+      )
+    });
+  }
+
 }

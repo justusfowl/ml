@@ -64,7 +64,18 @@ const config = {
     procBackend : {
       host: process.env.PROC_BACKEND_HOST,
       port : process.env.PROC_BACKEND_PORT,
-    }
+    }, 
+
+
   };
+
+  function getMqURL(){
+    var mqURL = 'amqp://' + config.mq.mqUser + ':' + config.mq.mqPassword + '@' + config.mq.mqServer + ':' + config.mq.mqPort;
+    return mqURL;
+  }
+
+  config["getMqURL"] = getMqURL
+
+
   
   module.exports = config;

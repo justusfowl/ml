@@ -22,7 +22,7 @@ import { StatisticsComponent } from './statistics/statistics.component';
 import { SettingsComponent } from './settings/settings.component';
 import { SearchComponent } from './search/search.component';
 
-import { TrimLongStr, LogFilterPipe } from './pipes/pipes';
+import { TrimLongStr, LogFilterPipe, NERTagFilterPipe } from './pipes/pipes';
 
 import { LabelComponent } from './admin/label/label.component';
 import { NerlabelComponent } from './admin/nerlabel/nerlabel.component';
@@ -43,12 +43,13 @@ import { ToastrModule } from 'ngx-toastr';
     HomeComponent,
     StatisticsComponent, 
     LogsComponent,
-    LabelComponent, 
+    LabelComponent,
     SettingsComponent, 
     NerlabelComponent, 
-    SearchComponent, 
-    TrimLongStr, 
-    LogFilterPipe
+    SearchComponent,
+    TrimLongStr,
+    LogFilterPipe, 
+    NERTagFilterPipe
   ],
   imports: [
     HttpClientModule,
@@ -65,7 +66,8 @@ import { ToastrModule } from 'ngx-toastr';
   providers: [
     {provide: LocationStrategy, useClass: HashLocationStrategy},
     ProgressService,
-    ApiService
+    ApiService, 
+    NERTagFilterPipe
   ],
   bootstrap: [AppComponent]
 })

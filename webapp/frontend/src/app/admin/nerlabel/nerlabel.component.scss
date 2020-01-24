@@ -214,6 +214,12 @@
 .newLabelShortcutInput{
     width: 30%; 
 }
+
+
+.entity-types{
+    width: 100%; 
+}
+
 .entitiyselect-row{
     display: flex; 
     flex-wrap: wrap;
@@ -228,6 +234,8 @@
     border-radius: 4px;
     position: relative; 
     cursor: pointer;
+    width: 18%;
+    box-sizing: border-box;
 
     .label{
         margin-right: 5px;
@@ -250,6 +258,14 @@
         position: absolute; 
         right: 5px; 
     }
+}
+
+.entity-select.non-prod{
+    border: 2px dashed red;
+}
+
+.entity-select.non-prod.hide{
+    display: none !important;
 }
 
 .entity-select.selected{

@@ -62,7 +62,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       if (typeof(message.message) != "undefined"){
         this.toastr.info(this.currentObjId, message.message, {timeOut: 6000});
       }
-      
     });
 
   }
