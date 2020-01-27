@@ -1,16 +1,18 @@
-import { Component } from '@angular/core';
+import { ViewChild, Component, AfterViewInit } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ApiService } from '../api.service';
+import { NavDrawerService } from '../services/nav.service';
+import { MatDrawer, MatSidenav } from '@angular/material';
 
 @Component({
   selector: 'app-nav',
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.scss']
 })
-export class NavComponent {
+export class NavComponent implements AfterViewInit {
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(
@@ -18,12 +20,22 @@ export class NavComponent {
       shareReplay()
     );
 
+    @ViewChild("drawer", {static: false}) public drawer: MatSidenav
+
   constructor(
     private breakpointObserver: BreakpointObserver, 
     public router : Router, 
     public api : ApiService, 
-    private route: ActivatedRoute
-  ) {}
+    private route: ActivatedRoute, 
+    private navService : NavDrawerService
+  ) {
+
+   
+  }
+
+  ngAfterViewInit(){
+    this.navService.setMyNavDrawer(this.drawer);  
+  }
 
   execSearch(){
 

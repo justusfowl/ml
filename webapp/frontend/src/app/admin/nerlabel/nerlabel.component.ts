@@ -134,14 +134,16 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.progressService.getObjectProgressLog().subscribe((message: any) => {
       if (typeof(message.message) != "undefined"){
-        this.toastr.info(this.objId, message.message, {timeOut: 6000});
+        this.toastr.info(message.category, message.message, {timeOut: 6000});
         if (typeof(message.details) != "undefined"){
           if (typeof(message.details.complete) != "undefined"){
-            this.api.isLoading = false;
+            // this.api.isLoading = false;
+            this.api.setLoadingStatus(false);
           }
 
           if (typeof(message.details.start) != "undefined"){
-            this.api.isLoading = true;
+            // this.api.isLoading = true;
+            this.api.setLoadingStatus(true);
           }
         }
       }
@@ -158,17 +160,20 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
 
   async ngAfterViewInit() {
    
-    this.api.isLoading = true;
+    // this.api.isLoading = true;
+    this.api.setLoadingStatus(true);
 
     // use async to wait for labels to load first
     await this.api.getNerLabelTag().then( (data : any) => {
       this.tags = data;
       if (this.flagIsDemo){
-        this.api.isLoading = false; 
+        // this.api.isLoading = false;
+        this.api.setLoadingStatus(false);
       }
     }).catch(err => {
       console.log(err);
-      this.api.isLoading = false; 
+      // this.api.isLoading = false;
+      this.api.setLoadingStatus(false);
     })
 
 
@@ -383,21 +388,23 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
       "shortcut" : this.newEntTextShortCut.toUpperCase()
     }
 
-    this.api.isLoading = true;
+    // this.api.isLoading = true;
+    this.api.setLoadingStatus(true);
 
     this.api.addNerLabelTag(newTag).then( (data : any) => {
 
       if (data.ops.length > 0){
         this.tags.push(data.ops[0])
       }
-
-      this.api.isLoading = false;
+      this.api.setLoadingStatus(false);
+      //this.api.isLoading = false;
       this.newEntText = "";
       this.newEntTextShortCut = ""; 
 
     }).catch(err => {
       console.log(err);
-      this.api.isLoading = false; 
+      // this.api.isLoading = false;
+      this.api.setLoadingStatus(false);
     })
 
     console.log(newTag); 
@@ -437,7 +444,8 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getNerLabelObject(objectId?){
     const self = this;
-    self.api.isLoading = true;
+    // self.api.isLoading = true;
+    self.api.setLoadingStatus(true);
     self.flagIsNoDataAvailable = false; 
 
     // reset the pages visited for the new object
@@ -474,11 +482,13 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
           throw "no pages contained in the object";
         }       
       }
-       self.api.isLoading = false; 
+       // self.api.isLoading = false;
+       self.api.setLoadingStatus(false); 
 
     }).catch(err => {
       console.log(err);
-      self.api.isLoading = false;
+      // self.api.isLoading = false;
+      self.api.setLoadingStatus(false);
       self.flagIsNoDataAvailable = false; 
     })
 
@@ -743,7 +753,8 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
         if (flagApproveItem){
           if (confirm('Alle Seiten korrekt gelabelt?')) {
            
-            this.api.isLoading = true; 
+            // this.api.isLoading = true;
+            this.api.setLoadingStatus(true); 
 
             this.api.approveNerLabelObject(this.textObj).then(res => {
 
@@ -757,7 +768,8 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.snackBar.open('Etwas hat nicht geklappt.', null, {
                     duration: 1500,
                 });
-                this.api.isLoading = false; 
+                // this.api.isLoading = false;
+                this.api.setLoadingStatus(false);
                 console.error(err);
             })
               
@@ -872,7 +884,8 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
 
     }).catch(err => {
       console.error(err);
-      this.api.isLoading = false; 
+      // this.api.isLoading = false; 
+      this.api.setLoadingStatus(false);
     })
 
   }

@@ -58,9 +58,21 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       this.goToNlp()
     });
 
+
     this.progressService.getObjectProgressLog().subscribe((message: any) => {
       if (typeof(message.message) != "undefined"){
-        this.toastr.info(this.currentObjId, message.message, {timeOut: 6000});
+        this.toastr.info(message.category, message.message, {timeOut: 6000});
+        if (typeof(message.details) != "undefined"){
+          if (typeof(message.details.complete) != "undefined"){
+            // this.api.isLoading = false;
+            this.api.setLoadingStatus(false);
+          }
+
+          if (typeof(message.details.start) != "undefined"){
+            // this.api.isLoading = true;
+            this.api.setLoadingStatus(true);
+          }
+        }
       }
     });
 
