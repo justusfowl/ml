@@ -15,7 +15,7 @@ from dbal import DB
 
 class PDFInjector:
 
-    def __init__(self, file_path, **kwargs):
+    def __init__(self, file_path, pat_nummer, pat_name, **kwargs):
 
         self.TIFF_PATH = os.environ.get("TIFF_PATH")
         self.db = DB()
@@ -23,6 +23,9 @@ class PDFInjector:
 
         self.file_path = file_path
         self.file_name = os.path.basename(self.file_path)
+
+        self.pat_nummer = pat_nummer
+        self.pat_name = pat_name
 
         self.pages = []
         self.exist_ids = []
@@ -42,6 +45,11 @@ class PDFInjector:
             self.check_file_exists()
 
         self.inserted_id = None
+
+        if "wfsteps" in kwargs:
+            self.wfsteps = kwargs["wfsteps"]
+        else:
+            self.wfsteps = []
 
         self.connection = pika.BlockingConnection(self.db.mq_conn_params)
         self.channel = self.connection.channel()
@@ -124,6 +132,8 @@ class PDFInjector:
         if not self.flag_file_exists:
             my_dict = {
                 "fileName" : self.file_name,
+                "patName" : self.pat_name,
+                "patNummer": self.pat_nummer,
                 "fileHash" : self.file_hash,
                 "filePathOrig" : self.file_path,
                 "filePath" : self.file_path_tiff,
@@ -149,10 +159,13 @@ class PDFInjector:
             obj["wfstatus"] = 1
 
             obj["wfstatus_change"] = [
+
+                # WFstatus 0 -> image is stored and thumbnails created
                 {
                     "timeChange": dt.datetime.now(pytz.utc),
                     "wfstatus": 0
                 },
+                # WFstatus 1 -> image is analyzed for BBox'es for the text body
                 {
                     "timeChange": dt.datetime.now(pytz.utc),
                     "wfstatus": 1
@@ -168,5 +181,8 @@ class PDFInjector:
 
     def publish_to_OCR(self):
         if self.inserted_id is not None:
-            msg = {"_id": self.inserted_id}
-            self.channel.basic_publish(exchange='', routing_key=os.environ.get("MQ_QUEUE_OCR"), body=json.dumps(msg))
+            if "ocr" in self.wfsteps:
+                msg = {"_id": self.inserted_id, "wfsteps" : self.wfsteps}
+                self.channel.basic_publish(exchange='', routing_key=os.environ.get("MQ_QUEUE_OCR"), body=json.dumps(msg))
+            else:
+                print("publish to OCR aborted - wfsteps not defined")

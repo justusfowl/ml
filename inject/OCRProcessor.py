@@ -86,7 +86,12 @@ class OCRProcessor:
 
     def store_obj(self):
 
+        # remove entities that might have previously existed for this object
+        # because due to spellchecking, those might be corrupt any way
 
+        for p in self.label_obj["pages"]:
+            if "entities" in p:
+                del p["entities"]
 
         self.label_obj["wfstatus"] = 2
 
@@ -99,13 +104,9 @@ class OCRProcessor:
 
         self.db.mongo_db.labels.update({"_id": self.label_obj["_id"]}, self.label_obj, upsert=True)
 
-
-
     def publish_to_pretagging(self):
         msg = {"_id": str(self.label_obj["_id"])}
         self.channel.basic_publish(exchange='', routing_key=os.environ.get("MQ_QUEUE_PRETAG"), body=json.dumps(msg))
-
-
 
     def callback(self, ch, method, properties, body):
 
@@ -113,6 +114,10 @@ class OCRProcessor:
             requestParams = json.loads(body.decode('utf-8'))
 
             object_id = str(requestParams["_id"])
+            wfsteps = requestParams["wfsteps"]
+
+            if not wfsteps:
+                wfsteps = []
 
             print("Processing...%s" % object_id)
 
@@ -135,10 +140,16 @@ class OCRProcessor:
                 self.store_obj()
                 self.progressHandler.pub_to(str(self.label_obj["_id"]), "Object stored", "OCR")
 
-                self.publish_to_pretagging()
-                self.progressHandler.pub_to(str(self.label_obj["_id"]), "Published to pretagging", "OCR", details={"complete" : True})
+                if "pretag" in wfsteps:
+
+                    self.publish_to_pretagging()
+
+                    self.progressHandler.pub_to(str(self.label_obj["_id"]), "Published to pretagging", "OCR", details={"complete" : True})
+                else:
+                    self.progressHandler.pub_to(str(self.label_obj["_id"]), "No publish to pretagging as defined in wfsteps", "OCR", details={"complete": True})
 
                 ch.basic_ack(delivery_tag=method.delivery_tag)
+
                 print("Completed for %s" % object_id)
                 self.progressHandler.leave_room(object_id)
 
