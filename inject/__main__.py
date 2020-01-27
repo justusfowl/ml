@@ -122,7 +122,6 @@ def main(args=sys.argv[1:]):
         else:
             logging.error("Please provide what type of loader should be executed.")
 
-
     else:
         print("service")
 

@@ -57,3 +57,6 @@ class PH:
 
     def join_room(self, obj_id):
         self.sio.emit("newobj", obj_id)
+
+    def leave_room(self, obj_id):
+        self.sio.emit("leaveobj", obj_id)

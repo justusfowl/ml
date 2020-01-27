@@ -33,7 +33,7 @@ class OCRProcessor:
 
         else:
 
-            self.spellChecker = Speller(dev=True)
+            self.spellChecker = Speller()
 
             self.flagDev = False
 
@@ -116,6 +116,8 @@ class OCRProcessor:
 
             print("Processing...%s" % object_id)
 
+            self.progressHandler.join_room(object_id)
+
             self.progressHandler.pub_to(object_id, "OCR Processing started", "OCR", details={"start" : True})
 
             self.label_obj = self.db.mongo_db.labels.find_one({"_id": ObjectId(object_id)})
@@ -123,7 +125,7 @@ class OCRProcessor:
             if not self.label_obj:
                 ch.basic_ack(delivery_tag=method.delivery_tag)
                 self.progressHandler.pub_to(object_id, "Fatal error, object cannot be found in database. Is dropped.", "OCR", details={"complete" : True})
-
+                self.progressHandler.leave_room(object_id)
 
             else:
 
@@ -137,8 +139,8 @@ class OCRProcessor:
                 self.progressHandler.pub_to(str(self.label_obj["_id"]), "Published to pretagging", "OCR", details={"complete" : True})
 
                 ch.basic_ack(delivery_tag=method.delivery_tag)
-
                 print("Completed for %s" % object_id)
+                self.progressHandler.leave_room(object_id)
 
 
         except Exception as e:
@@ -150,6 +152,8 @@ class OCRProcessor:
             else:
                 ch.basic_reject(delivery_tag=method.delivery_tag, requeue=True)
                 self.progressHandler.pub_to(str(self.label_obj["_id"]), "File rejected", "OCR", error=e)
+
+            self.progressHandler.leave_room(object_id)
 
     def init_consuming(self):
         print("start consuming...")

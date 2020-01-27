@@ -86,12 +86,15 @@ class MedLangProcessor:
             object_id = str(requestParams["_id"])
 
             print("Processing...%s" % object_id)
+            self.progressHandler.join_room(object_id)
+
             self.progressHandler.pub_to(str(object_id), "Pretagging initiated", "Pretag", details={"start" : True})
             self.label_obj = self.db.mongo_db.labels.find_one({"_id": ObjectId(object_id)})
 
             if not self.label_obj:
                 ch.basic_ack(delivery_tag=method.delivery_tag)
                 self.progressHandler.pub_to(object_id, "Fatal error, object cannot be found in database. Is dropped.", "Pretag", details={"complete" : True})
+                self.progressHandler.leave_room(object_id)
             else:
                 self.process_pretag_object()
                 self.progressHandler.pub_to(str(object_id), "Pretagging completed", "Pretag")
@@ -102,15 +105,19 @@ class MedLangProcessor:
                 ch.basic_ack(delivery_tag=method.delivery_tag)
 
                 print("Completed for %s" % object_id)
+                self.progressHandler.leave_room(object_id)
 
         except Exception as e:
             print("File could not be processed... %s" % object_id, e)
             if method.delivery_tag > 100 and method.redelivered:
                 ch.basic_ack(delivery_tag=method.delivery_tag)
                 self.progressHandler.pub_to(object_id, "Fatal error, object cannot be processed. Is dropped.", "OCR", details={"complete": True}, error=e)
+
             else:
                 ch.basic_reject(delivery_tag=method.delivery_tag, requeue=True)
                 self.progressHandler.pub_to(str(self.label_obj["_id"]), "File rejected", "Pretag", error=e)
+
+            self.progressHandler.leave_room(object_id)
 
 
 
