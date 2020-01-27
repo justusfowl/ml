@@ -161,11 +161,11 @@ function approveLabelObject(req, res){
         }
         
         collection.replaceOne(
-          {"_id" : ObjectID(objId), "wfsteps" : ["pretag"]}, 
+          {"_id" : ObjectID(objId)}, 
           labelObject,
           function(err, docs){
             res.json({"message" : "ok"});
-            publishToQueue("medlines", {"_id" :objId }); 
+            publishToQueue("medlines", {"_id" :objId, "wfsteps" : ["pretag"] }); 
             console.log("published id: " + objId);
           });
 
