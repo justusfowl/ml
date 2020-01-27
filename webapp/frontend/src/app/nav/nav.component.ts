@@ -78,4 +78,20 @@ export class NavComponent implements AfterViewInit {
     } 
   }
 
+  goToLabelWF(drawer){
+    const self = this;
+   
+    self.router.navigate(["/admin/label"], { queryParams: { wf: 'true'} }).then( (e) => {
+      drawer.close();
+   });
+  }
+
+  goToNERLabelWF(drawer){
+    const self = this;
+   
+    self.router.navigate(["/admin/nerlabel"], { queryParams: { wf: 'true'} }).then( (e) => {
+      drawer.close();
+   });
+  }
+
 }

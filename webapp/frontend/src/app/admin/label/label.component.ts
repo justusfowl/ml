@@ -19,6 +19,8 @@ export class LabelComponent implements OnInit, AfterViewInit {
 
   objId : string = ""; 
 
+  flagIsPageCalledFromWorkflow : boolean = true;
+
   selectedObjectId : string = ""; 
 
   loadedObjects = [];
@@ -76,6 +78,7 @@ export class LabelComponent implements OnInit, AfterViewInit {
   templateAttrCategory = ""; 
   templateAttrType = ""; 
 
+
   @HostListener('document:keydown', ['$event']) onKeydownHandler(evt: KeyboardEvent) {
       
       if (evt.key == "Escape"){
@@ -107,7 +110,7 @@ export class LabelComponent implements OnInit, AfterViewInit {
   availableGroupLabels = [];
   availableCrawlGroupLabels = [];
 
-  isValidatedGroupLabelInfo : any = {
+  isValidatedGroupLabelInfo : any = { 
       "total" : "-"
   };
 
@@ -136,12 +139,20 @@ export class LabelComponent implements OnInit, AfterViewInit {
     this.router.routeReuseStrategy.shouldReuseRoute = () => false;
 
     let objId = this.route.snapshot.queryParamMap.get('objId'); 
+    let wfCalled = this.route.snapshot.queryParamMap.get('wf');
+
+    if (!wfCalled || wfCalled == "false"){
+        this.flagIsPageCalledFromWorkflow = false;
+    }else{
+        this.flagIsPageCalledFromWorkflow = true;
+    }
 
     console.log(objId);
 
     this.clearView();
 
     if (objId){
+     
       this.objId = objId;
       this.getLabelObject(this.objId);
     }else{
@@ -161,7 +172,8 @@ export class LabelComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-   // this.api.toggleNavClose();
+      console.log("I am from workflow?")
+      console.log(this.flagIsPageCalledFromWorkflow)
   }
 
   clearView(){
@@ -196,7 +208,7 @@ export class LabelComponent implements OnInit, AfterViewInit {
         this.flagIsNoDataAvailable = false;
     }
 
-    this.api.getLabelObject(objectId).then((result : any) => {
+    this.api.getLabelObject(objectId, this.flagIsPageCalledFromWorkflow).then((result : any) => {
 
         if (typeof(result._id) == "undefined"){
             this.isLoading = false; 
@@ -206,8 +218,10 @@ export class LabelComponent implements OnInit, AfterViewInit {
             if (!objectId){
                 this.loadedObjects.push(result._id);
                 this.objId = result._id; 
-                this.updateUrlParams()
+               
             }
+
+           
 
             this.selectedObjectId = result._id; 
 
@@ -564,14 +578,19 @@ export class LabelComponent implements OnInit, AfterViewInit {
     }
 
     approveObject(){
+        
 
         if (this.getIsFinal()){
 
+            if(!this.flagIsPageCalledFromWorkflow){
+                this.updateUrlParamsToWF();
+            }
+
             this.isLoading = true;
-            // this.api.isLoading = true;
             this.progressService.loaderIsLoading();
 
             this.api.approveLabelObject(this.labelObject).then(res => {
+
 
                 this.snackBar.open('Dokument bestätigt.', null, {
                     duration: 1500,
@@ -580,12 +599,14 @@ export class LabelComponent implements OnInit, AfterViewInit {
                 this.clearView(); 
                 this.getLabelObject();
 
+
+
             }).catch(err => {
                 this.snackBar.open('Etwas hat nicht geklappt.', null, {
                     duration: 1500,
                 });
+
                 this.isLoading = false;
-                // this.api.isLoading = false; 
                 this.progressService.loaderIsLoading();
                 console.error(err);
             })
@@ -611,9 +632,13 @@ export class LabelComponent implements OnInit, AfterViewInit {
 
     disregardObject(){
         if (confirm('Dieses Objekt für die weitere Bearbeitung aussortieren?')) {
+            
+            if(!this.flagIsPageCalledFromWorkflow){
+                this.updateUrlParamsToWF();
+            }
 
             this.isLoading = true;
-            // this.api.isLoading = true; 
+
             this.progressService.loaderIsLoading();
 
             this.api.disregardObject(this.labelObject).then(res => {
@@ -639,17 +664,43 @@ export class LabelComponent implements OnInit, AfterViewInit {
         }
     }
 
+    updateUrlParams(){
+        this.router.navigate(
+            [], 
+            {
+              relativeTo: this.route,
+              queryParams: { objId: this.objId },
+              queryParamsHandling: 'merge'
+            });
+
+        this.flagIsPageCalledFromWorkflow = true;
+    }
     
-  updateUrlParams(){
+    updateUrlParamsToWF(){
 
     this.router.navigate(
       [], 
       {
         relativeTo: this.route,
-        queryParams: { objId: this.objId },
-        queryParamsHandling: 'merge'
+        queryParams: { wf: true },
+        queryParamsHandling: ''
       });
     
+    }
+
+  copyUrlToClipboard(){
+
+      let targetUrl = window.location.origin + "/#" +this.router.url.split('?')[0] + "?objId="+ this.objId
+
+    document.addEventListener('copy', (e: ClipboardEvent) => {
+        e.clipboardData.setData('text/plain', (targetUrl));
+        e.preventDefault();
+        document.removeEventListener('copy', null);
+        this.snackBar.open("URL kopiert", null, {
+            duration: 1500,
+        });
+      });
+      document.execCommand('copy');
   }
 
 

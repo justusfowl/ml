@@ -31,7 +31,8 @@ function getLabelObject(req, res){
       try{
         
         // for direct calls of an object, do not update the workflow status so that for demo purposes the object can be called in different views
-        let flagUpdateWFStatus = true; 
+        
+        let flagUpdateWFStatus = eval(req.query.flagUpdateWFStatus) ; 
 
         let filterArray = [];
 
@@ -44,7 +45,6 @@ function getLabelObject(req, res){
 
             filterArray.push(filterObj);
 
-            flagUpdateWFStatus = false; 
         }else{
 
            // default object: search for workflow items with wfstatus == 1 --> item is injected into pipeline as PDF
@@ -98,7 +98,7 @@ function getLabelObject(req, res){
       
                   if (typeof(docs._id) != "undefined" && flagUpdateWFStatus){
                     // collection.updateOne({"_id" : ObjectID(docs._id)}, {$set: { wfstatus : 1}, $push: { "wfstatus_change" :changeItem}})
-                    collection.update({"id" : ObjectID(docs._id)}, {$set: { lockTime: new Date() } })
+                    collection.updateOne({"_id" : ObjectID(docs._id)}, {$set: { lockTime: new Date() } })
                   }
                 }else{
                   res.json({})
@@ -161,7 +161,7 @@ function approveLabelObject(req, res){
         }
         
         collection.replaceOne(
-          {"_id" : ObjectID(objId)}, 
+          {"_id" : ObjectID(objId), "wfsteps" : ["pretag"]}, 
           labelObject,
           function(err, docs){
             res.json({"message" : "ok"});

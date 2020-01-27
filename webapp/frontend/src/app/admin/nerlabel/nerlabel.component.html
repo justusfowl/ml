@@ -116,12 +116,14 @@
                     <mat-menu #menu="matMenu">
                         <button mat-menu-item [matMenuTriggerFor]="viewObjMenu">Ansehen</button>
                         <button mat-menu-item [matMenuTriggerFor]="execObjMenu">Workflow</button>
+                        <button mat-menu-item (click)="copyUrlToClipboard()">URL kopieren</button>
                     </mat-menu>
                     
                     <mat-menu #viewObjMenu="matMenu" >
                             <a mat-menu-item routerLink="/admin/label" [queryParams]="{ objId: textObj._id}" routerLinkActive="active">Bbox label</a>
                             <a mat-menu-item routerLink="/logs" [queryParams]="{ objId: textObj._id}" routerLinkActive="active">Logs</a>
-                    </mat-menu>
+                    
+                        </mat-menu>
 
                     <mat-menu #execObjMenu="matMenu">
                         <button mat-menu-item (click)="issueObjToWf('pretag')">Pretag</button>
