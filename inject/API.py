@@ -21,7 +21,7 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 nerTagger = PreTagger()
 
-spellChecker = Speller()
+spellChecker = Speller(dev=True)
 
 def initAPI():
 

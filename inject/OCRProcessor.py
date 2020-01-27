@@ -33,7 +33,7 @@ class OCRProcessor:
 
         else:
 
-            self.spellChecker = Speller()
+            self.spellChecker = Speller(dev=True)
 
             self.flagDev = False
 
@@ -114,10 +114,11 @@ class OCRProcessor:
             requestParams = json.loads(body.decode('utf-8'))
 
             object_id = str(requestParams["_id"])
-            wfsteps = requestParams["wfsteps"]
-
-            if not wfsteps:
+            
+            if not "wfsteps" in requestParams:
                 wfsteps = []
+            else:
+                wfsteps = requestParams["wfsteps"]
 
             print("Processing...%s" % object_id)
 
