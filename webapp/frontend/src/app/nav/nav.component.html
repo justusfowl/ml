@@ -1,5 +1,5 @@
 <mat-sidenav-container class="sidenav-container">
-  <mat-sidenav #drawer class="sidenav" fixedInViewport
+  <mat-sidenav  #drawer class="sidenav" fixedInViewport
       [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
       [mode]="(isHandset$ | async) ? 'over' : 'side'"
       [opened]="api.navOpen">
@@ -24,9 +24,13 @@
         <a class="menu-item" mat-list-item routerLink="/stats" routerLinkActive="active">
           <mat-icon  aria-hidden="false" >bar_chart</mat-icon>
       </a>
-        <a class="menu-item" mat-list-item routerLink="/settings" routerLinkActive="active" >
-          <mat-icon  aria-hidden="false" >settings</mat-icon>
-        </a>
+      <a class="menu-item" mat-list-item routerLink="/logs" routerLinkActive="active" >
+        <mat-icon  aria-hidden="false" >subject</mat-icon>
+      </a>
+      <a class="menu-item" mat-list-item routerLink="/settings" routerLinkActive="active" >
+        <mat-icon  aria-hidden="false" >settings</mat-icon>
+      </a>
+
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
@@ -64,4 +68,4 @@
     <router-outlet></router-outlet>
 
   </mat-sidenav-content>
-</mat-sidenav-container>
+</mat-sidenav-container> 

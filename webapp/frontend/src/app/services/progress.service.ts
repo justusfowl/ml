@@ -74,6 +74,7 @@ export class ProgressService {
     }
 
     public joinObjLogRoom(objId) {
+        console.log("joining room.." + objId)
         this.socket.emit('newobj', objId);
     }
 

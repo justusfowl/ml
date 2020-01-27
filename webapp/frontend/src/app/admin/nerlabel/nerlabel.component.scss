@@ -54,14 +54,17 @@
 }
 
 .card.textbody{
-    max-width: 53vw;
+    width: 50%;
     max-height:70vh;
 }
 
 .card.textbody.large{
-    max-width: 100%;
+    width: 100%;
 }
 
+.textbody.large #annotatedText{
+    width: 100%;
+}
 
 
 .setting-row{
@@ -325,4 +328,16 @@
 
 .nerheader{
     display:flex; 
+}
+
+.ner{
+
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+
+    .mainbody{
+        display:flex; 
+    }
+
 }

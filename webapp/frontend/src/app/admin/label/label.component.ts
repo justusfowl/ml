@@ -1,10 +1,11 @@
-import { Component, OnInit, HostListener, ViewEncapsulation, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, OnInit, HostListener, ViewEncapsulation, AfterViewInit } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
 import {DomSanitizer} from '@angular/platform-browser'; 
 import { v1 as uuid } from 'uuid';
 import { ApiService } from '../../api.service';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar, MatDrawer, MatSidenav } from '@angular/material';
 import { Router, ActivatedRoute } from '@angular/router';
+import { NavDrawerService } from 'src/app/services/nav.service';
 
 
 @Component({
@@ -113,15 +114,20 @@ export class LabelComponent implements OnInit, AfterViewInit {
 
   groupLabelsInfoChangedItem : any;
 
+
+  
+  @ViewChild('drawer', {static: true}) drawer: MatSidenav;
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private _fb: FormBuilder,
     private api: ApiService,
     public snackBar: MatSnackBar,
+    private navService : NavDrawerService,
     private sanitizer: DomSanitizer) {
 
-     }
+     } 
 
   ngOnInit() {
 
@@ -153,7 +159,7 @@ export class LabelComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-   this.api.toggleNavClose();
+   // this.api.toggleNavClose();
   }
 
   clearView(){
@@ -179,7 +185,9 @@ export class LabelComponent implements OnInit, AfterViewInit {
 
   getLabelObject(objectId?, isActiveClick?){
 
-    this.api.isLoading = true; 
+    // this.api.isLoading = true;
+    this.api.setLoadingStatus(true);
+
     this.isLoading = true;
 
     if (!isActiveClick){
@@ -216,7 +224,8 @@ export class LabelComponent implements OnInit, AfterViewInit {
             this.flagIsNoDataAvailable = false; 
         }
 
-        this.api.isLoading = false; 
+        // this.api.isLoading = false; 
+        this.api.setLoadingStatus(false);
     
     })
   }
@@ -281,22 +290,26 @@ export class LabelComponent implements OnInit, AfterViewInit {
     }
 
     getPageIsSkipped(i){
+        let self = this; 
 
-        if ( this.skipPagesIndex.findIndex(x => x == i) == -1){
-            if (typeof(this.activePage.isSkipped) != "undefined"){
-                return true;
-            }else{
-                return false;
-            }
-            
-        }else{
+        if ( self.skipPagesIndex.findIndex(x => x == i) != -1 || typeof(this.labelObject.pages[i].isSkipped) != "undefined" ){
             return true;
+        }else{
+            return false;
         }
+
     }   
   
   setMousePosition(e) {
         var ev = e || window.event; //Moz || IE
-        if (ev.pageX) { //Moz
+        let menuBandX = ev.target.offsetParent.getClientRects()[0].x;
+        
+        if (menuBandX > 0){
+           this.navService.closeNav();
+        }
+
+        if (ev.pageX) { //Moz          
+
             this.mouse.x = ev.pageX + window.pageXOffset - 2;
             this.mouse.y = ev.pageY + window.pageYOffset - 2;
         } else if (ev.clientX) { //IE
@@ -553,7 +566,8 @@ export class LabelComponent implements OnInit, AfterViewInit {
         if (this.getIsFinal()){
 
             this.isLoading = true;
-            this.api.isLoading = true; 
+            // this.api.isLoading = true;
+            this.api.setLoadingStatus(true);
 
             this.api.approveLabelObject(this.labelObject).then(res => {
 
@@ -569,7 +583,8 @@ export class LabelComponent implements OnInit, AfterViewInit {
                     duration: 1500,
                 });
                 this.isLoading = false;
-                this.api.isLoading = false; 
+                // this.api.isLoading = false; 
+                this.api.setLoadingStatus(true);
                 console.error(err);
             })
             
@@ -584,7 +599,7 @@ export class LabelComponent implements OnInit, AfterViewInit {
     getIsFinal(){
         let isFinal = true; 
         this.labelObject.pages.forEach((element, index) => {
-            if (!element.bbox && this.skipPagesIndex.findIndex(x => x==index) == -1){
+            if (!element.bbox && this.skipPagesIndex.findIndex(x => x==index) == -1 && typeof(element.isSkipped) == "undefined"){
                 isFinal = false;
             }
         });
@@ -596,7 +611,8 @@ export class LabelComponent implements OnInit, AfterViewInit {
         if (confirm('Dieses Objekt für die weitere Bearbeitung aussortieren?')) {
 
             this.isLoading = true;
-            this.api.isLoading = true; 
+            // this.api.isLoading = true; 
+            this.api.setLoadingStatus(true);
 
             this.api.disregardObject(this.labelObject).then(res => {
 
@@ -608,7 +624,8 @@ export class LabelComponent implements OnInit, AfterViewInit {
                 this.getLabelObject();
 
                 this.isLoading = false;
-                this.api.isLoading = false; 
+                // this.api.isLoading = false; 
+                this.api.setLoadingStatus(false);
 
             }).catch(err => {
                 this.snackBar.open('Etwas hat nicht geklappt.', null, {

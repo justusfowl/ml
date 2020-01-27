@@ -30,9 +30,11 @@ import { LogsComponent } from './admin/applogs/logs.component';
 
 import { ApiService } from './api.service';
 import { ProgressService } from './services/progress.service';
+import { NavDrawerService } from './services/nav.service';
 
 import { NgxFileDropModule } from 'ngx-file-drop';
 import { ToastrModule } from 'ngx-toastr';
+
 
 
 @NgModule({
@@ -67,7 +69,8 @@ import { ToastrModule } from 'ngx-toastr';
     {provide: LocationStrategy, useClass: HashLocationStrategy},
     ProgressService,
     ApiService, 
-    NERTagFilterPipe
+    NERTagFilterPipe, 
+    NavDrawerService
   ],
   bootstrap: [AppComponent]
 })

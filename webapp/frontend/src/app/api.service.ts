@@ -80,10 +80,6 @@ export class ApiService {
     });
   }
 
-
-  
-
-
   searchQueryHandler(inText){
 
     const api = this;
@@ -107,9 +103,12 @@ export class ApiService {
 
 
 
-
-
-
+  setLoadingStatus(newStatus){
+    let self = this; 
+    setTimeout(() => {
+      self.isLoading = newStatus;
+    },10)
+  }
 
   handleAPIError(error){
 
