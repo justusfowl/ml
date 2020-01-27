@@ -35,6 +35,23 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   currentObjId : string = ""; 
 
+  selectedChoice : any;
+
+  choicesWFSteps = [
+    {
+      display: "store", 
+      choices : []
+    },
+    {
+      display: "ocr/bbox", 
+      choices : ["ocr"]
+    }, 
+    {
+      display: "pretag", 
+      choices : ["ocr", "pretag"]
+    }
+  ]
+
   constructor(
     public api: ApiService, 
     private router: Router, 
@@ -54,6 +71,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(){
 
+    // set default choice for WF injection
+    this.selectedChoice = this.choicesWFSteps[0]
+
     this.uploadChange.subscribe((data) => {
       this.goToNlp()
     });
@@ -64,15 +84,14 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.toastr.info(message.category, message.message, {timeOut: 6000});
         if (typeof(message.details) != "undefined"){
           if (typeof(message.details.complete) != "undefined"){
-            this.api.isLoading = false;
+
+            this.progressService.loaderIsComplete()
             console.log("completed...")
-           // this.api.setLoadingStatus(false);
           }
 
           if (typeof(message.details.start) != "undefined"){
-            this.api.isLoading = true;
+            this.progressService.loaderIsLoading()
             console.log("started...")
-           // this.api.setLoadingStatus(true);
           }
         }
       }
@@ -161,7 +180,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   analyzeItem(){
-    this.api.isLoading = true;
+    this.progressService.loaderIsLoading();
     const self = this; 
     console.log("Analzing input text...")
 
@@ -171,11 +190,13 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   sendDocumentForWF(){
-    this.api.isLoading = true;
+    this.progressService.loaderIsLoading();
+
+
 
     this.inputDocToWF().then((res : any) => {
 
-      this.api.isLoading = false;
+      this.progressService.loaderIsComplete()
 
       this.snackBar.open('Dokument bestätigt.', null, {
         duration: 1500,
@@ -192,12 +213,15 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       
     }).catch(err => {
-
+      console.error(err);
+      this.progressService.loaderIsComplete()
     })
   }
   
   
   inputDocToWF(){
+
+    let wfsteps = this.selectedChoice.choices;
 
     const self = this; 
 
@@ -209,9 +233,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
       const formData = new FormData();
       formData.append('file', self.uploadForm.get('file').value);
+      formData.append('wfsteps', wfsteps);
 
       self.api.processFileIntoWorkflow(formData).then((res : any) => {
-        
         resolve(res);
       }).catch(err => {
         self.api.handleAPIError(err);
@@ -223,9 +247,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   sendDocumentForProcessing(){
-    this.api.isLoading = true;
+    this.progressService.loaderIsLoading();
     this.analyzeTBody().then((result : any) => {
-      this.api.isLoading = false;
+      this.progressService.loaderIsComplete();
 
       if (typeof(result.data.pages) == "undefined"){
         result.data.pages = []
@@ -297,7 +321,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   tagInputText(){
 
     const self = this;
-    self.api.isLoading = true; 
+    self.progressService.loaderIsLoading(); 
 
     self.api.tagText(this.api.inputText).then( (data : any) => {
 
@@ -309,7 +333,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         console.error("No attribute data found in response")
       }
       
-      self.api.isLoading = false; 
+      self.progressService.loaderIsComplete(); 
     })
     
   }
@@ -321,7 +345,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
    
      self.router.navigate(["/admin/nerlabel"], { queryParams: { demo: 'true'} }).then( (e) => {
 
-      self.api.isLoading = false; 
+      self.progressService.loaderIsComplete(); 
     });
 
   }
@@ -331,10 +355,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const self = this; 
 
-    self.api.isLoading = true; 
+    self.progressService.loaderIsLoading(); 
 
     self.router.navigate(["/nlp"]).then( (e) => {
-      self.api.isLoading = false; 
+      self.progressService.loaderIsComplete(); 
     });
 
   }

@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
 
-import {ApiService} from './api.service';
+import { ApiService } from './api.service';
 import { Title } from '@angular/platform-browser';
 import { ProgressService } from './services/progress.service';
 
@@ -10,9 +10,10 @@ import { ProgressService } from './services/progress.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
   title = 'Medizinisches Freitextverständnis';
 
+  @ViewChild('globalSpinner', {static: true}) public globalSpinner: ElementRef;
 
 
   constructor(
@@ -24,8 +25,11 @@ export class AppComponent {
     this.titleService.setTitle( "medlines.tech - Medizinisches Freitextverständnis" );
 
     this.progressService.init();
-
-
-
   }
+
+  ngAfterViewInit(){
+    this.progressService.setGlobalSpinner(this.globalSpinner);
+    this.progressService.loaderIsComplete();
+  }
+
 }

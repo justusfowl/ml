@@ -125,7 +125,8 @@
 
                     <mat-menu #execObjMenu="matMenu">
                         <button mat-menu-item (click)="issueObjToWf('pretag')">Pretag</button>
-                        <button mat-menu-item (click)="issueObjToWf('ocr')">OCR+Spellcheck+Pretag</button>
+                        <button mat-menu-item (click)="issueObjToWf('ocr', ['ocr'])">OCR+Spellcheck</button>
+                        <button mat-menu-item (click)="issueObjToWf('ocr', ['ocr', 'pretag'])">OCR+Spellcheck+Pretag</button>
                     </mat-menu>
 
                     

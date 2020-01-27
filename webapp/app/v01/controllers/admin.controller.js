@@ -50,8 +50,10 @@ function getLabelObject(req, res){
            // default object: search for workflow items with wfstatus == 1 --> item is injected into pipeline as PDF
            // only include objects that have a lockTime greater than 24hrs
 
-          let filterObj = {
-              "wfstatus" : 0
+          let filterObj =  {$or: [
+              { "wfstatus" : 0 },
+              { "wfstatus" : 1}
+              ]
           }
 
           filterArray.push(filterObj);

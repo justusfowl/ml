@@ -155,7 +155,7 @@ async function getNERLabelStats(req, res){
   
           collection.aggregate(
             [
-                { $match : {"wfstatus" : 3}}, {$unwind: '$pages'}, {$unwind: '$pages.entities'},
+                { $match : {"wfstatus" : 4}}, {$unwind: '$pages'}, {$unwind: '$pages.entities'},
                 { $group: { _id: "$pages.entities._id", count: { $sum: 1 } } }
             ]
           ).toArray(function(err, results) {

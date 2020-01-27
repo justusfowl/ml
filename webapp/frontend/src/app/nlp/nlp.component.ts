@@ -2,6 +2,7 @@ import { Component, OnInit, AfterViewInit, ViewEncapsulation } from '@angular/co
 import { ApiService } from '../api.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+import { ProgressService } from '../services/progress.service';
 
 
 
@@ -39,7 +40,8 @@ export class NlpComponent implements OnInit, AfterViewInit {
   constructor(
     private api: ApiService, 
     private sanitizer: DomSanitizer, 
-    private router: Router
+    private router: Router, 
+    private progressService : ProgressService
   ) { }
 
   ngOnInit() {
@@ -84,12 +86,12 @@ export class NlpComponent implements OnInit, AfterViewInit {
 
    processText(inText){
     const self = this;
-    self.api.isLoading = true; 
+    self.progressService.loaderIsLoading(); 
 
     self.api.tagText(inText).then( data => {
       console.log(data)
       self.annotatedText = self.constructHtml(data);
-      self.api.isLoading = false; 
+      self.progressService.loaderIsComplete(); 
     })
    }
 
@@ -352,17 +354,17 @@ export class NlpComponent implements OnInit, AfterViewInit {
 
   getTags(){
     const self = this;
-    self.api.isLoading = true;
+    self.progressService.loaderIsLoading();
 
     self.api.getNerLabelTag().then( (data : any) => {
 
       this.tags = data;
 
-      self.api.isLoading = false; 
+      self.progressService.loaderIsComplete(); 
 
     }).catch(err => {
       console.log(err);
-      self.api.isLoading = false; 
+      self.progressService.loaderIsComplete(); 
     })
    }
 
