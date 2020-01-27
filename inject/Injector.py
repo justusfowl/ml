@@ -112,8 +112,10 @@ class PDFInjector:
                 }
 
                 # get bounding box for text body based on predictive CV model
+                bbox = self.cvProcessor.get_tbody(page)
 
-                page["bbox"] = self.cvProcessor.get_tbody(page)
+                if bbox:
+                    page["bbox"] = bbox
 
                 self.pages.append(page)
 

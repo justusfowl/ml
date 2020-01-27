@@ -88,20 +88,29 @@ class MedLangProcessor:
             print("Processing...%s" % object_id)
             self.progressHandler.pub_to(str(object_id), "Pretagging initiated", "Pretag", details={"start" : True})
             self.label_obj = self.db.mongo_db.labels.find_one({"_id": ObjectId(object_id)})
-            self.process_pretag_object()
-            self.progressHandler.pub_to(str(object_id), "Pretagging completed", "Pretag")
-            self.progressHandler.pub_to(str(object_id), "Update workflow status == 3", "Pretag")
-            self.store_obj()
-            self.progressHandler.pub_to(str(object_id), "Object stored", details={"complete" : True})
 
-            ch.basic_ack(delivery_tag=method.delivery_tag)
+            if not self.label_obj:
+                ch.basic_ack(delivery_tag=method.delivery_tag)
+                self.progressHandler.pub_to(object_id, "Fatal error, object cannot be found in database. Is dropped.", "Pretag", details={"complete" : True})
+            else:
+                self.process_pretag_object()
+                self.progressHandler.pub_to(str(object_id), "Pretagging completed", "Pretag")
+                self.progressHandler.pub_to(str(object_id), "Update workflow status == 3", "Pretag")
+                self.store_obj()
+                self.progressHandler.pub_to(str(object_id), "Object stored", details={"complete" : True})
 
-            print("Completed for %s" % object_id)
+                ch.basic_ack(delivery_tag=method.delivery_tag)
+
+                print("Completed for %s" % object_id)
 
         except Exception as e:
             print("File could not be processed... %s" % object_id, e)
-            ch.basic_reject(delivery_tag=method.delivery_tag, requeue=True)
-            self.progressHandler.pub_to(str(self.label_obj["_id"]), "File rejected", "Pretag", details=e)
+            if method.delivery_tag > 100 and method.redelivered:
+                ch.basic_ack(delivery_tag=method.delivery_tag)
+                self.progressHandler.pub_to(object_id, "Fatal error, object cannot be processed. Is dropped.", "OCR", details={"complete": True}, error=e)
+            else:
+                ch.basic_reject(delivery_tag=method.delivery_tag, requeue=True)
+                self.progressHandler.pub_to(str(self.label_obj["_id"]), "File rejected", "Pretag", error=e)
 
 
 

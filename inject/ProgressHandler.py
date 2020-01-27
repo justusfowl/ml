@@ -12,7 +12,7 @@ load_dotenv(dotenv_path=dotenv_path)
 
 class PH:
 
-    def __init__(self):
+    def __init__(self, **kwargs):
 
         sio = socketio.Client()
 
@@ -24,14 +24,22 @@ class PH:
         def disconnect():
             print('ProgressHandler | disconnected from server')
 
+        if "host" in kwargs and "port" in kwargs:
+            host = kwargs["host"]
+            port = kwargs["port"]
+        else:
+            host = os.environ.get('SOCKET_HOST')
+            port = os.environ.get('SOCKET_PORT')
+
+
         sio.connect("http://{sockethost}:{socketport}".format(
-                sockethost=os.environ.get('SOCKET_HOST'),
-                socketport=os.environ.get('SOCKET_PORT')
+                sockethost=host,
+                socketport=port
             ))
 
         self.sio = sio
 
-    def pub_to(self, obj_id, message, category="", details=None):
+    def pub_to(self, obj_id, message, category="", details=None, error=None):
 
         message_obj = {
             "_id" : obj_id,
@@ -41,9 +49,11 @@ class PH:
         }
 
         if details:
-            message_obj["details"] = str(details)
+            message_obj["details"] = details
+        if error:
+            message_obj["error"] = str(error)
 
         self.sio.emit('log', message_obj);
 
-    def new_room(self, obj_id):
-        self.sio.emit(obj_id, "message")
+    def join_room(self, obj_id):
+        self.sio.emit("newobj", obj_id)

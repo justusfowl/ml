@@ -21,7 +21,7 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 nerTagger = PreTagger()
 
-spellChecker = Speller()
+spellChecker = Speller(dev=True)
 
 def initAPI():
 
@@ -78,12 +78,10 @@ def initAPI():
 
                 pdf_obj = PDFInjector(file_path=file_path, flagoverwrite=flag_over_write)
 
-
                 pdf_obj.create_tiff()
                 pdf_obj.create_thumbs()
                 pdf_obj.store_obj()
                 pdf_obj.publish_to_OCR()
-
 
                 res_dict = pdf_obj.to_dict()
 

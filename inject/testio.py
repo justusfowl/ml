@@ -10,57 +10,31 @@ from os.path import join, dirname
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path=dotenv_path)
 
+from ProgressHandler import PH
 
-class PH:
+ph = PH(host="CL18", port=8000)
 
-    def __init__(self):
-        sio = socketio.Client()
+_id = input("Enter ID: ")
 
-        @sio.event
-        def connect():
-            print('ProgressHandler | connection established')
-
-        @sio.event
-        def disconnect():
-            print('ProgressHandler | disconnected from server')
-
-        sio.connect("http://{sockethost}:{socketport}".format(
-            sockethost="CL18",
-            socketport=8000
-        ))
-
-        self.sio = sio
-
-    def pub_to(self, obj_id, message, category="", details=None):
-        message_obj = {
-            "_id": obj_id,
-            "message": message,
-            "category": category,
-            "datetime": str(dt.datetime.now(pytz.utc))
-        }
-
-        if details:
-            message_obj["details"] = str(details)
-
-        self.sio.emit('log', message_obj);
-
-    def new_room(self, obj_id):
-        self.sio.emit("newobj", obj_id)
-
-ph = PH()
-
-ph.new_room("1234")
-
+ph.join_room(_id)
 
 def run(p):
     while True:
         try:
             try:
                 msg = input("Enter query: ")
-                er = 1/0
+                if msg == "start" :
+
+                    p.pub_to(_id, msg, details={"start" : True})
+                elif msg == "complete" :
+                    p.pub_to(_id, msg, details={"complete": True})
+
+                else:
+                    p.pub_to(_id, msg)
+
             except Exception as e:
 
-                p.pub_to("1234", msg, details=e)
+                p.pub_to(_id, msg, error=e)
 
         except KeyboardInterrupt:
             return
