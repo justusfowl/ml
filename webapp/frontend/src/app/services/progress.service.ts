@@ -80,6 +80,7 @@ export class ProgressService {
 
     public leaveObjLogRoom(objId) {
         this.socket.emit('leaveobj', objId);
+        console.log("leave the room....");
     }
 
 }

@@ -105,9 +105,15 @@ export class ApiService {
 
   setLoadingStatus(newStatus){
     let self = this; 
+    let delay = 200; 
+    
+    if (!newStatus){
+      delay = 100; 
+    }
+     
     setTimeout(() => {
       self.isLoading = newStatus;
-    },10)
+    },delay)
   }
 
   handleAPIError(error){
