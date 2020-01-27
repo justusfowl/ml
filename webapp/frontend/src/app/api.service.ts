@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { environment } from './../environments/environment';
 import { ToastrService } from 'ngx-toastr';
+import { ProgressService } from './services/progress.service';
 
 
 @Injectable({
@@ -43,7 +44,8 @@ export class ApiService {
 
   constructor(
     public http: HttpClient, 
-    private toastr: ToastrService
+    private toastr: ToastrService, 
+    private progressService : ProgressService
   ) {
 
     this.ENV = environment.env;
@@ -103,26 +105,12 @@ export class ApiService {
 
 
 
-  setLoadingStatus(newStatus){
-    let self = this; 
-    let delay = 200; 
-    
-    if (!newStatus){
-      delay = 100; 
-    }
-     
-    setTimeout(() => {
-      self.isLoading = newStatus;
-    },delay)
-  }
-
   handleAPIError(error){
 
     this.toastr.error("Netzwerk", "Etwas ist schief gelaufen. Bitte Console prüfen.", {timeOut: 6000});
 
     console.error(error);
-    // alert(JSON.stringify(error))
-    this.isLoading = false;
+    this.progressService.loaderIsComplete();
   }
 
   setDocument(array, type){

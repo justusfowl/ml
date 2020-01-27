@@ -55,7 +55,7 @@ export class SearchComponent implements OnInit {
 
   execSearch(){
 
-    this.api.isLoading = true; 
+    this.progressService.loaderIsLoading()
 
     this.api.searchQueryHandler(this.api.searchQryString).then((res : any) =>{
         this.api.searchResults = res.data.search_result; 
@@ -63,7 +63,7 @@ export class SearchComponent implements OnInit {
         this.api.lastEmbedTime = res.data.embed_time; 
 
         this.api.flagHasSearched = true; 
-        this.api.isLoading = false; 
+        this.progressService.loaderIsComplete();
 
     }).catch(err => {
       console.error(err);

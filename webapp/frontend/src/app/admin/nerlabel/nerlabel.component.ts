@@ -138,12 +138,12 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
         if (typeof(message.details) != "undefined"){
           if (typeof(message.details.complete) != "undefined"){
             // this.api.isLoading = false;
-            this.api.setLoadingStatus(false);
+            this.progressService.loaderIsComplete();
           }
 
           if (typeof(message.details.start) != "undefined"){
             // this.api.isLoading = true;
-            this.api.setLoadingStatus(true);
+            this.progressService.loaderIsLoading();
           }
         }
       }
@@ -161,19 +161,19 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
   async ngAfterViewInit() {
    
     // this.api.isLoading = true;
-    this.api.setLoadingStatus(true);
+    this.progressService.loaderIsLoading();
 
     // use async to wait for labels to load first
     await this.api.getNerLabelTag().then( (data : any) => {
       this.tags = data;
       if (this.flagIsDemo){
         // this.api.isLoading = false;
-        this.api.setLoadingStatus(false);
+        this.progressService.loaderIsComplete();
       }
     }).catch(err => {
       console.log(err);
       // this.api.isLoading = false;
-      this.api.setLoadingStatus(false);
+      this.progressService.loaderIsComplete();
     })
 
 
@@ -389,14 +389,14 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     // this.api.isLoading = true;
-    this.api.setLoadingStatus(true);
+    this.progressService.loaderIsLoading();
 
     this.api.addNerLabelTag(newTag).then( (data : any) => {
 
       if (data.ops.length > 0){
         this.tags.push(data.ops[0])
       }
-      this.api.setLoadingStatus(false);
+      this.progressService.loaderIsComplete();
       //this.api.isLoading = false;
       this.newEntText = "";
       this.newEntTextShortCut = ""; 
@@ -404,7 +404,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
     }).catch(err => {
       console.log(err);
       // this.api.isLoading = false;
-      this.api.setLoadingStatus(false);
+      this.progressService.loaderIsComplete();
     })
 
     console.log(newTag); 
@@ -445,7 +445,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
   getNerLabelObject(objectId?){
     const self = this;
     // self.api.isLoading = true;
-    self.api.setLoadingStatus(true);
+    self.progressService.loaderIsLoading();
     self.flagIsNoDataAvailable = false; 
 
     // reset the pages visited for the new object
@@ -480,15 +480,17 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
 
         }else{
           throw "no pages contained in the object";
-        }       
+        
+        }
+        this.progressService.joinObjLogRoom(self.objId);
       }
        // self.api.isLoading = false;
-       self.api.setLoadingStatus(false); 
+       self.progressService.loaderIsComplete(); 
 
     }).catch(err => {
       console.log(err);
       // self.api.isLoading = false;
-      self.api.setLoadingStatus(false);
+      self.progressService.loaderIsComplete();
       self.flagIsNoDataAvailable = false; 
     })
 
@@ -505,6 +507,8 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
    }
 
    sortEntities(entities?){
+
+     if (entities)
 
     if (entities){
       entities.sort((a, b) => (a.start > b.start) ? 1 : -1); 
@@ -754,7 +758,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
           if (confirm('Alle Seiten korrekt gelabelt?')) {
            
             // this.api.isLoading = true;
-            this.api.setLoadingStatus(true); 
+            this.progressService.loaderIsLoading(); 
 
             this.api.approveNerLabelObject(this.textObj).then(res => {
 
@@ -769,7 +773,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
                     duration: 1500,
                 });
                 // this.api.isLoading = false;
-                this.api.setLoadingStatus(false);
+                this.progressService.loaderIsComplete();
                 console.error(err);
             })
               
@@ -870,22 +874,23 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
   
   }
 
-  issueObjToWf(targetWf){
+  issueObjToWf(targetWf, wfsteps=[]){
 
     let body = {
       "targetWf" : targetWf, 
-      "objectIds" : [this.objId]
+      "objectIds" : [this.objId], 
+      "wfsteps" : wfsteps
     }
 
     this.api.issueObjIdsToWf(body).then( (res : any) => {
 
       this.toastr.info("Das Objekt wurde '" + targetWf + "' zugefügt.");
-      this.progressService.joinObjLogRoom(this.objId);
+      
 
     }).catch(err => {
       console.error(err);
       // this.api.isLoading = false; 
-      this.api.setLoadingStatus(false);
+      this.progressService.loaderIsComplete();
     })
 
   }

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 import { MatTableDataSource } from '@angular/material/table';
+import { ElementRef } from '@angular/core';
 
 export class ProgressService {
 
@@ -14,6 +15,8 @@ export class ProgressService {
     private socket;
 
     public logs = new MatTableDataSource()
+
+    private globalSpinner : ElementRef
 
     constructor() {
 
@@ -81,6 +84,22 @@ export class ProgressService {
     public leaveObjLogRoom(objId) {
         this.socket.emit('leaveobj', objId);
         console.log("leave the room....");
+    }
+
+
+
+
+    setGlobalSpinner(spinnerElemRef){
+        this.globalSpinner = spinnerElemRef
+    }
+
+    loaderIsLoading(){
+        console.log(this.globalSpinner);
+        this.globalSpinner.nativeElement.classList.remove("hideLoader")
+    }
+
+    loaderIsComplete(){
+        this.globalSpinner.nativeElement.classList.add("hideLoader")
     }
 
 }

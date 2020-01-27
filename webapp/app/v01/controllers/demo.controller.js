@@ -7,7 +7,7 @@ const config = require('../../config/config');
 function processPdfBbox(req, res){
 
     var file = req.file;
-
+ 
     if (path.extname(file.originalname) != ".pdf"){
         console.log("no PDF");
         res.status(500).json({"message" : "Invalid datatype - only PDFs supported"});

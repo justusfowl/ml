@@ -9,6 +9,9 @@ var amqp = require('amqplib/callback_api');
 function processFile(req, res){
 
     var file = req.file;
+    var wfsteps = req.body.wfsteps || [];
+    var patNummer = req.body.patNummer || "-77";
+    var patName = req.body.patName || "frontendload"; 
 
     if (path.extname(file.originalname) != ".pdf"){
         console.log("no PDF");
@@ -20,7 +23,10 @@ function processFile(req, res){
             url: 'http://' + config.procBackend.host + ":" + config.procBackend.port + '/file/pdf?flagoverwrite=true',
             method: 'POST',
             formData: {
-              'file': fs.createReadStream(file.destination+file.originalname)
+              'file': fs.createReadStream(file.destination+file.originalname), 
+              'wfsteps' : wfsteps,
+              'pat_nummer' : patNummer,
+              'pat_name' : patName
             }
           }, function(error, response, body) {
 
@@ -61,6 +67,7 @@ function issueObjIdToWf(req, res){
 
     let objectIds = req.body.objectIds; 
     let targetWfStatus = req.body.targetWf;
+    let wfsteps = req.body.wfsteps;
 
     let allowedWfTargets = ["ocr" , "pretag"]
     let wfQueues = ["medlines", "pretag"];
@@ -107,7 +114,7 @@ function issueObjIdToWf(req, res){
 
             objectIds.forEach(objId => {
 
-                let payload = {"_id" : objId }
+                let payload = {"_id" : objId, "wfsteps" : wfsteps }
           
                 ch.sendToQueue(targetQueue, new Buffer.from(JSON.stringify(payload)));
 

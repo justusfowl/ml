@@ -50,6 +50,13 @@
                             <button type="button" *ngIf="!api.fileUploaded" class="upload-button" mat-flat-button color="primary"  (click)="openFileSelector()">Durchsuchen...</button>
                             <button type="button" *ngIf="api.fileUploaded" class="upload-button analysis-button" mat-flat-button color="primary"  (click)="sendDocumentForProcessing()">Demo: Textkörper</button>
                             <button type="button" *ngIf="api.fileUploaded" class="upload-button analysis-button" mat-flat-button color="primary"  (click)="sendDocumentForWF()">Dokument@WF</button>
+                            <mat-form-field class="wf_select" *ngIf="api.fileUploaded">
+                                <mat-select class="wf_select" [(value)]="selectedChoice">
+                                    <mat-option *ngFor="let c of choicesWFSteps" [value]="c">
+                                    {{c.display}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
                             </ng-template>
                         </ngx-file-drop>
                     </div>

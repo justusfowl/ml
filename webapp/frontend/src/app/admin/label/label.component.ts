@@ -6,6 +6,7 @@ import { ApiService } from '../../api.service';
 import { MatSnackBar, MatDrawer, MatSidenav } from '@angular/material';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NavDrawerService } from 'src/app/services/nav.service';
+import { ProgressService } from 'src/app/services/progress.service';
 
 
 @Component({
@@ -122,6 +123,7 @@ export class LabelComponent implements OnInit, AfterViewInit {
     private router: Router,
     private route: ActivatedRoute,
     private _fb: FormBuilder,
+    private progressService : ProgressService,
     private api: ApiService,
     public snackBar: MatSnackBar,
     private navService : NavDrawerService,
@@ -186,7 +188,7 @@ export class LabelComponent implements OnInit, AfterViewInit {
   getLabelObject(objectId?, isActiveClick?){
 
     // this.api.isLoading = true;
-    this.api.setLoadingStatus(true);
+    this.progressService.loaderIsLoading();
 
     this.isLoading = true;
 
@@ -225,7 +227,7 @@ export class LabelComponent implements OnInit, AfterViewInit {
         }
 
         // this.api.isLoading = false; 
-        this.api.setLoadingStatus(false);
+        this.progressService.loaderIsComplete();
     
     })
   }
@@ -567,7 +569,7 @@ export class LabelComponent implements OnInit, AfterViewInit {
 
             this.isLoading = true;
             // this.api.isLoading = true;
-            this.api.setLoadingStatus(true);
+            this.progressService.loaderIsLoading();
 
             this.api.approveLabelObject(this.labelObject).then(res => {
 
@@ -584,7 +586,7 @@ export class LabelComponent implements OnInit, AfterViewInit {
                 });
                 this.isLoading = false;
                 // this.api.isLoading = false; 
-                this.api.setLoadingStatus(true);
+                this.progressService.loaderIsLoading();
                 console.error(err);
             })
             
@@ -612,7 +614,7 @@ export class LabelComponent implements OnInit, AfterViewInit {
 
             this.isLoading = true;
             // this.api.isLoading = true; 
-            this.api.setLoadingStatus(true);
+            this.progressService.loaderIsLoading();
 
             this.api.disregardObject(this.labelObject).then(res => {
 
@@ -625,7 +627,7 @@ export class LabelComponent implements OnInit, AfterViewInit {
 
                 this.isLoading = false;
                 // this.api.isLoading = false; 
-                this.api.setLoadingStatus(false);
+                this.progressService.loaderIsComplete();
 
             }).catch(err => {
                 this.snackBar.open('Etwas hat nicht geklappt.', null, {
