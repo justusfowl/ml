@@ -19,6 +19,8 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
 
   objId : string = ""; 
 
+  flagIsPageCalledFromWorkflow : boolean = true;
+
   totalNumPages : number = 0; 
   textObj : any = {}; 
   annotatedText : SafeHtml = "";
@@ -117,7 +119,14 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.routeReuseStrategy.shouldReuseRoute = () => false;
     
     let objId = this.route.snapshot.queryParamMap.get('objId');
-    let flagIsDemo = this.route.snapshot.queryParamMap.get('demo'); 
+    let flagIsDemo = this.route.snapshot.queryParamMap.get('demo');
+    let wfCalled = this.route.snapshot.queryParamMap.get('wf');
+
+    if (!wfCalled || wfCalled == "false"){
+        this.flagIsPageCalledFromWorkflow = false;
+    }else{
+        this.flagIsPageCalledFromWorkflow = true;
+    }
 
     if (flagIsDemo){
       this.flagIsDemo = true;
@@ -451,16 +460,16 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
     // reset the pages visited for the new object
     self.pagesReVisited = [];
 
-    self.api.getNerLabelObject(objectId).then( (data : any) => {
+    self.api.getNerLabelObject(objectId, this.flagIsPageCalledFromWorkflow).then( (data : any) => {
 
       if (typeof(data._id) == "undefined"){
           self.flagIsNoDataAvailable = true;
-          self.updateUrlParams(true);
+          // self.updateUrlParams(true);
       }else{
 
         self.objId = data._id; 
 
-        self.updateUrlParams();
+        // self.updateUrlParams();
 
         if (typeof(data.pages) != "undefined"){
 
@@ -874,6 +883,18 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
   
   }
 
+  updateUrlParamsToWF(){
+
+    this.router.navigate(
+      [], 
+      {
+        relativeTo: this.route,
+        queryParams: { wf: true },
+        queryParamsHandling: ''
+      });
+    
+    }
+
   issueObjToWf(targetWf, wfsteps=[]){
 
     let body = {
@@ -901,6 +922,21 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
   }
+
+  copyUrlToClipboard(){
+
+    let targetUrl = window.location.origin + "/#" +this.router.url.split('?')[0] + "?objId="+ this.objId
+
+  document.addEventListener('copy', (e: ClipboardEvent) => {
+      e.clipboardData.setData('text/plain', (targetUrl));
+      e.preventDefault();
+      document.removeEventListener('copy', null);
+      this.snackBar.open("URL kopiert", null, {
+          duration: 1500,
+      });
+    });
+    document.execCommand('copy');
+}
 
 
 

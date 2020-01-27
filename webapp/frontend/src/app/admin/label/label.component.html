@@ -11,7 +11,7 @@
           </mat-option>
         </mat-select>
     </mat-form-field>
-</div>
+</div> 
 
 <div class="container" *ngIf="!flagIsNoDataAvailable">
     <div class="response">
@@ -23,6 +23,7 @@
                    <mat-menu #menu="matMenu">
                     <a mat-menu-item *ngIf="labelObject.wfstatus>2" routerLink="/admin/nerlabel" [queryParams]="{ objId: labelObject._id}" routerLinkActive="active">Text/NER</a>
                     <a mat-menu-item routerLink="/logs" [queryParams]="{ objId: labelObject._id}" routerLinkActive="active">Logs</a>
+                    <a mat-menu-item (click)="copyUrlToClipboard()">URL kopieren</a>
                   </mat-menu>
 
                 <button type="button" class="skip-button" mat-flat-button color="error"  (click)="skipLabelPage()">Überspringen</button>

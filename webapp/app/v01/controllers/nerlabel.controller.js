@@ -19,7 +19,8 @@ function getLabelObject(req, res){
     try{
 
         // for direct calls of an object, do not update the workflow status so that for demo purposes the object can be called in different views
-        let flagUpdateWFStatus = true; 
+        // let flagUpdateWFStatus = true; 
+        let flagUpdateWFStatus = eval(req.query.flagUpdateWFStatus) ; 
 
         let filterArray = [];
 
@@ -31,8 +32,7 @@ function getLabelObject(req, res){
             }
 
             filterArray.push(filterObj);
-
-            flagUpdateWFStatus = false; 
+            
         }else{
 
            // default object: search for workflow items with wfstatus == 3 --> OCR results, contain read_text which is already spellchecked.

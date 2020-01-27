@@ -15,10 +15,10 @@
           <mat-icon  aria-hidden="false" >memory</mat-icon>
       </a>
      
-      <a class="menu-item" mat-list-item routerLink="/admin/label" (click)="drawer.close()" routerLinkActive="active">
+      <a class="menu-item" mat-list-item (click)="goToLabelWF($drawer)" routerLinkActive="active">
           <mat-icon  aria-hidden="false" >gamepad</mat-icon>
           </a>
-      <a class="menu-item" mat-list-item routerLink="/admin/nerlabel"  routerLinkActive="active" >
+      <a class="menu-item" mat-list-item (click)="goToNERLabelWF($drawer)"  routerLinkActive="active" >
           <mat-icon  aria-hidden="false" >text_format</mat-icon>
         </a>
         <a class="menu-item" mat-list-item routerLink="/stats" routerLinkActive="active">

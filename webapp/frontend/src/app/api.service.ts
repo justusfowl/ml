@@ -142,7 +142,7 @@ export class ApiService {
 
   // ### admin area : NER LABEL ### 
 
-  getNerLabelObject(objectId?){
+  getNerLabelObject(objectId?, flagUpdateWFStatus=false){
 
     let objId = ""; 
 
@@ -152,9 +152,12 @@ export class ApiService {
 
     const api = this;
 
+    const params = new HttpParams()
+    .set('flagUpdateWFStatus', flagUpdateWFStatus.toString());
+
     return new Promise(function(resolve, reject) {
       
-      api.http.get(api.apiURL + '/admin/nerlabel' + objId).subscribe(
+      api.http.get(api.apiURL + '/admin/nerlabel' + objId, {params}).subscribe(
         (data: any) => {
           resolve(data)
         },
@@ -241,12 +244,10 @@ export class ApiService {
     });
   }
 
-
-
   // ### admin area : LABEL ### 
 
 
-  getLabelObject(objectId?){
+  getLabelObject(objectId?, flagUpdateWFStatus=false){
 
     let objId = ""; 
 
@@ -256,9 +257,12 @@ export class ApiService {
 
     const api = this;
 
+    const params = new HttpParams()
+    .set('flagUpdateWFStatus', flagUpdateWFStatus.toString());
+
     return new Promise(function(resolve, reject) {
       
-      api.http.get(api.apiURL + '/admin/label' + objId).subscribe(
+      api.http.get(api.apiURL + '/admin/label' + objId, {params}).subscribe(
         (data: any) => {
           resolve(data)
         },
