@@ -80,6 +80,14 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(){
     this.progressService.leaveObjLogRoom(this.currentObjId);
+    this.resetFileDropped();
+  }
+
+  resetFileDropped(){
+    this.files = null; 
+    this.api.fileName = null; 
+    this.api.fileUploaded = false;
+    this.uploadFile = null;
   }
 
 
