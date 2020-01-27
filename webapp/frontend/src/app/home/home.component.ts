@@ -64,13 +64,15 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.toastr.info(message.category, message.message, {timeOut: 6000});
         if (typeof(message.details) != "undefined"){
           if (typeof(message.details.complete) != "undefined"){
-            // this.api.isLoading = false;
-            this.api.setLoadingStatus(false);
+            this.api.isLoading = false;
+            console.log("completed...")
+           // this.api.setLoadingStatus(false);
           }
 
           if (typeof(message.details.start) != "undefined"){
-            // this.api.isLoading = true;
-            this.api.setLoadingStatus(true);
+            this.api.isLoading = true;
+            console.log("started...")
+           // this.api.setLoadingStatus(true);
           }
         }
       }
