@@ -30,7 +30,7 @@ def run(p):
                     p.pub_to(_id, msg, details={"complete": True})
 
                 else:
-                    p.pub_to(_id, msg)
+                    p.pub_to(_id, msg, details={"progress": True})
 
             except Exception as e:
 

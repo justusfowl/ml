@@ -50,6 +50,14 @@ class PH:
 
         if details:
             message_obj["details"] = details
+
+            if not "start" in details or "complete" in details:
+                message_obj["details"]["progress"] = True
+        else:
+            message_obj["details"] = {
+                "progress" : True
+            }
+
         if error:
             message_obj["error"] = str(error)
 

@@ -99,7 +99,14 @@ class NERTag:
     def make_new_db_tag(self):
         #@TODO: Make sure to make shortcut unique!
 
-        res = self.db.mongo_client.medlabels.metalabels.insert_one({"value": self.label, "shortcut": self.label[:1].upper(), "prod" : True})
+        res = self.db.mongo_client.medlabels.metalabels.insert_one({
+            "value": self.label,
+            "display": self.label,
+            "shortcut": self.label[:1].upper(),
+            "prod" : True,
+            "bgColor": '#ffffff',
+            "textColor" : '#000000'
+        })
         tag = self.db.mongo_client.medlabels.metalabels.find_one({"_id": ObjectId(res.inserted_id)})
 
         return tag
