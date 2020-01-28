@@ -89,7 +89,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
             console.log("completed...")
           }
 
-          if (typeof(message.details.start) != "undefined"){
+          if (typeof(message.details.start) != "undefined" || typeof(message.details.progress) != "undefined"){
             this.progressService.loaderIsLoading()
             console.log("started...")
           }
