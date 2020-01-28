@@ -58,7 +58,7 @@
                                         <mat-checkbox [(ngModel)]="flagShowEntSmall" (change)="toggleClassShowEnt($event)">Entitäten einblenden?</mat-checkbox>
                                     </div>
                                     
-                                    <div class="setting-row checkbox-itm" *ngIf="!flagIsDemo">
+                                    <div class="setting-row checkbox-itm">
                                         <mat-checkbox [(ngModel)]="flagShowRawText" >Roh-Text einblenden?</mat-checkbox>
                                     </div>
                                     
@@ -98,14 +98,12 @@
 
     <div class="container ner" >
 
-
-
         <div class="mainbody">
             
-            <div class="card textbody" [class.large]="!flagShowRawText">
-                <div class="title nerlabel" >
+            <div class="card textbody" [class.large]="!flagShowRawText" >
+                <div class="title nerlabel" *ngIf="!flagIsDemo">
 
-                    <button (click)="prevPage()" mat-button type="button" *ngIf="!flagIsDemo">
+                    <button (click)="prevPage()" mat-button type="button" >
                         -
                     </button>
                 <div class="pageInfo">
@@ -157,7 +155,7 @@
             </div>
 
             <div class="card textbody" *ngIf="flagShowRawText" >
-                    <div class="title nerlabel">
+                    <div class="title nerlabel" *ngIf="!flagIsDemo">
                         <div class="pageInfo">
                             Roh-Text per OCR
                             <p class="details">{{textObj._id}}</p>

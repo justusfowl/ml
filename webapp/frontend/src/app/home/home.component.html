@@ -57,6 +57,9 @@
                                     </mat-option>
                                 </mat-select>
                             </mat-form-field>
+                            
+                            <a *ngFor="let url of wfResultingLinks;" mat-menu-item [routerLink]="url.routerLink" [queryParams]="url.queryParams" routerLinkActive="active">{{url.display}}</a>
+                            
                             </ng-template>
                         </ngx-file-drop>
                     </div>
