@@ -241,6 +241,49 @@ function disregardObject(req, res){
   
   }
 
+  function updateTag(req, res){
+
+    try{
+  
+      let tagObject = req.body;
+      let tagId = tagObject._id;
+
+      if (!tagId){
+        res.send(500, "Please provide tagId");
+        return;
+      }
+
+  
+      MongoClient.connect(url, function(err, db) {
+  
+        if (err) throw err;
+        
+        let dbo = db.db("medlabels");
+
+        // Get the documents collection
+        const collection = dbo.collection('metalabels');
+
+        if (tagObject._id){
+          delete tagObject._id
+      }
+
+        collection.replaceOne(
+          {"_id" : ObjectID(tagId)},
+            tagObject,
+          function(err, docs){
+            if (err) throw err;
+            res.json(docs);
+          });
+
+      });
+  
+    }catch(error){
+      console.error(error)
+      res.send(500, "An error occured updating the tag: " + JSON.stringify(req.body) );
+    }
+  
+  }
+
   function getTag(req, res){
 
     try{
@@ -266,4 +309,4 @@ function disregardObject(req, res){
   }
 
 
-module.exports = { getLabelObject, approveLabelObject, disregardObject,  addTag, getTag}
+module.exports = { getLabelObject, approveLabelObject, disregardObject,  addTag, getTag, updateTag}

@@ -226,6 +226,24 @@ export class ApiService {
     });
   }
 
+  updateNerLabelTag(tag){
+
+    const api = this;
+
+    return new Promise(function(resolve, reject) {
+      
+      api.http.put(api.apiURL + '/admin/meta/nerlabel', tag).subscribe(
+        (data: any) => {
+          resolve(data)
+        },
+        error => {
+          api.handleAPIError(error);
+          reject(error)
+        }
+      )
+    });
+  }
+
   getNerLabelTag(){
 
     const api = this;

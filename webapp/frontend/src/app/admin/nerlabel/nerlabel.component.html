@@ -10,11 +10,12 @@
             <div class="content entitiyselect-row">
                     <div 
                     *ngFor="let t of tags; let i = index;" 
-                    [class]="((i == tagIdxSelected) ? ('entity-select selected ent_' + i ) : 'entity-select ent_' + i) + ((!t.prod) ? ' non-prod' : '') + ((!getIncludeNonProdTags()) ? ' hide' : '')" 
+                    [style.background-color]="t.bgColor + '57'"
+                    [class]="((i == tagIdxSelected) ? ('entity-select selected ') : 'entity-select ') + ((!t.prod) ? ' non-prod' : '') + ((!getIncludeNonProdTags()) ? ' hide' : '')" 
                     (click)="selectEntity(i, t._id)" 
                     >
                         <span class="shortcut">{{t.shortcut}}</span>
-                        <span class="label" [class.selected]="i == tagIdxSelected">{{t.value | trimLongStr:15}}</span>
+                        <span class="label" [class.selected]="i == tagIdxSelected">{{t.display | trimLongStr:15}}</span>
                         <mat-icon class="selected-icon" *ngIf="i == tagIdxSelected" aria-hidden="false" aria-label="Example home icon">done</mat-icon>
                     </div>
             </div>
@@ -100,12 +101,11 @@
 
 
         <div class="mainbody">
-
             
             <div class="card textbody" [class.large]="!flagShowRawText">
-                <div class="title nerlabel" *ngIf="!flagIsDemo">
+                <div class="title nerlabel" >
 
-                    <button (click)="prevPage()" mat-button type="button">
+                    <button (click)="prevPage()" mat-button type="button" *ngIf="!flagIsDemo">
                         -
                     </button>
                 <div class="pageInfo">
@@ -137,6 +137,8 @@
                     <button (click)="nextPage()" #tooltip="matTooltip" matTooltip="Bitte alle Seiten labeln." matTooltipPosition="right"  mat-button type="button">
                         +
                     </button>
+
+                    <button type="button" #refreshToolTip="matTooltip" matTooltip="Dokument aktualisieren." matTooltipPosition="right" mat-flat-button (click)="refreshThisPageNoReload()">Aktualisieren</button>
                     
                 </div>
             
@@ -178,7 +180,7 @@
 
     </div>
 
-    <div class="card" *ngIf="!flagIsDemo">
+    <div class="card" *ngIf="!flagIsDemo && flagAllowEntChange">
         <div class="content">
             <div class="">
 

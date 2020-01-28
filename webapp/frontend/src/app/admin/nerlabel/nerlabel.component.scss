@@ -3,13 +3,17 @@
 #annotatedText, #rawText{
     white-space: pre-line;
     padding: 15px;
-    max-height: 56vh;
+    max-height: 50vh;
     overflow-y: scroll;
     line-height: 25px;
 }
 
 #annotatedText.largetext{
     line-height: 35px;
+}
+
+#annotatedText:hover{
+    cursor: pointer;
 }
 
 .container{
@@ -59,11 +63,11 @@
 }
 
 .card.textbody.large{
-    width: 100%;
+    width: 97%;
 }
 
 .textbody.large #annotatedText{
-    width: 100%;
+    width: 97%;
 }
 
 
@@ -239,6 +243,7 @@
     cursor: pointer;
     width: 18%;
     box-sizing: border-box;
+    padding: 2px;
 
     .label{
         margin-right: 5px;
@@ -338,6 +343,7 @@
 
     .mainbody{
         display:flex; 
+        width: 100%;
     }
 
 }

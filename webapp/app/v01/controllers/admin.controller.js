@@ -135,10 +135,11 @@ function approveLabelObject(req, res){
       throw "No _id provided.";
     }else{
 
-      // set wfstatus == 1 -> bbox is created; ready for OCR further processing
+      // set wfstatus == 11 -> bbox is created; ready for OCR further processing
+      // 11 = (1) bbox + (1) approved
 
-      labelObject["wfstatus"] = 1;
-      let changeItem = {"timeChange": new Date(), "wfstatus" : 1 };
+      labelObject["wfstatus"] = 11;
+      let changeItem = {"timeChange": new Date(), "wfstatus" : "11" };
       labelObject.wfstatus_change.push(changeItem);
 
       if (typeof(labelObject.lockTime) != "undefined"){
