@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, HostListener, AfterViewInit, ViewEncapsulation, ChangeDetectorRef, ViewChild , ElementRef} from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, AfterViewInit, ViewEncapsulation, ChangeDetectorRef, ViewChild , ElementRef, ApplicationRef} from '@angular/core';
 import { ApiService } from '../../api.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
@@ -45,6 +45,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
   flagHidePerson : boolean = false;
 
   flagIsDemo : boolean = false;
+  flagAllowEntChange : boolean = true;
 
   pagesReVisited : any[] = [];
 
@@ -78,8 +79,8 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
       
     const re = /^[0-9.]+$/
 
-    // disable shortkeys for demo
-    if (!this.flagIsDemo){
+    // disable shortkeys for demo 
+    if (!this.flagIsDemo && this.flagAllowEntChange){
       if (evt.key.match(re)){
         let number = parseInt(evt.key);
   
@@ -87,11 +88,29 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
           this.tagIdxSelected = number - 1;
         }
       }else{
-        let selIdx = this.tags.findIndex(x => x.shortcut.toUpperCase() == evt.key.toUpperCase()); 
+        let selIdx = this.tags.findIndex(x => x.shortcut.toUpperCase() == evt.key.toUpperCase());
+
+        let suitableIdx;
+
+        if (!this.getIncludeNonProdTags()){
+          let visibleTags = this.tags.filter(x => x.prod == true);
+          suitableIdx = visibleTags.map((elem, idx) => elem.shortcut.toUpperCase() == evt.key.toUpperCase() ? idx : "").filter(String)
+        }else{
+          suitableIdx = this.tags.map((elem, idx) => elem.shortcut.toUpperCase() == evt.key.toUpperCase() ? idx : "").filter(String)
+        } 
         
         // if selected tag exists but is not visible, due to non-prod, set selIdx == -1
         if (selIdx > -1 && !this.getIncludeNonProdTags() && !this.tags[selIdx].prod ){
           selIdx = -1;
+        }
+
+        if (suitableIdx.length > 1){
+          selIdx = -1;
+          this.tagIdxSelected = selIdx; 
+          this.snackBar.open('Der Shortcut ist doppelt vergeben - bitte Kategorie anklicken.', null, {
+            duration: 1500,
+          });
+          return;
         }
 
         this.tagIdxSelected = selIdx; 
@@ -107,6 +126,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
     public snackBar: MatSnackBar, 
     private route: ActivatedRoute, 
     private cd: ChangeDetectorRef, 
+    private appRef: ApplicationRef,
     private toastr: ToastrService, 
     public progressService : ProgressService, 
     private nerTagFilterPipe: NERTagFilterPipe
@@ -130,6 +150,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (flagIsDemo){
       this.flagIsDemo = true;
+      this.flagAllowEntChange = false;
 
       if (!this.api.nerDemoResponse || this.api.docType != 'text'){
         this.router.navigate(["/home"]); 
@@ -148,9 +169,10 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
           if (typeof(message.details.complete) != "undefined"){
             // this.api.isLoading = false;
             this.progressService.loaderIsComplete();
+            setTimeout(() => { this.refreshToolTip.show(); }, 500);
           }
 
-          if (typeof(message.details.start) != "undefined"){
+          if (typeof(message.details.start) != "undefined" || typeof(message.details.progress) != "undefined"){
             // this.api.isLoading = true;
             this.progressService.loaderIsLoading();
           }
@@ -165,6 +187,8 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   @ViewChild('tooltip', {static: false}) tooltip: MatTooltip;
+  @ViewChild('refreshToolTip', {static: false}) refreshToolTip: MatTooltip;
+  
 
 
   async ngAfterViewInit() {
@@ -219,6 +243,17 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   showSelectedText(evt) {
+
+    if (this.flagIsDemo || !this.flagAllowEntChange){
+      return;
+    }
+
+
+    // disable right click
+    if (evt.which == 3){
+      return;
+    }
+
     var text = ""; 
     var startIdx, endIdx; 
 
@@ -394,7 +429,8 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
 
     let newTag = {
       "value" : this.newEntText, 
-      "shortcut" : this.newEntTextShortCut.toUpperCase()
+      "shortcut" : this.newEntTextShortCut.toUpperCase(), 
+      "prod" : true
     }
 
     // this.api.isLoading = true;
@@ -427,7 +463,8 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
     // create a demo doc letter document from input text
 
     self.flagIsDemo = true;
-    self.flagIsNoDataAvailable = false; 
+    self.flagIsNoDataAvailable = false;
+    self.flagAllowEntChange = false;
 
     self.totalNumPages = 1;
     self.pageIdxSelected = 0;
@@ -516,8 +553,6 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
    }
 
    sortEntities(entities?){
-
-     if (entities)
 
     if (entities){
       entities.sort((a, b) => (a.start > b.start) ? 1 : -1); 
@@ -622,19 +657,43 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
     for (var i=0; i<data.entities.length; i++){
       var ent = data.entities[i];
 
-      var s = this.getEntity(ent);
+      let prodTag = this.getEntIsProdClass(ent._id);
 
-      var start = offset + ent.start; 
-      var end = offset + ent.end;
+      if ((prodTag != "" && this.getIncludeNonProdTags()) || prodTag == ""){
 
-      text = text.substring(0, start) + s + text.substring(end,text.length)
+        let sanityCheckOverlap = true;
+        let previousTag
+        if (i > 0){
+          previousTag = data.entities[i-1];
+          if (previousTag.end > ent.start){
+            sanityCheckOverlap = false;
+          }
+        }
+        
+        if (sanityCheckOverlap){
+          var s = this.getEntity(ent);
 
-      offset = offset + (s.length - ent.value.length);
-
+          var start = offset + ent.start; 
+          var end = offset + ent.end;
+    
+          text = text.substring(0, start) + s + text.substring(end,text.length)
+    
+          offset = offset + (s.length - ent.value.length);
+        }else{
+          this.snackBar.open('Ein Tag überschneidet sich mit vorherigen. Konsole prüfen.', null, {
+            duration: 1500,
+          });
+          console.log("Conflicting tags: ")
+          console.log(previousTag); 
+          console.log(ent)
+        }
+        
+      }
 
     }
 
-    this.cd.detectChanges();
+    // this.cd.detectChanges();
+    this.appRef.tick();
     
     return this.sanitizer.bypassSecurityTrustHtml(text); 
 
@@ -687,7 +746,10 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
         ent.value = hidden_val;
 
      }
-    var snippit = '<span class="entity hl-' + this.getEntHlId(ent._id) + " " + classShowEnt + " " + this.getEntIsProdClass(ent._id) +'" data-tag-id="' + this.getEntHlId(ent._id) + '" data-ent-id="' + ent.ent_id + '">' + ent.value + '<span class="ent-tooltip">' + this.getEntHlValue(ent._id) + '</span><div class="removeEnt" data-ent-id="' + ent.ent_id + '">X</div></span>'
+    var snippit = '<span class="entity hl-' + this.getEntHlId(ent._id) + " " + classShowEnt + " " + this.getEntIsProdClass(ent._id) +'" ' + 
+     ' style="background-color: ' + this.getEntBgColor(ent._id) + '; border: ' + this.getEntBorderStyle(ent._id) + ';"' + ' data-tag-id="' + 
+      this.getEntHlId(ent._id) + '" data-ent-id="' + ent.ent_id + '">' + ent.value + '<span style="color:' + this.getEntTextColor(ent._id) +  ';" class="ent-tooltip">' + this.getEntHlValue(ent._id) + 
+      '</span><div class="removeEnt" data-ent-id="' + ent.ent_id + '">X</div></span>'
     return snippit;
    }
 
@@ -702,11 +764,42 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
     
    }
 
+   getEntTextColor(tag_id){
+    var entInd = this.tags.findIndex(x => x._id == tag_id); 
+
+    if (entInd > -1){
+      return this.tags[entInd].textColor;
+    }else{
+      return '#000000';
+    }
+    
+   }
+
+   getEntBgColor(tag_id){
+    var entInd = this.tags.findIndex(x => x._id == tag_id); 
+
+    if (entInd > -1){
+      return this.tags[entInd].bgColor + "57"; // adding transparency;
+    }else{
+      return '#000000';
+    }
+   }
+
+   getEntBorderStyle(tag_id){
+    var entInd = this.tags.findIndex(x => x._id == tag_id); 
+
+    if (entInd > -1){
+      return "1px solid " + this.tags[entInd].bgColor; // adding transparency;
+    }else{
+      return "1px solid " + '#000000';
+    }
+   }
+
    getEntHlValue(tag_id){
     var entInd = this.tags.findIndex(x => x._id == tag_id); 
 
     if (entInd > -1){
-      return  this.tags[entInd].value;
+      return  this.tags[entInd].display;
     }else{
       return "unknown";
     }
@@ -841,6 +934,12 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
 
     let target_obj_meta = this.entityTypes[this.entityTypes.findIndex(x => x.id == this.selectedEntityTypeId)]; 
 
+    if (target_obj_meta.id == 0){
+      this.flagAllowEntChange = true;
+    }else{
+      this.flagAllowEntChange = false;
+    }
+
     let target_obj_name = target_obj_meta.target_obj;
 
     let target_obj = this.textObj.pages[this.pageIdxSelected].details[target_obj_name]
@@ -927,16 +1026,27 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
 
     let targetUrl = window.location.origin + "/#" +this.router.url.split('?')[0] + "?objId="+ this.objId
 
-  document.addEventListener('copy', (e: ClipboardEvent) => {
-      e.clipboardData.setData('text/plain', (targetUrl));
-      e.preventDefault();
-      document.removeEventListener('copy', null);
-      this.snackBar.open("URL kopiert", null, {
-          duration: 1500,
+    document.addEventListener('copy', (e: ClipboardEvent) => {
+        e.clipboardData.setData('text/plain', (targetUrl));
+        e.preventDefault();
+        document.removeEventListener('copy', null);
+        this.snackBar.open("URL kopiert", null, {
+            duration: 1500,
+        });
       });
-    });
-    document.execCommand('copy');
-}
+      document.execCommand('copy');
+  }
+
+  refreshThisPageNoReload(){
+    this.api.getNerLabelTag().then( (data : any) => {
+      this.tags = data;
+      this.getNerLabelObject(this.objId);
+    }).catch(err => {
+      console.log(err);
+      this.progressService.loaderIsComplete();
+    })
+
+  }
 
 
 

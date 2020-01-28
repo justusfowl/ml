@@ -28,6 +28,7 @@ router.route('/nerlabel/:objectid')
 router.route('/meta/nerlabel')
     .post(nerLabelCtrl.addTag)
     .get(nerLabelCtrl.getTag)
+    .put(nerLabelCtrl.updateTag)
 
 router.route('/nerlabel/disregard')
     .put(nerLabelCtrl.disregardObject)  

@@ -34,6 +34,7 @@ import { NavDrawerService } from './services/nav.service';
 
 import { NgxFileDropModule } from 'ngx-file-drop';
 import { ToastrModule } from 'ngx-toastr';
+import { ColorPickerModule } from 'ngx-color-picker';
 
 
 
@@ -63,6 +64,7 @@ import { ToastrModule } from 'ngx-toastr';
     FormsModule, 
     ReactiveFormsModule,
     NgxFileDropModule, 
+    ColorPickerModule ,
     ToastrModule.forRoot()
   ],
   providers: [

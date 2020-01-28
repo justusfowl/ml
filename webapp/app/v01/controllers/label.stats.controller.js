@@ -167,8 +167,10 @@ async function getNERLabelStats(req, res){
                       let tag = tags.filter(t => t._id.toString() == element._id.toString());
                       if (tag.length > 0){
                         element["value"] = tag[0].value;
+                        element["display"] = tag[0].display;
                       }else{
                         element["value"] = null;
+                        element["display"] = null;
                       }
                       
                 });

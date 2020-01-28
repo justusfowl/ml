@@ -47,7 +47,6 @@ export class ProgressService {
     }
 
     public getMessages = () => {
-        console.log("get message")
         return Observable.create((observer) => {
             this.socket.on('new-message', (message) => {
                 this.logs.data.unshift(message);
@@ -94,7 +93,6 @@ export class ProgressService {
     }
 
     loaderIsLoading(){
-        console.log(this.globalSpinner);
         this.globalSpinner.nativeElement.classList.remove("hideLoader")
     }
 

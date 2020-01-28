@@ -1,8 +1,79 @@
 <mat-card>
-    <h4>
-            Environment:
-    </h4>
-    <p>
-            {{api.ENV}}
-    </p>
+
+                <table class="tags-settings">
+                        <tr>
+                                <th>Value</th>
+                                <th>Display</th>
+                                <th>Shortcut</th>
+                                <th>BGColor</th>
+                                <th>TextColor</th>
+                                <th>Prod</th>
+                        </tr>
+                        <tr *ngFor = 'let row of tags' >
+                                <td>{{row.value}}</td>
+                                <td>
+                                        <mat-form-field class="example-full-width">
+                                                <input matInput  [(ngModel)]="row.display" (ngModelChange)="handleTagChange(row, $event)" >
+                                        </mat-form-field>
+                                </td>
+                                <td>
+                                        <mat-form-field class="shortcut-input">
+                                                <input matInput  [(ngModel)]="row.shortcut" (ngModelChange)="updateTag(row)" >
+                                        </mat-form-field>
+                                </td>
+                                <td>
+                                        <input class="bgColorDemo" cpOutputFormat='hex'  [(colorPicker)]="row.bgColor" (colorPickerSelect)="changeColor($event, row)" [style.background]="row.bgColor"/>
+                                </td>
+                                <td>
+                                        <span class="textColorDemo" [style.color]="row.textColor"
+                                                [cpPosition]="'bottom'"
+                                                [cpPositionOffset]="'50%'"
+                                                cpOutputFormat='hex'
+                                                [cpPositionRelativeToArrow]="true"
+                                                (colorPickerSelect)="changeColor($event, row)"
+                                                [(colorPicker)]="row.textColor">{{row.display}}</span>
+                                </td>
+                                <td> <mat-checkbox [(ngModel)]="row.prod" (ngModelChange)="updateTag(row)" >Prod?</mat-checkbox></td>
+                        </tr>
+                </table>
+
+        <!--
+        <table mat-table [dataSource]="tags" #sortTags="matSort" matSort  class="mat-elevation-z8">
+               
+                <ng-container matColumnDef="_id">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> _id </th>
+                        <td mat-cell *matCellDef="let element"> {{element._id}} </td>
+                </ng-container>
+                
+                
+                <ng-container matColumnDef="value">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Value </th>
+                        <td mat-cell *matCellDef="let element">{{element.value}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="shortcut">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Shortcut </th>
+                        <td mat-cell *matCellDef="let element">{{element.shortcut}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="prod">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Prod? </th>
+                        <td mat-cell *matCellDef="let element">{{element.prod}} </td>
+                </ng-container>
+                
+                <tr mat-header-row *matHeaderRowDef="displayedColumnsTags"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumnsTags;"></tr>
+        </table>
+        -->
+       
+</mat-card>
+
+
+<mat-card>
+        <h4>
+                Environment:
+        </h4>
+        <p>
+                {{api.ENV}}
+        </p>
 </mat-card>

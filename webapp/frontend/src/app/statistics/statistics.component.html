@@ -60,7 +60,7 @@
 
                 <ng-container matColumnDef="value">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
-                  <td mat-cell *matCellDef="let element">  <p class="main">{{element.value}}</p>  <p class="sub">{{element._id}}</p>  </td>
+                  <td mat-cell *matCellDef="let element">  <p class="main">{{element.display}}</p>  <p class="sub">{{element.value}} / {{element._id}}</p>  </td>
                 </ng-container>
               
                 <ng-container matColumnDef="count">
