@@ -112,7 +112,7 @@ def main(args=sys.argv[1:]):
 
                     myPDFLoader = PatLoader(dir=d, wfsteps=wfsteps)
                     myPDFLoader.process_pats()
-                    logging.info("Patloader completed.")
+                    print("Patloader completed.")
 
             else:
                 logging.error("Please provide at least one directory to be monitored (-d/--directories)")
