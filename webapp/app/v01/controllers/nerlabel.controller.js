@@ -78,6 +78,8 @@ function getLabelObject(req, res){
                             
                             });
                         }
+
+                        docs.lockTime = new Date();
             
                         res.json(docs);
             
@@ -112,10 +114,16 @@ function approveLabelObject(req, res){
     try{
   
       let labelObject = req.body;
+      let allText = ""; 
   
       if (typeof(labelObject.pages) != "undefined"){
         labelObject.pages.forEach(element => {
           delete element.base64String;
+
+          if (element.read_text){
+            allText += element.read_text
+          }
+          
         });
       }
   
@@ -126,7 +134,13 @@ function approveLabelObject(req, res){
         // set wfstatus == 4 -> NER approved files 
 
         labelObject["wfstatus"] = 4;
-        let changeItem = {"timeChange": new Date(), "wfstatus" : 4 };
+
+        // calculate duation + duration per 100 characters
+
+        let duration = (new Date() - new Date(labelObject.lockTime))/1000;
+        let durationPer100Char = duration / (allText.length/100);
+
+        let changeItem = {"timeChange": new Date(), "wfstatus" : 4, "duration" :  duration, "durationPer100Char" : durationPer100Char};
         labelObject.wfstatus_change.push(changeItem);
 
         if (typeof(labelObject.lockTime) != "undefined"){
@@ -147,6 +161,7 @@ function approveLabelObject(req, res){
           if (labelObject._id){
               delete labelObject._id
           }
+
           
           collection.replaceOne(
             {"_id" : ObjectID(objId)}, 
@@ -154,7 +169,6 @@ function approveLabelObject(req, res){
             function(err, docs){
               res.json({"message" : "ok"});
             });
-  
           
         });
       }
@@ -164,8 +178,6 @@ function approveLabelObject(req, res){
     }
   
   }
-
-
   
 function disregardObject(req, res){
 
