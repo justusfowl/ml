@@ -476,7 +476,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
           "entities" :  self.sortEntities(nerResponse.entities),
           "details" : nerResponse.details,
           "read_text" : nerResponse.text, 
-          "read_text_raw" : nerResponse.text
+          "read_text_raw" : nerResponse.text_raw
         }
       ]
 
@@ -739,7 +739,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
        classShowEnt = "showEnt";
      }
 
-     if (this.flagHidePerson && this.getEntHlValue(ent._id) == "PER"){
+     if (this.flagHidePerson && this.getEntHlImmutableTitle(ent._id) == "PER"){
 
         let origLen = ent.value.length;
         let hidden_val = new Array( origLen ).fill( 1 ).map( ( _, i ) => String.fromCharCode( 65 + 23 ) ).join(""); 
@@ -803,7 +803,17 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
     }else{
       return "unknown";
     }
-    
+   }
+
+   
+   getEntHlImmutableTitle(tag_id){
+    var entInd = this.tags.findIndex(x => x._id == tag_id); 
+
+    if (entInd > -1){
+      return  this.tags[entInd].value;
+    }else{
+      return "unknown";
+    }
    }
 
    getEntIsProdClass(tag_id){

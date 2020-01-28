@@ -52,6 +52,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   ]
 
+  wfResultingLinks = []
+
   constructor(
     public api: ApiService, 
     private router: Router, 
@@ -82,19 +84,57 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.progressService.getObjectProgressLog().subscribe((message: any) => {
       if (typeof(message.message) != "undefined"){
         this.toastr.info(message.category, message.message, {timeOut: 6000});
+        this.resetWFResultingLinks(); 
+        
         if (typeof(message.details) != "undefined"){
           if (typeof(message.details.complete) != "undefined"){
 
             this.progressService.loaderIsComplete()
-            console.log("completed...")
+            console.log("completed..."); 
+            this.handleWfInjectComplete(); 
           }
 
           if (typeof(message.details.start) != "undefined" || typeof(message.details.progress) != "undefined"){
             this.progressService.loaderIsLoading()
-            console.log("started...")
+            console.log("started..."); 
+            
           }
         }
       }
+    });
+
+  }
+
+  resetWFResultingLinks(){
+    this.wfResultingLinks = [];
+  }
+
+  handleWfInjectComplete(){
+
+    this.resetWFResultingLinks(); 
+
+    this.selectedChoice.choices.forEach(element => {
+
+      let routerLink, queryParams, display; 
+
+      queryParams = {objId :  this.currentObjId}
+
+      if (element == "ocr"){
+        routerLink = "/admin/label"
+        display = "OCR Ergebnis"
+      }else if (element == 'pretag'){
+        routerLink = "/admin/nerlabel"
+        display = "NER Ergebnis"
+      }
+      
+      if (routerLink){
+        this.wfResultingLinks.push({
+          "routerLink" : routerLink,
+          "queryParams" : queryParams,
+          "display" : display
+        })
+      }
+
     });
 
   }
