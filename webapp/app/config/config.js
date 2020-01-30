@@ -66,6 +66,10 @@ const config = {
       port : process.env.PROC_BACKEND_PORT,
     }, 
 
+    auth: {
+      jwtsec : process.env.JWT_TOKEN_SEC, 
+      expiresIn: 100000000
+    }
 
   };
 

@@ -4,7 +4,6 @@ import { ApiService } from './api.service';
 import { Title } from '@angular/platform-browser';
 import { ProgressService } from './services/progress.service';
 
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -25,6 +24,7 @@ export class AppComponent implements AfterViewInit {
     this.titleService.setTitle( "medlines.tech - Medizinisches Freitextverständnis" );
 
     this.progressService.init();
+
   }
 
   ngAfterViewInit(){

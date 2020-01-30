@@ -10,9 +10,12 @@ import { NerlabelComponent } from './admin/nerlabel/nerlabel.component';
 import { SettingsComponent } from './settings/settings.component';
 import { SearchComponent } from './search/search.component';
 import { LogsComponent } from './admin/applogs/logs.component';
+import { LoginComponent } from './login/login.component';
+import { AuthGuard } from './services/authguard'
 
 const routes: Routes = [
-  { path: 'home', component: HomeComponent },
+  { path: 'login', component: LoginComponent },
+  { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
   { path: 'search', component: SearchComponent },
   { path: 'stats', component: StatisticsComponent },
   { path: 'logs', component: LogsComponent },
@@ -21,7 +24,9 @@ const routes: Routes = [
   { path: 'admin/label', component: LabelComponent },
   { path: 'admin/nerlabel', component: NerlabelComponent },
   
-  { path: '', redirectTo: '/home', pathMatch: 'full' }
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
+  // otherwise redirect to home
+  { path: '**', redirectTo: '' }
 ];
 
 @NgModule({

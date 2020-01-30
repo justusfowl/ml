@@ -2,6 +2,19 @@
   height: 100%;
 }
 
+.sidenav.hide{
+  display: none;
+}
+
+.menu-btn.hide{
+  display: none;
+}
+
+.account-btn{
+  margin-left: 20px;
+  background-color: #5ec3b1 !important;
+}
+
 .sidenav {
   width: 200px;
 }

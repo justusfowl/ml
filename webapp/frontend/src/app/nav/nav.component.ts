@@ -7,6 +7,9 @@ import { ApiService } from '../api.service';
 import { NavDrawerService } from '../services/nav.service';
 import { MatDrawer, MatSidenav } from '@angular/material';
 
+import { AuthenticationService } from '../services/auth.service';
+
+
 @Component({
   selector: 'app-nav',
   templateUrl: './nav.component.html',
@@ -22,15 +25,18 @@ export class NavComponent implements AfterViewInit {
 
     @ViewChild("drawer", {static: false}) public drawer: MatSidenav
 
+    currentUserName = ""; 
+
   constructor(
     private breakpointObserver: BreakpointObserver, 
     public router : Router, 
     public api : ApiService, 
     private route: ActivatedRoute, 
-    private navService : NavDrawerService
+    private navService : NavDrawerService,
+    public authenticationService: AuthenticationService
   ) {
 
-   
+    this.authenticationService.currentUser.subscribe((x : any) => this.currentUserName = x.userName);
   }
 
   ngAfterViewInit(){

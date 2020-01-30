@@ -11,7 +11,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { LayoutModule } from '@angular/cdk/layout';
 
-import { HttpClientModule } from '@angular/common/http'; 
+import { HttpClientModule, HTTP_INTERCEPTORS  } from '@angular/common/http'; 
 
 import { MaterialModule } from './material.module';
 
@@ -27,6 +27,7 @@ import { TrimLongStr, LogFilterPipe, NERTagFilterPipe } from './pipes/pipes';
 import { LabelComponent } from './admin/label/label.component';
 import { NerlabelComponent } from './admin/nerlabel/nerlabel.component';
 import { LogsComponent } from './admin/applogs/logs.component';
+import { LoginComponent } from './login/login.component';
 
 import { ApiService } from './api.service';
 import { ProgressService } from './services/progress.service';
@@ -35,6 +36,9 @@ import { NavDrawerService } from './services/nav.service';
 import { NgxFileDropModule } from 'ngx-file-drop';
 import { ToastrModule } from 'ngx-toastr';
 import { ColorPickerModule } from 'ngx-color-picker';
+
+import { JwtInterceptor } from './services/jwt.intercept';
+import { ErrorInterceptor } from './services/error.intercept';
 
 
 
@@ -49,6 +53,7 @@ import { ColorPickerModule } from 'ngx-color-picker';
     LabelComponent,
     SettingsComponent, 
     NerlabelComponent, 
+    LoginComponent,
     SearchComponent,
     TrimLongStr,
     LogFilterPipe, 
@@ -68,6 +73,8 @@ import { ColorPickerModule } from 'ngx-color-picker';
     ToastrModule.forRoot()
   ],
   providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+      { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     {provide: LocationStrategy, useClass: HashLocationStrategy},
     ProgressService,
     ApiService, 

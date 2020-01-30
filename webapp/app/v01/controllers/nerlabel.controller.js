@@ -115,6 +115,7 @@ function approveLabelObject(req, res){
   
       let labelObject = req.body;
       let allText = ""; 
+      let userId = req.userId; 
   
       if (typeof(labelObject.pages) != "undefined"){
         labelObject.pages.forEach(element => {
@@ -140,7 +141,7 @@ function approveLabelObject(req, res){
         let duration = (new Date() - new Date(labelObject.lockTime))/1000;
         let durationPer100Char = duration / (allText.length/100);
 
-        let changeItem = {"timeChange": new Date(), "wfstatus" : 4, "duration" :  duration, "durationPer100Char" : durationPer100Char};
+        let changeItem = {"timeChange": new Date(), "wfstatus" : 4, "duration" :  duration, "durationPer100Char" : durationPer100Char, "userId" : userId};
         labelObject.wfstatus_change.push(changeItem);
 
         if (typeof(labelObject.lockTime) != "undefined"){
@@ -184,6 +185,7 @@ function disregardObject(req, res){
     try{
   
         let labelObject = req.body;
+        let userId = req.userId;
   
       if (typeof(labelObject._id) == "undefined"){
         throw "No _id provided.";
@@ -204,7 +206,10 @@ function disregardObject(req, res){
               delete labelObject._id
           }
           
-          collection.updateOne({"_id" : ObjectID(objId)}, {$set: { wfstatus : -3}, $push: { "wfstatus_change" : {"timeChange": new Date(), "wfstatus" : -3 }}},
+          collection.updateOne({"_id" : ObjectID(objId)}, {$set: { 
+            wfstatus : -3}, $push: {
+               "wfstatus_change" : {"timeChange": new Date(), "wfstatus" : -3 , "userId" : userId}
+            }},
             function(err, docs){
               res.json({"message" : "ok"});
             });
