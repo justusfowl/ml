@@ -303,8 +303,10 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
             // a text area has been selected
             text = window.getSelection().toString();
 
+            let textNoLinebreak = text.replace(/(\r\n|\n|\r)/g,"   ");
+
             startIdx = textAnchorIndex + Math.min(sel.focusOffset,sel.anchorOffset); // textAnchorIndex + sel.anchorOffset;
-            endIdx = startIdx + text.length;
+            endIdx = startIdx + textNoLinebreak.length;
 
             if (typeof((sel as any).baseNode.classList) != "undefined"){
               if ((sel as any).baseNode.classList.contains("entity")){
@@ -574,10 +576,15 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
           this.makeText();
         }else{
           console.log("interfering tag...cannot add")
+          this.snackBar.open('Ein Wort kann nur in einem Tag vorkommen. Überschneidungen sind nicht zulässig.', null, {
+            duration: 1500,
+          });
         }        
 
       }else{
-        console.log("cannot add the same tag again...")
+        this.snackBar.open('Es ist ein Fehler aufgetreten - lösche das Tag vor dem ausgewählten Wort und versuche es erneut.', null, {
+          duration: 1500,
+        });
       }
     
    }
@@ -596,7 +603,11 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
      }
 
      this.textObj.pages[this.pageIdxSelected].entities.forEach(element => {
-        if ((element.start <= tag.start && element.end >= tag.start) || (element.start <= tag.end && element.end >= tag.end)){
+        if (
+          (element.end > tag.start  && element.start < tag.start) ||
+          (element.start < tag.end && element.end > tag.end) ||
+          (element.start >= tag.start && element.end <= tag.end)
+          ){
           flagDoesInterfere = true; 
         }
      });
@@ -675,10 +686,12 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
 
           var start = offset + ent.start; 
           var end = offset + ent.end;
-    
+
           text = text.substring(0, start) + s + text.substring(end,text.length)
+
+          let textNoLinebreak = ent.value.replace(/(\r\n|\n|\r)/g,"   ");          
     
-          offset = offset + (s.length - ent.value.length);
+          offset = offset + (s.length - textNoLinebreak.length);
         }else{
           this.snackBar.open('Ein Tag überschneidet sich mit vorherigen. Konsole prüfen.', null, {
             duration: 1500,

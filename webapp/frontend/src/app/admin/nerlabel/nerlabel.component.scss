@@ -116,6 +116,12 @@
     padding: 8px 1px 2px 2px;
 }
 
+.entity.showEnt:hover {
+    .removeEnt{
+        max-width: 100%; 
+    }
+}
+
 .entity .ent-tooltip{
     position: absolute;
     left: 0px;
@@ -147,6 +153,9 @@
     font-size: 11px;
     height: 15px;
     align-items: center;
+    max-width: 0%;
+    overflow: hidden; 
+    transition: cubic-bezier(0.39, 0.575, 0.565, 1);
 }
 
 .entity.hideMe{
