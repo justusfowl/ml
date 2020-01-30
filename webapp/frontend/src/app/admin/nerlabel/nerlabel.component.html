@@ -11,6 +11,7 @@
                     <div 
                     *ngFor="let t of tags; let i = index;" 
                     [style.background-color]="t.bgColor + '57'"
+                     [matTooltip]="t.tooltip"
                     [class]="((i == tagIdxSelected) ? ('entity-select selected ') : 'entity-select ') + ((!t.prod) ? ' non-prod' : '') + ((!getIncludeNonProdTags()) ? ' hide' : '')" 
                     (click)="selectEntity(i, t._id)" 
                     >
