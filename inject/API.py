@@ -52,8 +52,24 @@ def initAPI():
             return redirect(request.url)
 
         file = request.files['file']
-        flag_over_write = False
 
+        try:
+            pat_nummer = request.form["pat_nummer"]
+            pat_name = request.form["pat_name"]
+            if "wfsteps" in request.form:
+                wfsteps = request.form["wfsteps"]
+            else:
+                wfsteps = []
+
+        except :
+            print('No body sent - dummies set.')
+            pat_nummer = "-99"
+            pat_name = "dummy"
+            wfsteps = []
+
+
+
+        flag_over_write = False
         if request.args.get('flagoverwrite') is not None:
             flag_over_write = True
 
@@ -76,14 +92,12 @@ def initAPI():
 
             if (f_ext == "pdf"):
 
-                pdf_obj = PDFInjector(file_path=file_path, flagoverwrite=flag_over_write)
-
+                pdf_obj = PDFInjector(file_path=file_path, flagoverwrite=flag_over_write, pat_name=pat_name, pat_nummer=pat_nummer, wfsteps=wfsteps)
 
                 pdf_obj.create_tiff()
                 pdf_obj.create_thumbs()
                 pdf_obj.store_obj()
                 pdf_obj.publish_to_OCR()
-
 
                 res_dict = pdf_obj.to_dict()
 
@@ -126,7 +140,7 @@ def initAPI():
 
             if (f_ext == "pdf"):
 
-                pdf_obj = PDFInjector(file_path=file_path, flagoverwrite=True)
+                pdf_obj = PDFInjector(file_path=file_path, flagoverwrite=True, pat_name="dummy", pat_nummer="-99")
                 pdf_obj.create_tiff()
                 pdf_obj.create_thumbs()
 

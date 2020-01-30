@@ -4,9 +4,44 @@ docker run -d -p 8000:8000 --env-file=.env --mount type=bind,source=/media/datad
 
 # Starting python services: 
 
-- python -m inject -r service [API]
-- python -m inject -r ocr [OCR engine + Spellchecker]
-- python -m inject -r pretag [pretagging for NER]
+WEBSERVICE
+[API]
+- python -m inject -r service 
+
+WORKER SERVICES
+[OCR engine + Spellchecker] / [pretagging for NER]
+- python -m inject -r ocr 
+- python -m inject -r pretag 
+
+LOADER-VARIANTS: 
+Load objects into the pipeline. 
+Optional flag to set the latest wfstep; multiple steps possible, no WF step skipping allowed: --wfsteps ocr pretag 
+
+
+PATLOADER 
+[Load patient data from defined directory(ies). Folder structure needs to comply with.
+Allowed formats: 
+* PDF
+* TIFF (will be converted into PDF)
+]
+
+- base_directory
+-- Patient_Folder format: "{NUMBER@NAME}"
+--- "Briefe"
+---- Letter_Folder: "{DOC_NAME}"
+
+- python -m inject --routines patloader -d {BASE_DIR_OF_DATA} --fromdir
+
+LOADER
+[bluntly loading pdf files into the pipeline from directories]
+Allowed formats: 
+* PDF
+]
+
+PROCESSLOADER 
+[Load individual objects by Id]
+- python -m inject --routines loader --fromdb --objId {OBJECT_IDS}
+
 
 # Workflow status: 
 * 0 : PDF / File injected, thumbnails created and stored into the mongoDB (PDF -> TIFF / thumbnails)
@@ -16,7 +51,6 @@ docker run -d -p 8000:8000 --env-file=.env --mount type=bind,source=/media/datad
 * 3 : Prelabeling NER has been applied
 * --> [-3] --> Object disregarded, e.g. because of text spell check errors / irrelevance
 * 4 : Approved NER labeling
-
 
 
 # textembeddings demo 

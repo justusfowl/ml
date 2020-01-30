@@ -48,7 +48,7 @@ class OCRProcessor:
 
         for p in self.label_obj["pages"]:
 
-            if "bbox" in p:
+            if "bbox" in p and p["bbox"]:
 
                 self.progressHandler.pub_to(str(self.label_obj["_id"]), "Page " + str(cnt_p), category="OCR")
 
@@ -86,7 +86,12 @@ class OCRProcessor:
 
     def store_obj(self):
 
+        # remove entities that might have previously existed for this object
+        # because due to spellchecking, those might be corrupt any way
 
+        for p in self.label_obj["pages"]:
+            if "entities" in p:
+                del p["entities"]
 
         self.label_obj["wfstatus"] = 2
 
@@ -99,13 +104,9 @@ class OCRProcessor:
 
         self.db.mongo_db.labels.update({"_id": self.label_obj["_id"]}, self.label_obj, upsert=True)
 
-
-
     def publish_to_pretagging(self):
         msg = {"_id": str(self.label_obj["_id"])}
         self.channel.basic_publish(exchange='', routing_key=os.environ.get("MQ_QUEUE_PRETAG"), body=json.dumps(msg))
-
-
 
     def callback(self, ch, method, properties, body):
 
@@ -114,29 +115,57 @@ class OCRProcessor:
 
             object_id = str(requestParams["_id"])
 
+            if not "wfsteps" in requestParams:
+                wfsteps = []
+            else:
+                wfsteps = requestParams["wfsteps"]
+
             print("Processing...%s" % object_id)
+
+            self.progressHandler.join_room(object_id)
 
             self.progressHandler.pub_to(object_id, "OCR Processing started", "OCR", details={"start" : True})
 
             self.label_obj = self.db.mongo_db.labels.find_one({"_id": ObjectId(object_id)})
-            self.process_label_object()
 
-            self.progressHandler.pub_to(str(self.label_obj["_id"]), "Update workflow status == 2 ", "OCR")
-            self.store_obj()
-            self.progressHandler.pub_to(str(self.label_obj["_id"]), "Object stored", "OCR")
+            if not self.label_obj:
+                ch.basic_ack(delivery_tag=method.delivery_tag)
+                self.progressHandler.pub_to(object_id, "Fatal error, object cannot be found in database. Is dropped.", "OCR", details={"complete" : True})
+                self.progressHandler.leave_room(object_id)
 
-            self.publish_to_pretagging()
-            self.progressHandler.pub_to(str(self.label_obj["_id"]), "Published to pretagging", "OCR", details={"complete" : True})
+            else:
 
-            ch.basic_ack(delivery_tag=method.delivery_tag)
+                self.process_label_object()
 
-            print("Completed for %s" % object_id)
+                self.progressHandler.pub_to(str(self.label_obj["_id"]), "Update workflow status == 2 ", "OCR")
+                self.store_obj()
+                self.progressHandler.pub_to(str(self.label_obj["_id"]), "Object stored", "OCR")
+
+                if "pretag" in wfsteps:
+
+                    self.publish_to_pretagging()
+
+                    self.progressHandler.pub_to(str(self.label_obj["_id"]), "Published to pretagging", "OCR", details={"complete" : True})
+                else:
+                    self.progressHandler.pub_to(str(self.label_obj["_id"]), "No publish to pretagging as defined in wfsteps", "OCR", details={"complete": True})
+
+                ch.basic_ack(delivery_tag=method.delivery_tag)
+
+                print("Completed for %s" % object_id)
+                self.progressHandler.leave_room(object_id)
 
 
         except Exception as e:
             print("File could not be processed... %s" % object_id, e)
-            ch.basic_reject(delivery_tag=method.delivery_tag, requeue=True)
-            self.progressHandler.pub_to(str(self.label_obj["_id"]), "File rejected", "OCR", details=e)
+
+            if method.delivery_tag > 100 and method.redelivered:
+                ch.basic_ack(delivery_tag=method.delivery_tag)
+                self.progressHandler.pub_to(object_id, "Fatal error, object cannot be processed. Is dropped.", "OCR", details={"complete": True}, error=e)
+            else:
+                ch.basic_reject(delivery_tag=method.delivery_tag, requeue=True)
+                self.progressHandler.pub_to(str(self.label_obj["_id"]), "File rejected", "OCR", error=e)
+
+            self.progressHandler.leave_room(object_id)
 
     def init_consuming(self):
         print("start consuming...")

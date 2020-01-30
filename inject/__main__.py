@@ -17,6 +17,7 @@ load_dotenv(dotenv_path=dotenv_path)
 list_of_choices = [
     'service',
     'loader',
+    'patloader',
     'ocr',
     'spell',
     'pretag'
@@ -35,7 +36,10 @@ parser.add_argument(
 )
 
 parser.add_argument("-d", "--directories", nargs='+',
-                    help="directories to be user for loader, works with --routines=loader", metavar="STRINGS")
+                    help="directories to be user for loader, works with --routines=loader / patloader", metavar="STRINGS")
+
+parser.add_argument("--wfsteps", nargs='+',
+                    help="define what steps of the workflow shall be applied. skipping is not supported. --routines=loader / patloader", metavar="STRINGS")
 
 parser.add_argument("-o", '--ocrdev', action='store_true',  help='Execute OCR as development env')
 parser.add_argument('--flagdev', action='store_true',  help='Indicate OCR service to run in dev mode')
@@ -88,6 +92,31 @@ def main(args=sys.argv[1:]):
         speller.dev(objId="5de7aaf285363ed084394b1c")
         speller.store_obj()
 
+    elif 'patloader' in args.routines:
+        from DocLoader import PatLoader
+
+        wfsteps = args.wfsteps
+
+        if not wfsteps:
+            wfsteps = []
+
+        if args.fromdir:
+            print("PATLOADER service started")
+
+            directories = args.directories
+
+            if len(directories) > 0:
+
+                for d in directories:
+                    logging.info("The following directory should be used {}".format(d))
+
+                    myPDFLoader = PatLoader(dir=d, wfsteps=wfsteps)
+                    myPDFLoader.process_pats()
+                    print("Patloader completed.")
+
+            else:
+                logging.error("Please provide at least one directory to be monitored (-d/--directories)")
+
     elif 'loader' in args.routines:
         from DocLoader import PDFLoader, ProcessLoader
 
@@ -102,6 +131,7 @@ def main(args=sys.argv[1:]):
                     logging.info("The following directory should be used {}".format(d))
 
                     myPDFLoader = PDFLoader(dir=d)
+                    myPDFLoader.process_files()
 
             else:
                 logging.error("Please provide at least one directory to be monitored (-d/--directories)")
@@ -121,7 +151,6 @@ def main(args=sys.argv[1:]):
 
         else:
             logging.error("Please provide what type of loader should be executed.")
-
 
     else:
         print("service")
