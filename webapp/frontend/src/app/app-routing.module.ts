@@ -16,13 +16,13 @@ import { AuthGuard } from './services/authguard'
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
-  { path: 'search', component: SearchComponent },
-  { path: 'stats', component: StatisticsComponent },
-  { path: 'logs', component: LogsComponent },
-  { path: 'nlp', component: NlpComponent },
-  { path: 'settings', component: SettingsComponent },
-  { path: 'admin/label', component: LabelComponent },
-  { path: 'admin/nerlabel', component: NerlabelComponent },
+  { path: 'search', component: SearchComponent, canActivate: [AuthGuard] },
+  { path: 'stats', component: StatisticsComponent, canActivate: [AuthGuard] },
+  { path: 'logs', component: LogsComponent, canActivate: [AuthGuard] },
+  { path: 'nlp', component: NlpComponent, canActivate: [AuthGuard] },
+  { path: 'settings', component: SettingsComponent, canActivate: [AuthGuard] },
+  { path: 'admin/label', component: LabelComponent, canActivate: [AuthGuard] },
+  { path: 'admin/nerlabel', component: NerlabelComponent, canActivate: [AuthGuard] },
   
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   // otherwise redirect to home
