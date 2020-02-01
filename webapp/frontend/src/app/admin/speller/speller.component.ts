@@ -80,6 +80,23 @@ export class SpellerComponent implements OnInit {
       this.objId = objId; 
     }
 
+    this.progressService.getObjectProgressLog().subscribe((message: any) => {
+      if (typeof(message.message) != "undefined"){
+        this.toastr.info(message.category, message.message, {timeOut: 6000});
+        if (typeof(message.details) != "undefined"){
+          if (typeof(message.details.complete) != "undefined"){
+            // this.api.isLoading = false;
+            this.progressService.loaderIsComplete();
+          }
+
+          if (typeof(message.details.start) != "undefined" || typeof(message.details.progress) != "undefined"){
+            // this.api.isLoading = true;
+            this.progressService.loaderIsLoading();
+          }
+        }
+      }
+    });
+
   }
 
   
@@ -574,26 +591,28 @@ export class SpellerComponent implements OnInit {
 
     finalizeCorrectionsCurrentPage(){
 
-      let suggs = document.getElementsByClassName("suggestion") as any;
+      if (this.annotatedText){
+        let suggs = document.getElementsByClassName("suggestion") as any;
 
-      for (var i=0; i<suggs.length;i++){
-        let sugg_item = suggs[i];
-        let suggId = sugg_item.getAttribute("data-sugg-id");
-        let finalText = sugg_item.innerText;
-
-        let suggIdx = this.textObj.pages[this.pageIdxSelected].suggestions.findIndex(x => x.sugg_id == suggId);
-
-        if (suggIdx > -1){
-          this.textObj.pages[this.pageIdxSelected].suggestions[suggIdx].final_text = finalText
+        for (var i=0; i<suggs.length;i++){
+          let sugg_item = suggs[i];
+          let suggId = sugg_item.getAttribute("data-sugg-id");
+          let finalText = sugg_item.innerText;
+  
+          let suggIdx = this.textObj.pages[this.pageIdxSelected].suggestions.findIndex(x => x.sugg_id == suggId);
+  
+          if (suggIdx > -1){
+            this.textObj.pages[this.pageIdxSelected].suggestions[suggIdx].final_text = finalText
+          }
+  
         }
-
+  
+        let updatedText = document.getElementById("annotatedText").innerText;
+  
+        this.textObj.pages[this.pageIdxSelected].read_text = updatedText;
+        this.textObj.pages[this.pageIdxSelected].flag_read_text_updated = true;
+  
       }
-
-      let updatedText = document.getElementById("annotatedText").innerText;
-
-      this.textObj.pages[this.pageIdxSelected].read_text = updatedText;
-      this.textObj.pages[this.pageIdxSelected].flag_read_text_updated = true;
-
       
     }
 
@@ -675,7 +694,9 @@ export class SpellerComponent implements OnInit {
   }
 
   refreshThisPageNoReload(){
-    this.getSpellerLabelObject(this.objId);
+    if (confirm('Soll das Objekt neu geladen werden? Alle Änderungen verfallen damit unwiderruflich.')) {
+      this.getSpellerLabelObject(this.objId);
+    }
   }
 
   issueObjToWf(targetWf, wfsteps=[]){
