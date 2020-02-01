@@ -25,6 +25,7 @@ import { SearchComponent } from './search/search.component';
 import { TrimLongStr, LogFilterPipe, NERTagFilterPipe } from './pipes/pipes';
 
 import { LabelComponent } from './admin/label/label.component';
+import { SpellerComponent } from './admin/speller/speller.component';
 import { NerlabelComponent } from './admin/nerlabel/nerlabel.component';
 import { LogsComponent } from './admin/applogs/logs.component';
 import { LoginComponent } from './login/login.component';
@@ -47,6 +48,7 @@ import { ErrorInterceptor } from './services/error.intercept';
     AppComponent,
     NavComponent,
     NlpComponent,
+    SpellerComponent,
     HomeComponent,
     StatisticsComponent, 
     LogsComponent,

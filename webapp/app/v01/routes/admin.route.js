@@ -3,7 +3,8 @@ var router = express.Router();
 
 var adminCtrl = require('../controllers/admin.controller');
 var nerLabelCtrl = require('../controllers/nerlabel.controller');
-var adminLabelStatsCtrl = require('../controllers/label.stats.controller')
+var adminLabelStatsCtrl = require('../controllers/label.stats.controller');
+var spellerCtrl = require('../controllers/speller.controller');
 
 router.route('/')
     .post(adminCtrl.hb)
@@ -16,7 +17,17 @@ router.route('/label/:objectid')
     .get(adminCtrl.getLabelObject)
 
 router.route('/label/disregard')
-    .put(adminCtrl.disregardObject)  
+    .put(adminCtrl.disregardObject) 
+    
+router.route('/speller')
+    .get(spellerCtrl.getObject)
+    .put(spellerCtrl.approveObject)
+
+router.route('/speller/:objectid')
+    .get(spellerCtrl.getObject)
+
+router.route('/speller/disregard')
+    .put(spellerCtrl.disregardObject) 
 
 router.route('/nerlabel')
     .get(nerLabelCtrl.getLabelObject)

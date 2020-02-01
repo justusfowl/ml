@@ -244,7 +244,13 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
 
   showSelectedText(evt) {
 
+    
     if (this.flagIsDemo || !this.flagAllowEntChange){
+      return;
+    }
+
+    if (evt.ctrlKey){
+      console.log("Ctrl-Pressed")
       return;
     }
 
@@ -338,6 +344,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
       }
 
     }
+
   }
 
   getWordBound(idx, text, start=false){

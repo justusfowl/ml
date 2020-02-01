@@ -124,7 +124,12 @@ function approveLabelObject(req, res){
   try{
 
     let labelObject = req.body;
-    let userId = req.userId; 
+    let userId = req.userId;
+    let wfsteps = req.wfsteps; 
+
+    if (typeof(wfsteps) == "undefined"){
+      wfsteps = [];
+    }
 
     if (typeof(labelObject.pages) != "undefined"){
       labelObject.pages.forEach(element => {
@@ -167,8 +172,8 @@ function approveLabelObject(req, res){
           labelObject,
           function(err, docs){
             res.json({"message" : "ok"});
-            publishToQueue("medlines", {"_id" :objId, "wfsteps" : ["pretag"] }); 
-            console.log("published id: " + objId);
+            publishToQueue("medlines", {"_id" :objId, "wfsteps" : wfsteps }); 
+            console.log("published to queue: medlines | id: " + objId );
           });
 
         

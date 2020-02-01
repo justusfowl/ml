@@ -1,0 +1,131 @@
+<div class="no-data" *ngIf="flagIsNoDataAvailable">
+        Ziemlich leer hier, sieht aus, als ob keine weiteren Daten zu korrigieren wären...
+        <button type="button" mat-flat-button (click)="getSpellerLabelObject()">Aktualisieren</button>
+    </div>
+    
+    <div *ngIf="!flagIsNoDataAvailable">
+        <div class="nerheader">
+
+            
+
+            <div class="settings">
+                <div class="card">
+                        <div class="content">
+                            <mat-accordion>
+                                <mat-expansion-panel>
+                                    <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        Einstellungen
+                                    </mat-panel-title>
+                                    <mat-panel-description>
+                                        Darstellung & Labelling
+                                    </mat-panel-description>
+                                    </mat-expansion-panel-header>
+                                
+                                    <div class="mb setting-row">
+
+                                        <button (click)="incrementZoom(-0.1)" mat-button type="button">
+                                            -
+                                        </button>
+                                    
+                                        <mat-form-field class="page-number">
+                                            <input matInput type="number" placeholder="Zoom" [(ngModel)]="scaleFactor" pattern="-?[0-9]*(\.[0-9]+)?">
+                                            <mat-error>Input is not a number!</mat-error>
+                                        </mat-form-field>
+                                        <button (click)="incrementZoom(0.1)" mat-button type="button">
+                                            +
+                                        </button>
+                                    </div>
+                                </mat-expansion-panel>
+                            </mat-accordion>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div class="card flag_updated_already" *ngIf="!getIfContentEditable()">
+                        <div class="content ">Dieser Text wurde bereits korrigiert.</div>
+                </div>
+        </div>
+    
+        <div class="container ner" >
+    
+            <div class="mainbody">
+                
+                <div class="card textbody" [class.large]="!flagShowRawText" >
+                    <div class="title nerlabel" *ngIf="!flagIsDemo">
+                        <button (click)="removeEditLock()" mat-button type="button" class="reset-btn" *ngIf="!getIfContentEditable()">
+                            Sperre aufheben
+                        </button>
+                        <button (click)="resetTextWithSuggestions()" mat-button type="button" class="reset-btn">
+                            Zurücksetzen?
+                        </button>
+                        <button (click)="prevPage()" mat-button type="button" disabled matTooltip="Korrekturen sind irreversibel." >
+                            -
+                        </button>
+                    <div class="pageInfo">
+                        Seite {{pageIdxSelected+1}} von {{totalNumPages}}
+                        <p class="details linktoobj" [matMenuTriggerFor]="menu" >{{textObj._id}} [status:{{textObj.wfstatus}} ] </p> 
+
+                        <mat-menu #menu="matMenu">
+                            <button mat-menu-item [matMenuTriggerFor]="viewObjMenu">Ansehen</button>
+                            <button mat-menu-item [matMenuTriggerFor]="execObjMenu">Workflow</button>
+                            <button mat-menu-item (click)="copyUrlToClipboard()">URL kopieren</button>
+                        </mat-menu>
+                        
+                        <mat-menu #viewObjMenu="matMenu" >
+                                <a mat-menu-item routerLink="/admin/label" [queryParams]="{ objId: textObj._id}" routerLinkActive="active">Bbox label</a>
+                                <a mat-menu-item routerLink="/logs" [queryParams]="{ objId: textObj._id}" routerLinkActive="active">Logs</a>
+                        
+                            </mat-menu>
+    
+                        <mat-menu #execObjMenu="matMenu">
+                            <button mat-menu-item (click)="issueObjToWf('ocr', ['ocr'])">OCR+Spellcheck</button>
+                        </mat-menu>
+
+                        </div>
+                    
+                        <button (click)="nextPage()" #tooltip="matTooltip" matTooltip="Bitte alle Seiten labeln." matTooltipPosition="right"  mat-button type="button">
+                            +
+                        </button>
+    
+                        <button type="button" #refreshToolTip="matTooltip" matTooltip="Dokument aktualisieren." matTooltipPosition="right" mat-flat-button (click)="refreshThisPageNoReload()">Aktualisieren</button>
+                        
+                    </div>
+                
+                    <div class="content" (mouseleave)="mouseLeaveTextArea($event)">
+                        <p *ngIf="!annotatedText">
+                            Kein Text auf dieser Seite gefunden
+                        </p>
+                        <div id="annotatedText" *ngIf="annotatedText" 
+                                (mouseup)="showSelectedText($event)"
+                                (scroll)="mouseLeaveTextArea($event)"
+                                class="largetext"
+                                [class.locked]="!getIfContentEditable()"
+                                [style.font-size]="14*scaleFactor + 'px'" 
+                                [style.letter-spacing]="1*scaleFactor + 'px'" 
+                                contenteditable="true"
+                                [innerHTML]="annotatedText">
+                        </div>
+                        <div id="sug-menu" (click)="selectSuggestion($event)">
+                        </div>
+                    </div>
+    
+                </div>
+    
+            </div>
+    
+        </div>
+    
+        <div class="card" >
+            <div class="content">
+                <div class="">
+    
+                    <button type="button" class="disregard-button" mat-flat-button color="error"  (click)="disregardSpellerObject()">Aussortieren</button>
+                    <button type="button" class="next-button" mat-flat-button color="primary" [disabled]="!getIsFinal()" (click)="approveObject()">Bestätigen</button>
+    
+                </div>
+            </div>
+        </div>
+    
+    </div>

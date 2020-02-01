@@ -139,6 +139,70 @@ export class ApiService {
     this.navOpen = false; 
   }
   
+  // ### admin area : SPELLER ### 
+
+  getSpellerObject(objectId?, flagUpdateWFStatus=false){
+
+    let objId = ""; 
+
+    if (objectId){
+      objId = "/" + objectId
+    }
+
+    const api = this;
+
+    const params = new HttpParams()
+    .set('flagUpdateWFStatus', flagUpdateWFStatus.toString());
+
+    return new Promise(function(resolve, reject) {
+      
+      api.http.get(api.apiURL + '/admin/speller' + objId, {params}).subscribe(
+        (data: any) => {
+          resolve(data)
+        },
+        error => {
+          api.handleAPIError(error);
+          reject(error)
+        }
+      )
+    });
+  }  
+
+  approveSpellerObject(txtLabelObject){
+
+    const api = this;
+
+    return new Promise(function(resolve, reject) {
+      
+      api.http.put(api.apiURL + '/admin/speller', txtLabelObject).subscribe(
+        (data: any) => {
+          resolve(data)
+        },
+        error => {
+          api.handleAPIError(error);
+          reject(error)
+        }
+      )
+    });
+  }
+
+  disregardSpellerObject(txtLabelObject){
+    
+      const api = this;
+
+      return new Promise(function(resolve, reject) {
+        
+        api.http.put(api.apiURL + '/admin/speller/disregard', txtLabelObject).subscribe(
+          (data: any) => {
+            resolve(data)
+          },
+          error => {
+            api.handleAPIError(error);
+            reject(error)
+          }
+        )
+      });
+    }
 
   // ### admin area : NER LABEL ### 
 
@@ -167,10 +231,7 @@ export class ApiService {
         }
       )
     });
-  }
-
-
-  
+  }  
 
   approveNerLabelObject(txtLabelObject){
 
