@@ -78,7 +78,20 @@ const config = {
     return mqURL;
   }
 
+  function getMongoUrl(){
+
+    var url = "mongodb://" + 
+    config.mongodb.username + ":" + 
+    config.mongodb.password + "@" + 
+    config.mongodb.host + ":" + config.mongodb.port +"/" + 
+    config.mongodb.database + "?authSource=" + config.mongodb.database + "&w=1" ;
+
+    return url; 
+
+  }
+
   config["getMqURL"] = getMqURL
+  config["getMongoURL"] = getMongoUrl
 
 
   

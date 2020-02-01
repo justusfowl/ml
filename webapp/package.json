@@ -1,6 +1,6 @@
 {
   "name": "mednlp",
-  "version": "0.1.335",
+  "version": "0.1.347",
   "description": "labeling services for mednlp",
   "main": "server.js",
   "dependencies": {

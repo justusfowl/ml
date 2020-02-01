@@ -4,7 +4,8 @@ var path = require('path');
 var request = require('request');
 const config = require('../../config/config');
 var amqp = require('amqplib/callback_api');
-
+var MongoClient = require('mongodb').MongoClient;
+var ObjectID = require('mongodb').ObjectID;
 
 function processFile(req, res){
 
@@ -137,5 +138,67 @@ function issueObjIdToWf(req, res){
 
 }
 
+function setWfStatusOfObject(req, res){
+    
+    try{
+  
+        let objectIds = req.body.objectIds; // array of objectIds
+        let targetStatus = req.body.targetStatus;
 
-module.exports = { processFile, issueObjIdToWf}
+        if (!targetStatus || !objectIds){
+            res.send(500, "Error: provide both targetStatus + array of ObjIds");
+            return;
+        }
+
+        try{
+            targetStatus = parseInt(targetStatus);
+        }catch(err){
+            res.send(500, "Error: of targetStatus"  + JSON.stringify(err));
+            return;
+        }
+
+        let filterArray = []
+
+        objectIds.forEach(element => {
+            filterArray.push({
+                "_id" : ObjectID(element)
+            })
+        });
+        let url = config.getMongoURL();
+        MongoClient.connect(url, function(err, db) {
+    
+          if (err) throw err;
+          
+          let dbo = db.db("medlabels");
+  
+          // Get the documents collection
+          const collection = dbo.collection('labels');
+  
+          collection.find(
+            {
+                "$or" : filterArray
+            }).toArray(function(err, docs) {
+                
+                var updated = 0;
+                if (docs.length > 0){
+                    docs.forEach(element => {
+                        collection.updateOne({"_id" : ObjectID(element._id)}, {$set: { "wfstatus" :  targetStatus}, $unset : {"lockTime": ""} });
+                        updated++;
+                    });
+                }
+
+              res.json({"message" : "ok", "updated" : updated});
+
+                db.close();
+              });  
+          
+        });
+    
+      }catch(error){
+        res.send(500, "An error occured approving the item with object: " + JSON.stringify(req.body) );
+      }
+    
+}
+
+
+module.exports = { processFile, issueObjIdToWf, setWfStatusOfObject}

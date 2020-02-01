@@ -80,6 +80,19 @@
 
 .mat-drawer-inner-container{
   background-color: #e4e4e4;
+
+}
+
+.sidenav{
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+}
+
+.mat-drawer-inner-container::-webkit-scrollbar, 
+.sidenav::-webkit-scrollbar  { 
+  display: none;  /* Safari and Chrome */
+  width: 0;
+    height: 0;
 }
 
 .search-icon{

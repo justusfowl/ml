@@ -594,17 +594,19 @@ export class SpellerComponent implements OnInit {
       if (this.annotatedText){
         let suggs = document.getElementsByClassName("suggestion") as any;
 
-        for (var i=0; i<suggs.length;i++){
-          let sugg_item = suggs[i];
-          let suggId = sugg_item.getAttribute("data-sugg-id");
-          let finalText = sugg_item.innerText;
-  
-          let suggIdx = this.textObj.pages[this.pageIdxSelected].suggestions.findIndex(x => x.sugg_id == suggId);
-  
-          if (suggIdx > -1){
-            this.textObj.pages[this.pageIdxSelected].suggestions[suggIdx].final_text = finalText
+        if (suggs){
+          for (var i=0; i<suggs.length;i++){
+            let sugg_item = suggs[i];
+            let suggId = sugg_item.getAttribute("data-sugg-id");
+            let finalText = sugg_item.innerText;
+    
+            let suggIdx = this.textObj.pages[this.pageIdxSelected].suggestions.findIndex(x => x.sugg_id == suggId);
+    
+            if (suggIdx > -1){
+              this.textObj.pages[this.pageIdxSelected].suggestions[suggIdx].final_text = finalText
+            }
+    
           }
-  
         }
   
         let updatedText = document.getElementById("annotatedText").innerText;

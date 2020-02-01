@@ -30,4 +30,7 @@ router.route('/file')
 router.route('/objIds')
     .post(wfCtrl.issueObjIdToWf)
 
+router.route('/objIds/setStatus')
+    .post(wfCtrl.setWfStatusOfObject)
+
 module.exports = router;
