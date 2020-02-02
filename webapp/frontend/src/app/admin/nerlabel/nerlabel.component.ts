@@ -162,6 +162,8 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
       this.objId = objId; 
     }
 
+    let self = this; 
+
     this.progressService.getObjectProgressLog().subscribe((message: any) => {
       if (typeof(message.message) != "undefined"){
         this.toastr.info(message.category, message.message, {timeOut: 6000});
@@ -169,7 +171,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
           if (typeof(message.details.complete) != "undefined"){
             // this.api.isLoading = false;
             this.progressService.loaderIsComplete();
-            setTimeout(() => { this.refreshToolTip.show(); }, 500);
+            setTimeout(() => { self.refreshToolTip.show(); }, 500);
           }
 
           if (typeof(message.details.start) != "undefined" || typeof(message.details.progress) != "undefined"){
@@ -574,9 +576,40 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
 
    addTag(tag: any){
 
-    if (this.textObj.pages[this.pageIdxSelected].entities.findIndex(x => x.start == tag.start) == -1 && 
-      this.textObj.pages[this.pageIdxSelected].entities.findIndex(x => x.end == tag.end) == -1
-      ){
+    let flagAdd = true;
+
+    // are there tags that start or end at the same index in the string?
+
+    let startIdx = this.textObj.pages[this.pageIdxSelected].entities.findIndex(x => x.start == tag.start);
+    let endIdx = this.textObj.pages[this.pageIdxSelected].entities.findIndex(x => x.end == tag.end);
+
+    if (startIdx > -1 || endIdx > -1){
+
+      // is the UI including non-prod tags?
+
+      let isShowNonProdEntities = this.getIncludeNonProdTags();
+
+      if (isShowNonProdEntities){
+        // if also non-prod entities should be displayed, then there is an interference with an existing tag
+        flagAdd = false;
+      }else{
+
+        let startEntProd = this.tags[this.tags.findIndex(x => x._id == this.textObj.pages[this.pageIdxSelected].entities[startIdx]._id)].prod;
+        let endEntProd = this.tags[this.tags.findIndex(x => x._id == this.textObj.pages[this.pageIdxSelected].entities[endIdx]._id)].prod;
+
+        // if non prod entities are not shown, then there might be no interference with a tag because 
+        // the existing tag in the entities list might be a non-prod tag entity
+        // yet: when one of the intering entities belongs to a productive entity, then there is an error
+
+        if (startEntProd || endEntProd){
+          flagAdd = false;
+        }
+
+      }
+
+    }
+
+    if (flagAdd){
 
         if (!this.doesTagInterfereWithOthers(tag)){
           this.textObj.pages[this.pageIdxSelected].entities.push(tag);
@@ -605,9 +638,13 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
      }
 
      // tag overlaps with all other tags
-     if (tag.start <= this.textObj.pages[this.pageIdxSelected].entities[0].start && tag.end >= this.textObj.pages[this.pageIdxSelected].entities[this.textObj.pages[this.pageIdxSelected].entities.length-1].end){
+     if (tag.start <= this.textObj.pages[this.pageIdxSelected].entities[0].start && 
+      tag.end >= this.textObj.pages[this.pageIdxSelected].entities[this.textObj.pages[this.pageIdxSelected].entities.length-1].end){
        return true; 
      }
+
+     // does the UI include non-prod tags?
+     let isShowNonProdEntities = this.getIncludeNonProdTags();
 
      this.textObj.pages[this.pageIdxSelected].entities.forEach(element => {
         if (
@@ -615,7 +652,15 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
           (element.start < tag.end && element.end > tag.end) ||
           (element.start >= tag.start && element.end <= tag.end)
           ){
-          flagDoesInterfere = true; 
+            if (!isShowNonProdEntities){
+              let elementIsProd = this.tags[this.tags.findIndex(x => x._id == element._id)].prod;
+              if (elementIsProd){
+                flagDoesInterfere = true; 
+              }
+            }else{
+              flagDoesInterfere = true; 
+            }
+          
         }
      });
 
@@ -899,6 +944,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
                   });
     
                 this.getNerLabelObject();
+                this.updateUrlParamsToWF();
 
             }).catch(err => {
                 this.snackBar.open('Etwas hat nicht geklappt.', null, {
@@ -942,6 +988,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
                 });
 
               this.getNerLabelObject();
+              this.updateUrlParamsToWF();
 
           }).catch(err => {
               this.snackBar.open('Etwas hat nicht geklappt.', null, {
@@ -1068,16 +1115,16 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   refreshThisPageNoReload(){
-    this.api.getNerLabelTag().then( (data : any) => {
-      this.tags = data;
-      this.getNerLabelObject(this.objId);
-    }).catch(err => {
-      console.log(err);
-      this.progressService.loaderIsComplete();
-    })
+    if (confirm('Soll das Objekt neu geladen werden? Alle Änderungen verfallen damit unwiderruflich.')) {
+      this.api.getNerLabelTag().then( (data : any) => {
+        this.tags = data;
+        this.getNerLabelObject(this.objId);
+      }).catch(err => {
+        console.log(err);
+        this.progressService.loaderIsComplete();
+      })
 
+    }
   }
-
-
 
 }

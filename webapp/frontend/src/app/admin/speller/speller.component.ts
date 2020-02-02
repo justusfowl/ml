@@ -173,6 +173,9 @@ export class SpellerComponent implements OnInit {
     if (!this.getIfContentEditable()){
       document.getElementById("annotatedText").setAttribute("contenteditable", "false");
       return
+    }else{
+      document.getElementById("annotatedText").setAttribute("contenteditable", "true");
+      return
     }
 
     var text = ""; 
