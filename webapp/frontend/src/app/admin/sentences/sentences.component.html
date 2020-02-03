@@ -58,7 +58,7 @@
 
                     <mat-menu #menu="matMenu">
                         <button mat-menu-item [matMenuTriggerFor]="viewObjMenu">Ansehen</button>
-                        <button mat-menu-item (click)="toggleSettings()">Einstellungen</button>
+                        <button mat-menu-item (click)="showSettings()">Einstellungen</button>
                         <button mat-menu-item (click)="copyUrlToClipboard()">URL kopieren</button>
                         <button mat-menu-item class="noLB-btn" [class.noLB]="flagNoLineBreak" (click)="toggleNoLB()">Toggle NoLineBreak</button>
                     </mat-menu>

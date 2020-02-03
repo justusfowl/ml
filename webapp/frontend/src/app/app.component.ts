@@ -18,7 +18,7 @@ export class AppComponent implements AfterViewInit {
   constructor(
     public api: ApiService, 
     private titleService: Title, 
-    private progressService : ProgressService
+    public progressService : ProgressService
   ){
 
     this.titleService.setTitle( "medlines.tech - Medizinisches Freitextverständnis" );

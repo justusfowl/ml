@@ -22,7 +22,7 @@ export class SettingsComponent implements OnInit {
 
   constructor(
     public api : ApiService, 
-    private progressService : ProgressService, 
+    public progressService : ProgressService, 
     private snackBar: MatSnackBar
   ) { }
 
