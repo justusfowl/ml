@@ -51,6 +51,11 @@ export class SpellerComponent implements OnInit {
 
   selectedEntityTypeId: number = 0;
 
+
+  // test area
+
+  textIdxSelected : number = 0;
+
   constructor(
     private router: Router,
     private api: ApiService,
@@ -156,6 +161,8 @@ export class SpellerComponent implements OnInit {
 
   showSelectedText(evt) {
 
+    this.getCarePosition(evt);
+
     this.closeSuggMenu();
 
     if (evt.ctrlKey){
@@ -186,6 +193,96 @@ export class SpellerComponent implements OnInit {
     if (evt.target.classList.contains("suggestion")){
       flagHasSuggestion = true;
     }
+  }
+
+  addEvtChangeText(){
+
+    let self = this; 
+
+    var editable = document.getElementById('annotatedText');
+
+    editable.addEventListener('input', function( event : any) {
+
+      if (event.inputType == "deleteContentForward"){
+        console.log("Delete " + 1 + " char before: " + self.textIdxSelected)
+      }else if (event.inputType == "deleteContentBackward"){
+        console.log("Delete " + 1 + " char after: " + self.textIdxSelected)
+      }else if (event.inputType == "insertText"){
+        let data = event.data;
+        console.log("Insert " + data.length + " chars after: " + self.textIdxSelected)
+      }
+      
+        console.log(event)
+    });
+
+  }
+
+  getCarePosition(evt){
+    let clickedSelection = window.getSelection() as any;
+    let clickedNode = clickedSelection.anchorNode;
+
+    let editableDiv = document.getElementById("annotatedText") as any;
+
+    let previousLength = 0;
+
+    function indexInParent(node) {
+        var children = node.parentNode.childNodes;
+        var num = 0;
+        for (var i=0; i<children.length; i++) {
+            if (children[i]==node) return num;
+            num++;
+        }
+        return -1;
+    }
+
+    let indexInPar =  indexInParent(clickedNode);
+    let childNodes = document.getElementById("annotatedText").childNodes;
+
+    if (indexInPar > 0){
+      for (var i=0; i<indexInPar; i++) {
+        const thisNode = childNodes[i] as any;
+        if ( thisNode.nodeType == 3){
+          previousLength = previousLength + thisNode.length
+        }else{
+          previousLength = previousLength + thisNode.innerText.length
+        }
+        
+      }
+    }
+
+    
+
+    let doc = document as any;
+
+    var caretPos = 0,
+    sel, range;
+    if (window.getSelection) {
+      sel = window.getSelection();
+      if (sel.rangeCount) {
+        range = sel.getRangeAt(0);
+        if (range.commonAncestorContainer.parentNode == editableDiv) {
+          caretPos = range.endOffset;
+        }
+      }
+    } else if (doc.selection && doc.selection.createRange) {
+      range = doc.selection.createRange();
+      if (range.parentElement() == editableDiv) {
+        var tempEl = document.createElement("span");
+        editableDiv.insertBefore(tempEl, editableDiv.firstChild);
+        var tempRange = range.duplicate();
+        tempRange.moveToElementText(tempEl);
+        tempRange.setEndPoint("EndToEnd", range);
+        caretPos = tempRange.text.length;
+      }
+    }
+
+    caretPos = caretPos + previousLength;
+
+    console.log(caretPos);
+
+    this.textIdxSelected  = caretPos;
+
+    return caretPos;
   }
 
   mouseLeaveTextArea(evt){
@@ -340,6 +437,11 @@ export class SpellerComponent implements OnInit {
           data.pages[self.pageIdxSelected].suggestions = self.sortSuggestions(data.pages[self.pageIdxSelected].suggestions);
           self.totalNumPages = data.pages.length; 
           self.annotatedText = self.constructHtml(data.pages);
+          
+          setTimeout(function(){
+            self.addEvtChangeText();
+          },500)
+          
 
 
         }else{
@@ -367,6 +469,7 @@ export class SpellerComponent implements OnInit {
    makeText(){
     this.sortSuggestions();
     this.annotatedText = this.constructHtml(this.textObj.pages);
+    this.addEvtChangeText(); 
    }
 
    sortSuggestions(suggestions?){

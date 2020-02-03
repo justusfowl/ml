@@ -5,6 +5,7 @@ var adminCtrl = require('../controllers/admin.controller');
 var nerLabelCtrl = require('../controllers/nerlabel.controller');
 var adminLabelStatsCtrl = require('../controllers/label.stats.controller');
 var spellerCtrl = require('../controllers/speller.controller');
+var sentenceCtrl = require('../controllers/sentence.controller');
 
 router.route('/')
     .post(adminCtrl.hb)
@@ -28,6 +29,13 @@ router.route('/speller/:objectid')
 
 router.route('/speller/disregard')
     .put(spellerCtrl.disregardObject) 
+
+router.route('/sentence')
+    .get(sentenceCtrl.getObject)
+    .put(sentenceCtrl.approveObject)
+
+router.route('/sentence/:objectid')
+    .get(sentenceCtrl.getObject)
 
 router.route('/nerlabel')
     .get(nerLabelCtrl.getLabelObject)

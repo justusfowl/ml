@@ -1,0 +1,108 @@
+
+<div class="no-data" *ngIf="flagIsNoDataAvailable">
+    Ziemlich leer hier, sieht aus, als ob keine weiteren Daten zu korrigieren wären...
+    <button type="button" mat-flat-button (click)="getSentenceObj()">Aktualisieren</button>
+</div>
+
+<div *ngIf="!flagIsNoDataAvailable">
+    <div class="nerheader" *ngIf="flagshowSettings">
+
+        <div class="settings">
+            <div class="card">
+                    <div class="content">
+                        <mat-accordion>
+                            <mat-expansion-panel>
+                                <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    Einstellungen
+                                </mat-panel-title>
+                                <mat-panel-description>
+                                    Darstellung & Labelling
+                                </mat-panel-description>
+                                </mat-expansion-panel-header>
+                            
+                                <div class="mb setting-row">
+
+                                    <button (click)="incrementZoom(-0.1)" mat-button type="button">
+                                        -
+                                    </button>
+                                
+                                    <mat-form-field class="page-number">
+                                        <input matInput type="number" placeholder="Zoom" [(ngModel)]="scaleFactor" pattern="-?[0-9]*(\.[0-9]+)?">
+                                        <mat-error>Input is not a number!</mat-error>
+                                    </mat-form-field>
+                                    <button (click)="incrementZoom(0.1)" mat-button type="button">
+                                        +
+                                    </button>
+                                </div>
+                            </mat-expansion-panel>
+                        </mat-accordion>
+                    </div>
+                </div>
+                
+            </div>
+
+    </div>
+
+    <div class="container ner" >
+
+        <div class="mainbody">
+            
+            <div class="card textbody large"  >
+                <div class="title nerlabel" >
+                   
+
+                <div class="pageInfo">
+                    
+                    <p class="details linktoobj" [matMenuTriggerFor]="menu" >{{textObj._id}} [status:{{textObj.wfstatus}} ] </p> 
+
+                    <mat-menu #menu="matMenu">
+                        <button mat-menu-item [matMenuTriggerFor]="viewObjMenu">Ansehen</button>
+                        <button mat-menu-item (click)="toggleSettings()">Einstellungen</button>
+                        <button mat-menu-item (click)="copyUrlToClipboard()">URL kopieren</button>
+                        <button mat-menu-item class="noLB-btn" [class.noLB]="flagNoLineBreak" (click)="toggleNoLB()">Toggle NoLineBreak</button>
+                    </mat-menu>
+                    
+                    <mat-menu #viewObjMenu="matMenu" >
+                            <a mat-menu-item routerLink="/admin/label" [queryParams]="{ objId: textObj._id}" routerLinkActive="active">Bbox label</a>
+                            <a mat-menu-item routerLink="/logs" [queryParams]="{ objId: textObj._id}" routerLinkActive="active">Logs</a>
+                    
+                        </mat-menu>
+
+                    </div>
+                
+                    <button type="button" #refreshToolTip="matTooltip" matTooltip="Dokument aktualisieren." matTooltipPosition="right" mat-flat-button (click)="refreshThisPageNoReload()">Aktualisieren</button>
+                    
+                </div>
+            
+                <div class="content" >
+                    <p *ngIf="!annotatedText">
+                        Kein Text auf dieser Seite gefunden
+                    </p>
+                    <div id="annotatedText" *ngIf="annotatedText" 
+                            (mouseup)="showSelectedText($event)"
+                            class="largetext"
+                            [style.font-size]="14*scaleFactor + 'px'" 
+                            [style.letter-spacing]="1*scaleFactor + 'px'" 
+                            [innerHTML]="annotatedText">
+                    </div>
+                   
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card" >
+        <div class="content">
+            <div class="">
+
+                <button type="button" class="next-button" mat-flat-button color="primary" (click)="approveSentences()">Bestätigen</button>
+
+            </div>
+        </div>
+    </div>
+
+</div>

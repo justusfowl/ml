@@ -204,6 +204,53 @@ export class ApiService {
       });
     }
 
+  // ### admin area: SENTENCES ###
+
+  getSentenceObj(objectId?, flagUpdateWFStatus=false){
+
+    let objId = ""; 
+
+    if (objectId){
+      objId = "/" + objectId
+    }
+
+    const api = this;
+
+    const params = new HttpParams()
+    .set('flagUpdateWFStatus', flagUpdateWFStatus.toString());
+
+    return new Promise(function(resolve, reject) {
+      
+      api.http.get(api.apiURL + '/admin/sentence' + objId, {params}).subscribe(
+        (data: any) => {
+          resolve(data)
+        },
+        error => {
+          api.handleAPIError(error);
+          reject(error)
+        }
+      )
+    });
+  }  
+
+  approveSentences(txtLabelObject){
+
+    const api = this;
+
+    return new Promise(function(resolve, reject) {
+      
+      api.http.put(api.apiURL + '/admin/sentence', txtLabelObject).subscribe(
+        (data: any) => {
+          resolve(data)
+        },
+        error => {
+          api.handleAPIError(error);
+          reject(error)
+        }
+      )
+    });
+  } 
+
   // ### admin area : NER LABEL ### 
 
   getNerLabelObject(objectId?, flagUpdateWFStatus=false){

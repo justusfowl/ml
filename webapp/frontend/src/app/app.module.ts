@@ -29,6 +29,7 @@ import { SpellerComponent } from './admin/speller/speller.component';
 import { NerlabelComponent } from './admin/nerlabel/nerlabel.component';
 import { LogsComponent } from './admin/applogs/logs.component';
 import { LoginComponent } from './login/login.component';
+import { SentencesComponent } from './admin/sentences/sentences.component';
 
 import { ApiService } from './api.service';
 import { ProgressService } from './services/progress.service';
@@ -51,6 +52,7 @@ import { ErrorInterceptor } from './services/error.intercept';
     SpellerComponent,
     HomeComponent,
     StatisticsComponent, 
+    SentencesComponent,
     LogsComponent,
     LabelComponent,
     SettingsComponent, 

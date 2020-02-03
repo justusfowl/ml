@@ -11,6 +11,7 @@ import { SettingsComponent } from './settings/settings.component';
 import { SearchComponent } from './search/search.component';
 import { LogsComponent } from './admin/applogs/logs.component';
 import { LoginComponent } from './login/login.component';
+import { SentencesComponent } from './admin/sentences/sentences.component';
 import { AuthGuard } from './services/authguard'
 
 const routes: Routes = [
@@ -24,6 +25,8 @@ const routes: Routes = [
   { path: 'admin/label', component: LabelComponent, canActivate: [AuthGuard] },
   { path: 'admin/speller', component: SpellerComponent, canActivate: [AuthGuard] },
   { path: 'admin/nerlabel', component: NerlabelComponent, canActivate: [AuthGuard] },
+  { path: 'admin/sentences', component: SentencesComponent, canActivate: [AuthGuard] },
+  
   
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   // otherwise redirect to home

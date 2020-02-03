@@ -3,14 +3,11 @@ var amqp = require('amqplib/callback_api');
 var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
 
-var url = "mongodb://" + 
-config.mongodb.username + ":" + 
-config.mongodb.password + "@" + 
-config.mongodb.host + ":" + config.mongodb.port +"/" + 
-config.mongodb.database + "?authSource=" + config.mongodb.database + "&w=1" ;
+var mongoURL = config.getMongoURL();
 
+  // area to dedicate the sentences 
 
-function getObject(req, res){
+  function getObject(req, res){
 
     try{
 
@@ -35,7 +32,8 @@ function getObject(req, res){
            // only include objects that have a lockTime greater than 24hrs
 
           let filterObj = {
-              "wfstatus" : 15
+              "wfstatus" : 4, 
+              "sentences" : {$exists: false}
           }
 
           filterArray.push(filterObj);
@@ -47,7 +45,7 @@ function getObject(req, res){
           });
         }
 
-        MongoClient.connect(url, function(err, db) {
+        MongoClient.connect(mongoURL, function(err, db) {
 
             if (err) throw err;
             
@@ -84,7 +82,6 @@ function getObject(req, res){
                         res.json(docs);
             
                         if (typeof(docs._id) != "undefined" && flagUpdateWFStatus){
-                          // collection.updateOne({"_id" : ObjectID(docs._id)}, {$set: { wfstatus : 3}, $push: { "wfstatus_change" :changeItem}})
                           collection.update({"_id" : ObjectID(docs._id)}, {$set: { lockTime: new Date() } })
                         }
 
@@ -108,46 +105,12 @@ function getObject(req, res){
 
 }
 
-function publishToQueue(queue, payload){
-
-    let mqURL = config.getMqURL();
-
-    amqp.connect(mqURL, function (err, conn) {
-  
-        if (err){
-            console.log(err); 
-            return;
-        }
-  
-        conn.createChannel(function (err, ch) {
-  
-          if(err) throw err;
-  
-          try{
-            ch.assertQueue('pretag', { durable: true });
-            
-            ch.sendToQueue('pretag', new Buffer.from(JSON.stringify(payload)));
-
-          }catch(error){
-            console.error("Something went wrong publishing : " + payload)
-            console.error(error);
-            console.error(err)
-          }
-        });
-  
-        setTimeout(function () { 
-            conn.close(); 
-        }, 500); 
-  
-    });
-  
-  }
-
 function approveObject(req, res){
 
     try{
   
       let labelObject = req.body;
+      let sentences = req.body.sentences;
       let allText = ""; 
       let userId = req.userId; 
   
@@ -166,24 +129,25 @@ function approveObject(req, res){
         throw "No _id provided.";
       }else{
 
-        // set wfstatus == 2 -> text has been verified 
-        // after pretag processing, wfstatus will be updated to 3
+        // set wfstatus == 5 -> sentences have been identified
 
-        labelObject["wfstatus"] = 2;
+        labelObject["wfstatus"] = 5;
 
         // calculate duation + duration per 100 characters
 
         let duration = (new Date() - new Date(labelObject.lockTime))/1000;
         let durationPer100Char = duration / (allText.length/100);
 
-        let changeItem = {"timeChange": new Date(), "wfstatus" : 2, "duration" :  duration, "durationPer100Char" : durationPer100Char, "userId" : userId};
+        let changeItem = {"timeChange": new Date(), "wfstatus" : 5, "duration" :  duration, "durationPer100Char" : durationPer100Char, "userId" : userId};
         labelObject.wfstatus_change.push(changeItem);
 
         if (typeof(labelObject.lockTime) != "undefined"){
           delete labelObject.lockTime;
         }
+
         
-        MongoClient.connect(url, function(err, db) {
+        
+        MongoClient.connect(mongoURL, function(err, db) {
   
           if (err) throw err;
           
@@ -198,15 +162,13 @@ function approveObject(req, res){
               delete labelObject._id
           }
 
-          
+ 
           collection.replaceOne(
             {"_id" : ObjectID(objId)}, 
             labelObject,
             function(err, docs){
 
               res.json({"message" : "ok"});
-              publishToQueue("pretag", {"_id" :objId }); 
-              console.log("published to queue: pretag | id: " + objId );
 
             });
           
@@ -218,53 +180,9 @@ function approveObject(req, res){
     }
   
   }
-  
-function disregardObject(req, res){
-
-    try{
-  
-        let labelObject = req.body;
-        let userId = req.userId;
-  
-      if (typeof(labelObject._id) == "undefined"){
-        throw "No _id provided.";
-      }else{
-  
-        MongoClient.connect(url, function(err, db) {
-  
-          if (err) throw err;
-          
-          let dbo = db.db("medlabels");
-  
-          // Get the documents collection
-          const collection = dbo.collection('labels');
-  
-          const objId = labelObject._id; 
-          
-          if (labelObject._id){
-              delete labelObject._id
-          }
-          
-          collection.updateOne({"_id" : ObjectID(objId)}, {$set: { 
-            wfstatus : -15}, $push: {
-               "wfstatus_change" : {"timeChange": new Date(), "wfstatus" : -15 , "userId" : userId}
-            }},
-            function(err, docs){
-              res.json({"message" : "ok"});
-            });
-          
-        });
-      }
-  
-    }catch(error){
-      res.send(500, "An error occured approving the item with object: " + JSON.stringify(req.body) );
-    }
-  
-  }
-
-  function getWordSuggestions(req, res){
-
-  }
 
 
-  module.exports = { getObject, approveObject, disregardObject}
+module.exports = {
+    getObject, 
+    approveObject
+}

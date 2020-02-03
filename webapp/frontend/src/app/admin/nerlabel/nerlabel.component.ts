@@ -334,7 +334,10 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
         console.log("Add new tag with text: " + text ); 
   
         let newTag = this.makeTag(startIdx, endIdx, text); 
-        this.addTag(newTag); 
+        if (newTag){
+          this.addTag(newTag);
+        }
+        
       }
 
 
@@ -594,9 +597,20 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
         flagAdd = false;
       }else{
 
-        let startEntProd = this.tags[this.tags.findIndex(x => x._id == this.textObj.pages[this.pageIdxSelected].entities[startIdx]._id)].prod;
-        let endEntProd = this.tags[this.tags.findIndex(x => x._id == this.textObj.pages[this.pageIdxSelected].entities[endIdx]._id)].prod;
+        let startEntProd, endEntProd;
 
+        try{
+          startEntProd = this.tags[this.tags.findIndex(x => x._id == this.textObj.pages[this.pageIdxSelected].entities[startIdx]._id)].prod;
+        }catch(err){    
+          startEntProd = false;
+        }
+        
+        try{
+          endEntProd = this.tags[this.tags.findIndex(x => x._id == this.textObj.pages[this.pageIdxSelected].entities[endIdx]._id)].prod;
+        }catch(err){
+          endEntProd = false;
+        }
+        
         // if non prod entities are not shown, then there might be no interference with a tag because 
         // the existing tag in the entities list might be a non-prod tag entity
         // yet: when one of the intering entities belongs to a productive entity, then there is an error
@@ -653,7 +667,14 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
           (element.start >= tag.start && element.end <= tag.end)
           ){
             if (!isShowNonProdEntities){
-              let elementIsProd = this.tags[this.tags.findIndex(x => x._id == element._id)].prod;
+
+              let elementIsProd;
+              try{
+                elementIsProd = this.tags[this.tags.findIndex(x => x._id == element._id)].prod;
+              }catch(err){    
+                elementIsProd = false;
+              }
+
               if (elementIsProd){
                 flagDoesInterfere = true; 
               }
@@ -744,13 +765,55 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
           let textNoLinebreak = ent.value.replace(/(\r\n|\n|\r)/g,"   ");          
     
           offset = offset + (s.length - textNoLinebreak.length);
+
         }else{
+          
+          /*
           this.snackBar.open('Ein Tag überschneidet sich mit vorherigen. Konsole prüfen.', null, {
             duration: 1500,
           });
-          console.log("Conflicting tags: ")
-          console.log(previousTag); 
-          console.log(ent)
+          */
+
+          console.log("Conflicting tags...")
+
+          let startPreviewIdxPre = Math.min(previousTag.start-15, 0);
+          let endPreviewIdxPre = Math.min(previousTag.start, 0);
+
+          let startPreviewIdxSuff = Math.min(previousTag.end-15, 0);
+          let endPreviewIdxSuff = Math.min(previousTag.end, 0);
+
+          let tagName = this.getEntHlValue(previousTag._id);
+
+          let prevText = text.substring(startPreviewIdxPre, endPreviewIdxPre) + previousTag.value + "[" + tagName + "]" + text.substring(startPreviewIdxSuff, endPreviewIdxSuff);
+
+
+          if (confirm("Ein Tag kann nicht zugefügt werden, soll der konfliktierende Tag gelöscht werden? \n" + prevText)){
+            let prevTagIdx = this.textObj.pages[this.pageIdxSelected].entities.findIndex(x => x.ent_id == previousTag.ent_id);
+            this.textObj.pages[this.pageIdxSelected].entities.splice(prevTagIdx, 1);
+            console.log("Delete previousTag"); 
+            console.log(previousTag); 
+          }
+
+          startPreviewIdxPre = Math.min(ent.start-15, 0);
+          endPreviewIdxPre = Math.min(ent.start, 0);
+
+          startPreviewIdxSuff = Math.min(ent.end-15, 0);
+          endPreviewIdxSuff = Math.min(ent.end, 0);
+
+          tagName = this.getEntHlValue(ent._id);
+
+          prevText = text.substring(startPreviewIdxPre, endPreviewIdxPre) + ent.value + "[" + tagName + "]" + text.substring(startPreviewIdxSuff, endPreviewIdxSuff);
+
+
+          if (confirm("Ein Tag kann nicht zugefügt werden, soll der konfliktierende Tag gelöscht werden? \n" + prevText)){
+
+            let entTagIdx = this.textObj.pages[this.pageIdxSelected].entities.findIndex(x => x.ent_id == ent.ent_id);
+            this.textObj.pages[this.pageIdxSelected].entities.splice(entTagIdx, 1);
+
+            console.log("Delete ent");
+            console.log(ent);
+          }
+          
         }
         
       }
