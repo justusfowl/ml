@@ -8,6 +8,7 @@ import { NavDrawerService } from '../services/nav.service';
 import { MatDrawer, MatSidenav } from '@angular/material';
 
 import { AuthenticationService } from '../services/auth.service';
+import { ProgressService } from '../services/progress.service';
 
 
 @Component({
@@ -33,7 +34,8 @@ export class NavComponent implements AfterViewInit {
     public api : ApiService, 
     private route: ActivatedRoute, 
     private navService : NavDrawerService,
-    public authenticationService: AuthenticationService
+    public authenticationService: AuthenticationService, 
+    public progressService : ProgressService
   ) {
 
     this.authenticationService.currentUser.subscribe((x : any) => this.currentUserName = x.userName);

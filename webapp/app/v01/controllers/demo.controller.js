@@ -67,6 +67,7 @@ function processNERTags(req, res){
             request({
                 url: 'http://' + config.procBackend.host + ":" + config.procBackend.port + '/analytics/tner',
                 method: 'POST',
+                qs : req.query,
                 body: body,
                 json: true
               }, function(error, response, resbody) {

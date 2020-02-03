@@ -113,3 +113,27 @@
 .header-search:focus{
   outline : none !important; 
 }
+
+
+.status-header{
+  display: flex; 
+  align-items: center;
+  font-size: 10px;
+  background-color: #eeeeee;
+}
+
+.status{
+  width: 10px; 
+  height: 10px; 
+  border-radius: 50%; 
+  background-color: red;
+  margin-right: 20px;
+}
+
+.status.online{
+  background-color: green;
+}
+
+.divider{
+  margin-top:10px;
+}

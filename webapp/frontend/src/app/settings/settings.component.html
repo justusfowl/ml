@@ -1,5 +1,5 @@
 <mat-card>
-
+                <h2>Named Entity Labels</h2>
                 <table class="tags-settings">
                         <tr>
                                 <th>Value</th>
@@ -76,10 +76,21 @@
 
 
 <mat-card>
-        <h4>
-                Environment:
-        </h4>
+        <h2>Environment</h2>
         <p>
                 {{api.ENV}}
         </p>
+</mat-card>
+
+<mat-card>
+        <h2>Heartbeat</h2>
+        <div *ngFor="let itm of progressService.hbElementList;">
+                <h4 class="status-header">
+                        <div class="status" [class.online]="itm.worker.length > 0"></div>
+                        {{itm.type}}
+                </h4>
+                <p *ngFor="let worker of itm.worker;">
+                        {{worker}}
+                </p>
+        </div>
 </mat-card>

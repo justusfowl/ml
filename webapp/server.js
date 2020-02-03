@@ -31,8 +31,13 @@ let io = socketIO(server);
 
 const port = process.env.PORT || 3000;
 
+var serviceStatus = {
+  "app" : ["nodeJS"]
+}
+
 io.on('connection', (socket) => {
   console.log('user connected: ' + socket.id);
+  socket.emit('hb', serviceStatus);
 
   socket.on('log', (message) => {
     socket.broadcast.emit('log', message);
@@ -46,6 +51,18 @@ io.on('connection', (socket) => {
     
   });
 
+  socket.on('registerService', (message) => {
+
+    if (typeof(serviceStatus[message.type]) == "undefined"){
+      serviceStatus[message.type] = []
+    }
+
+    serviceStatus[message.type].push(socket.id);
+
+    socket.broadcast.emit('hb', serviceStatus);
+    
+  });
+
   socket.on('newobj', (objId) => {
     socket.join(objId);
   });
@@ -54,7 +71,25 @@ io.on('connection', (socket) => {
     socket.leave(objId);
   });
 
+  socket.on('disconnect', (reason) => {
+
+    Object.keys(serviceStatus).forEach((key, value) => {
+  
+      let index = serviceStatus[key].findIndex(x => x == socket.id);
+  
+      if (index > -1){
+        serviceStatus[key].splice(index,1);
+      }
+  
+    });
+  
+    socket.broadcast.emit('hb', serviceStatus);
+  
+  });
+
 });
+
+
 
 server.listen(8000, () => {
   console.log('Server started!');

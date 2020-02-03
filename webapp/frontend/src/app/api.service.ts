@@ -141,6 +141,29 @@ export class ApiService {
   
   // ### admin area : SPELLER ### 
 
+  getWordSuggestion(text){
+
+    const api = this;
+
+    let body = {
+      "text" : text
+    }
+
+    return new Promise(function(resolve, reject) {
+      
+      api.http.post(api.apiURL + '/medlang/spellcheck', body).subscribe(
+        (data: any) => {    
+          resolve(data)
+        },
+        error => {
+          api.handleAPIError(error);
+          reject(error)
+        }
+      )
+    });
+
+  }
+
   getSpellerObject(objectId?, flagUpdateWFStatus=false){
 
     let objId = ""; 
@@ -494,17 +517,25 @@ export class ApiService {
 
   // ############ DEMO AREA ###############
 
-  tagText(inputText){
+  tagText(inputText, flagOnlyNLP=false){
 
     const api = this;
+    let params;
 
     let body = {
       "text" : inputText
     }
 
+    if (flagOnlyNLP){
+      params = new HttpParams()
+      .set('flag_only_nlp', "true");
+    }else{
+      params = new HttpParams();
+    }
+
     return new Promise(function(resolve, reject) {
       
-      api.http.post<any>(api.apiURL + '/demo/tner', body).subscribe(
+      api.http.post<any>(api.apiURL + '/demo/tner', body, {params}).subscribe(
         (data: any) => {
           resolve(data)
         },

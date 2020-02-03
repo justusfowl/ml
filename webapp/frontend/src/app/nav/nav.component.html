@@ -77,7 +77,10 @@
 
           <mat-menu #menu="matMenu">
               <button mat-menu-item >{{currentUserName}}</button>
+              
               <button mat-menu-item (click)="authenticationService.logout()">Logout</button>
+              <div class="divider"></div>
+              <div class="status-header" mat-menu-item *ngFor="let itm of progressService.hbElementList;"><div class="status" [class.online]="itm.worker.length > 0"></div>{{itm.type}}</div>
           </mat-menu>
 
 

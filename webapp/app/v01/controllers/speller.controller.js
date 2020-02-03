@@ -2,12 +2,9 @@ const config = require('../../config/config');
 var amqp = require('amqplib/callback_api');
 var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
+var request = require('request');
 
-var url = "mongodb://" + 
-config.mongodb.username + ":" + 
-config.mongodb.password + "@" + 
-config.mongodb.host + ":" + config.mongodb.port +"/" + 
-config.mongodb.database + "?authSource=" + config.mongodb.database + "&w=1" ;
+var url = config.getMongoURL();
 
 
 function getObject(req, res){
@@ -264,7 +261,40 @@ function disregardObject(req, res){
 
   function getWordSuggestions(req, res){
 
+    let body = req.body; 
+
+    if (typeof(body.text) == "undefined"){
+        console.log("no text posted");
+        res.status(500).json({"message" : "No text posted"});
+    }else{
+        try{
+            request({
+                url: 'http://' + config.procBackend.host + ":" + config.procBackend.port + '/medlang/spellcheck',
+                method: 'POST',
+                qs : req.query,
+                body: body,
+                json: true
+              }, function(error, response, resbody) {
+    
+                if (error){
+                    console.error(error);
+                    res.status(500).json({"message" : JSON.stringify(error)});
+                    return;
+                } 
+    
+                try{
+                    res.json(resbody);
+                }catch(err){
+                    res.status(500).json({"message" : JSON.stringify(err)});
+                }
+                
+            });
+        }catch(err){
+            res.status(500).json({"message" : JSON.stringify(err)});
+        }
+        
+    }
   }
 
 
-  module.exports = { getObject, approveObject, disregardObject}
+  module.exports = { getObject, approveObject, disregardObject, getWordSuggestions}

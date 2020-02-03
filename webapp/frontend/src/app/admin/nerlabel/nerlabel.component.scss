@@ -356,3 +356,44 @@
     }
 
 }
+
+
+
+#sug-menu{
+    padding: 10px;
+    border-radius: 4px;
+    position: fixed;
+    background-color: white;
+    max-height: 0%; 
+    overflow: hidden; 
+    transition: 0.1s linear;
+    box-shadow: 0 2px 4px -1px rgba(0,0,0,.2), 0 4px 5px 0 rgba(0,0,0,.14), 0 1px 10px 0 rgba(0,0,0,.12);
+    opacity: 0;
+    z-index: 99999;
+}
+
+#sug-menu.view{
+    max-height: 100%; 
+    opacity: 1;
+}
+
+.sug-header{
+    font-size: 12px; 
+    margin-top: 5px; 
+    margin-bottom : 5px; 
+    text-align : center; 
+    width: 100%; 
+}
+
+.sug-item{
+    padding: 3px; 
+}
+
+.sug-item.orig{
+    margin-bottom: 10px;
+}
+
+.sug-item:hover{
+    background-color: #cfcfcf;
+    cursor: pointer;
+}

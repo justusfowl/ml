@@ -18,3 +18,21 @@
 .shortcut-input{
     width: 30px; 
 }
+
+.status-header{
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+}
+
+.status{
+    width: 10px; 
+    height: 10px; 
+    border-radius: 50%; 
+    background-color: red;
+    margin-right: 20px;
+}
+
+.status.online{
+    background-color: green;
+}

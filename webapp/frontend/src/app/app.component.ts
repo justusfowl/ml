@@ -13,8 +13,8 @@ export class AppComponent implements AfterViewInit {
   title = 'Medizinisches Freitextverständnis';
 
   @ViewChild('globalSpinner', {static: true}) public globalSpinner: ElementRef;
-
-
+  @ViewChild('globalBackdrop', {static: true}) public globalBackdrop: ElementRef;
+  
   constructor(
     public api: ApiService, 
     private titleService: Title, 
@@ -28,7 +28,9 @@ export class AppComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(){
+
     this.progressService.setGlobalSpinner(this.globalSpinner);
+    this.progressService.setGlobalBackdrop(this.globalBackdrop);
     this.progressService.loaderIsComplete();
   }
 

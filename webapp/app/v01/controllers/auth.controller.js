@@ -33,7 +33,7 @@ function login(req, res){
             const collection = dbo.collection('users');
     
             collection.findOne(
-              {"userName" : userName}, 
+              {"userName" : userName.toLowerCase()}, 
               function(err, data){
     
                 if (err || !data){

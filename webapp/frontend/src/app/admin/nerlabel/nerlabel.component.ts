@@ -3,7 +3,7 @@ import { ApiService } from '../../api.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 import { v1 as uuid } from 'uuid';
-import { MatSnackBar, MatTooltip } from '@angular/material';
+import { MatSnackBar, MatTooltip, MatMenuTrigger, MatMenu } from '@angular/material';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { ProgressService } from '../../services/progress.service';
@@ -16,6 +16,7 @@ import { NERTagFilterPipe } from '../../pipes/pipes';
   encapsulation: ViewEncapsulation.None
 })
 export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
+
 
   objId : string = ""; 
 
@@ -73,7 +74,6 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
       "target_obj" : "details_fuzz_ent"
     }
   ]
-
   
   @HostListener('document:keydown', ['$event']) onKeydownHandler(evt: KeyboardEvent) {
       
@@ -246,28 +246,31 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
 
   showSelectedText(evt) {
 
-    
-    if (this.flagIsDemo || !this.flagAllowEntChange){
-      return;
-    }
-
-    if (evt.ctrlKey){
-      console.log("Ctrl-Pressed")
-      return;
-    }
-
-
-    // disable right click
-    if (evt.which == 3){
-      return;
-    }
-
     var text = ""; 
     var startIdx, endIdx; 
+
+    var flagRightClick = false;
+    var flagCtrlClick = false;
 
     let flagHasEntity = false;
     let flagAbort = false; 
     let flagRemoveEntity = false;
+
+    
+    // disable right click
+    if (evt.which == 3){
+      flagRightClick = true;
+      return;     
+    }
+    
+    if (evt.ctrlKey){
+      console.log("Ctrl-Pressed")
+      flagCtrlClick = true;
+    }
+
+    if ((this.flagIsDemo || !this.flagAllowEntChange) && !flagCtrlClick){
+      return;
+    }
 
     if (evt.target.classList.contains("entity")){
       flagHasEntity = true;
@@ -278,7 +281,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
       flagRemoveEntity = true;
     }
 
-    if (!flagHasEntity){
+    if (!flagHasEntity || flagCtrlClick){
 
       if (window.getSelection) {
 
@@ -329,7 +332,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
           text = (document as any).selection.createRange().text;
       }
 
-      if (true /* exclude line breaks:!(/\r|\n/.exec(text)) */){
+      if (!flagCtrlClick){
         this.selectedText = text;
         console.log("Add new tag with text: " + text ); 
   
@@ -338,6 +341,16 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
           this.addTag(newTag);
         }
         
+      }else{
+
+        this.api.getWordSuggestion(text).then((res : any) => {
+
+          this.openSuggMenu(evt, res);
+
+          console.log("right click text: " + text ); 
+          console.log(res)
+        })
+  
       }
 
 
@@ -351,6 +364,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
   }
+
 
   getWordBound(idx, text, start=false){
 
@@ -472,8 +486,15 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getNerDemoObject(){
     const self = this; 
-    let nerResponse = self.api.nerDemoResponse.data;
+
+    if (!self.api.nerDemoResponse){
+      return;
+    }
     
+
+    let nerResponse = self.api.nerDemoResponse.data;
+
+
     // create a demo doc letter document from input text
 
     self.flagIsDemo = true;
@@ -767,7 +788,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
           offset = offset + (s.length - textNoLinebreak.length);
 
         }else{
-          
+
           /*
           this.snackBar.open('Ein Tag überschneidet sich mit vorherigen. Konsole prüfen.', null, {
             duration: 1500,
@@ -1065,6 +1086,8 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   handleDisplayEntityChange(evt){
+
+    let self = this; 
     
      if (this.selectedEntityTypeId > 0) {
       this.snackBar.open('Es werden nun alle Tags angezeigt. Nicht produktive sind rot-umrandet.', null, {
@@ -1087,6 +1110,23 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
     this.textObj.pages[this.pageIdxSelected].entities = this.sortEntities(target_obj);
 
     this.makeText();
+
+    if (target_obj.length < 1){
+
+      let sb = this.snackBar.open( `Es wurden keine Entitäten für  ${target_obj_meta.val} gefunden`, "Laden?", {
+        duration: 5500,
+      });
+
+      sb.onAction().subscribe(() => {
+        console.log('The snack-bar action was triggered!');
+
+        self.router.navigate(["/home"]).then( (e) => {
+          self.progressService.loaderIsComplete(); 
+        });
+      });
+
+    }
+
 
    
 
@@ -1188,6 +1228,52 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
       })
 
     }
+  }
+
+  openSuggMenu(evt, response){
+
+
+    let cont = document.getElementById("sug-menu"); 
+    let targetClickedRects = evt.target.getClientRects()[0];
+
+    let top = evt.clientY // targetClickedRects.bottom;
+    let left = evt.clientX // targetClickedRects.left;
+
+    cont.setAttribute("style", "top: "+top+"px; left: "+left+"px");
+
+    // add content to menu
+
+    cont.innerHTML = ""; 
+
+    let itemIdx = response.suggestions.findIndex(x => x.orig == response.text)
+
+    if (itemIdx > -1){
+      let suggestions = response.suggestions[itemIdx].sug;
+
+      cont.innerHTML += '<div class="sug-header">Vorschläge</div>'
+  
+      for (var i=0; i<suggestions.length;i++){
+        let sug = suggestions[i];
+        cont.innerHTML += '<div class="sug-item">' + sug.key + '</div>'
+      }
+  
+      
+    }else{
+      cont.innerHTML += '<div class="sug-header">Keine Vorschläge für ' +response.text +' .</div>'
+    }
+
+    cont.classList.add("view");
+
+  }
+
+  closeSuggMenu(){
+    let cont = document.getElementById("sug-menu");
+    cont.classList.remove("view");
+    cont.innerHTML = ""; 
+  }
+
+  clickBody(){
+    this.closeSuggMenu();
   }
 
 }

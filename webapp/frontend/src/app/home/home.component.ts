@@ -361,9 +361,16 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   tagInputText(){
 
     const self = this;
-    self.progressService.loaderIsLoading(); 
+    self.progressService.loaderIsLoading();
+    
+    let flagOnlyNLP = true;
 
-    self.api.tagText(this.api.inputText).then( (data : any) => {
+    if (confirm("Erweiterte Analyse?")){
+      flagOnlyNLP = false;
+    }
+
+
+    self.api.tagText(this.api.inputText, flagOnlyNLP).then( (data : any) => {
 
       console.log(data)
       if (typeof(data.data) != "undefined"){
@@ -373,7 +380,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         console.error("No attribute data found in response")
       }
       
-      self.progressService.loaderIsComplete(); 
+      self.progressService.loaderIsComplete();
+      
     })
     
   }

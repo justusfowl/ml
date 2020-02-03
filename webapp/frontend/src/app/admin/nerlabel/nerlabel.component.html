@@ -3,7 +3,7 @@
     <button type="button" mat-flat-button (click)="getNerLabelObject()">Aktualisieren</button>
 </div>
 
-<div *ngIf="!flagIsNoDataAvailable">
+<div *ngIf="!flagIsNoDataAvailable" (click)="clickBody()">
     <div class="nerheader">
 
         <div class="card">
@@ -150,9 +150,15 @@
                             [class.largetext]="!flagShowRawText"
                             [style.font-size]="14*scaleFactor + 'px'" 
                             [style.letter-spacing]="1*scaleFactor + 'px'" 
-                            [innerHTML]="annotatedText">
+                            [innerHTML]="annotatedText"> 
                     </div>
+
+                   
                 </div>
+
+                <div id="sug-menu">
+                </div>
+               
 
             </div>
 

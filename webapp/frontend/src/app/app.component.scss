@@ -56,3 +56,23 @@ app-nav{
 ::ng-deep .mat-checkbox-checked.mat-accent .mat-checkbox-background, .mat-checkbox-indeterminate.mat-accent .mat-checkbox-background{
     background-color: #3f51b5 !important;
 }
+
+
+.backdrop-container{
+    z-index: 99;
+    width: 100%;
+    height: 100%;
+    flex-flow: wrap;
+    position: absolute;
+    background-color: #3d3d3dc2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 40px;
+}
+
+.backdrop-container.hide{
+    display: none;
+}
+

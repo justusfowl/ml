@@ -16,7 +16,14 @@ export class ProgressService {
 
     public logs = new MatTableDataSource()
 
-    private globalSpinner : ElementRef
+    private globalSpinner : ElementRef;
+    private globalBackdrop : ElementRef;
+
+    public hbElement : any;
+    public hbElementList : any;
+    public flagAppOnline : boolean = false; 
+
+    public globalBackdropMsg : string = "";
 
     constructor() {
 
@@ -40,11 +47,51 @@ export class ProgressService {
         .subscribe((message: string) => {
             console.log(message);
             
-            // add message at beginning of array
             this.logs.data.unshift(message);
             this.logs._updateChangeSubscription();
         });
+
+        this.socket.on('hb', (message) => {
+            this.updateHb(message);
+        });
+
+        this.socket.on('disconnect', (message) => {
+            this.updateHb({});
+            console.warn("The backend has gone away.");
+         });
+
+         this.globalBackdropMsg = "Die Anwendung ist offline."
+
+        
     }
+
+
+    updateHb(hbElement){
+
+        let hbItems = []
+
+        Object.keys(hbElement).forEach((key, val) => {
+
+            hbItems.push({
+                type : key, 
+                worker : hbElement[key]
+            })
+
+        })
+
+        this.hbElementList = hbItems;
+        this.hbElement = hbElement;
+
+        if (typeof(this.hbElement.app) != "undefined"){
+            this.flagAppOnline = true;
+            this.backdropHide();
+        }else{
+            this.flagAppOnline = false;
+            this.backdropShow("Die Anwendung ist offline.");
+        }
+
+    }
+
 
     public getMessages = () => {
         return Observable.create((observer) => {
@@ -86,10 +133,23 @@ export class ProgressService {
     }
 
 
-
+    setGlobalBackdrop(backdropRef){
+        this.globalBackdrop = backdropRef;
+    }
 
     setGlobalSpinner(spinnerElemRef){
         this.globalSpinner = spinnerElemRef
+    }
+
+    
+    backdropShow(msg=""){
+        this.globalBackdropMsg = msg;
+        this.globalBackdrop.nativeElement.classList.remove("hide")
+    }
+
+    backdropHide(){
+        this.globalBackdropMsg = "";
+        this.globalBackdrop.nativeElement.classList.add("hide")
     }
 
     loaderIsLoading(){
