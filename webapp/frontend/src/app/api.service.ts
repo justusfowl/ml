@@ -276,6 +276,22 @@ export class ApiService {
 
   // ### admin area : NER LABEL ### 
 
+  getDemoNERTestDataText(){
+    const api = this;
+    return new Promise(function(resolve, reject) {
+      
+      api.http.get(api.apiURL + '/demo/tner/demotext',).subscribe(
+        (data: any) => {
+          resolve(data)
+        },
+        error => {
+          api.handleAPIError(error);
+          reject(error)
+        }
+      )
+    });
+  }
+
   getNerLabelObject(objectId?, flagUpdateWFStatus=false){
 
     let objId = ""; 

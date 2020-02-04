@@ -93,5 +93,31 @@ function processNERTags(req, res){
 
 }
 
+function getDemoNERTestDataText(req, res){
+    try{
+        request({
+            url: 'http://' + config.procBackend.host + ":" + config.procBackend.port + '/analytics/tner/demotestdata',
+            method: 'GET',
+            json: true
+          }, function(error, response, resbody) {
 
-module.exports = { processPdfBbox, processNERTags}
+            if (error){
+                console.error(error);
+                res.status(500).json({"message" : JSON.stringify(error)});
+                return;
+            } 
+
+            try{
+                res.json({"message" : "ok", "data": resbody});
+            }catch(err){
+                res.status(500).json({"message" : JSON.stringify(err)});
+            }
+            
+        });
+    }catch(err){
+        res.status(500).json({"message" : JSON.stringify(err)});
+    }
+}
+
+
+module.exports = { processPdfBbox, processNERTags, getDemoNERTestDataText}

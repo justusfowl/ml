@@ -116,6 +116,14 @@
     padding: 8px 1px 2px 2px;
 }
 
+.content.demo{
+    .entity.showEnt:hover {
+        .removeEnt{
+            max-width: 0%; 
+        }
+    }
+}
+
 .entity.showEnt:hover {
     .removeEnt{
         max-width: 100%; 
@@ -261,7 +269,7 @@
     }
 
     .shortcut{
-        background-color: white;
+        background: radial-gradient(circle, rgb(255, 255, 255) 40%, rgba(255,255,255,0) 62%);
         padding: 3px;
         border-radius: 50%;
         min-width: 20px;
@@ -287,7 +295,7 @@
 
 .entity-select.selected{
     opacity: 1; 
-
+    border: 2px solid black;
     .label{
         margin-right: 30px;
     }

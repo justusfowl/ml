@@ -386,6 +386,17 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     
   }
 
+  getDemoNERTestDataText(){
+    this.api.getDemoNERTestDataText().then((data : any) => {
+      try{
+        this.api.inputText = data.data.demotext;
+      }catch(err){
+        this.api.inputText = "[Kein Demotext aus Testdaten verfügbar]"
+      }
+      
+    })
+  }
+
 
   // display result of inputtext tagging
   toNERLabel(){

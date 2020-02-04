@@ -151,6 +151,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
     if (flagIsDemo){
       this.flagIsDemo = true;
       this.flagAllowEntChange = false;
+      this.flagHidePerson = true;
 
       if (!this.api.nerDemoResponse || this.api.docType != 'text'){
         this.router.navigate(["/home"]); 
@@ -808,32 +809,40 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
           let prevText = text.substring(startPreviewIdxPre, endPreviewIdxPre) + previousTag.value + "[" + tagName + "]" + text.substring(startPreviewIdxSuff, endPreviewIdxSuff);
 
 
-          if (confirm("Ein Tag kann nicht zugefügt werden, soll der konfliktierende Tag gelöscht werden? \n" + prevText)){
-            let prevTagIdx = this.textObj.pages[this.pageIdxSelected].entities.findIndex(x => x.ent_id == previousTag.ent_id);
-            this.textObj.pages[this.pageIdxSelected].entities.splice(prevTagIdx, 1);
-            console.log("Delete previousTag"); 
-            console.log(previousTag); 
+          // for demo: prevent errors popping up 
+          // createHtml takes care of overlapping items for UI purposes.
+
+          if (!this.flagIsDemo){
+
+            if (confirm("Ein Tag kann nicht zugefügt werden, soll der konfliktierende Tag gelöscht werden? \n" + prevText)){
+              let prevTagIdx = this.textObj.pages[this.pageIdxSelected].entities.findIndex(x => x.ent_id == previousTag.ent_id);
+              this.textObj.pages[this.pageIdxSelected].entities.splice(prevTagIdx, 1);
+              console.log("Delete previousTag"); 
+              console.log(previousTag); 
+            }
+  
+            startPreviewIdxPre = Math.min(ent.start-15, 0);
+            endPreviewIdxPre = Math.min(ent.start, 0);
+  
+            startPreviewIdxSuff = Math.min(ent.end-15, 0);
+            endPreviewIdxSuff = Math.min(ent.end, 0);
+  
+            tagName = this.getEntHlValue(ent._id);
+  
+            prevText = text.substring(startPreviewIdxPre, endPreviewIdxPre) + ent.value + "[" + tagName + "]" + text.substring(startPreviewIdxSuff, endPreviewIdxSuff);
+  
+  
+            if (confirm("Ein Tag kann nicht zugefügt werden, soll der konfliktierende Tag gelöscht werden? \n" + prevText)){
+  
+              let entTagIdx = this.textObj.pages[this.pageIdxSelected].entities.findIndex(x => x.ent_id == ent.ent_id);
+              this.textObj.pages[this.pageIdxSelected].entities.splice(entTagIdx, 1);
+  
+              console.log("Delete ent");
+              console.log(ent);
+            }
+
           }
 
-          startPreviewIdxPre = Math.min(ent.start-15, 0);
-          endPreviewIdxPre = Math.min(ent.start, 0);
-
-          startPreviewIdxSuff = Math.min(ent.end-15, 0);
-          endPreviewIdxSuff = Math.min(ent.end, 0);
-
-          tagName = this.getEntHlValue(ent._id);
-
-          prevText = text.substring(startPreviewIdxPre, endPreviewIdxPre) + ent.value + "[" + tagName + "]" + text.substring(startPreviewIdxSuff, endPreviewIdxSuff);
-
-
-          if (confirm("Ein Tag kann nicht zugefügt werden, soll der konfliktierende Tag gelöscht werden? \n" + prevText)){
-
-            let entTagIdx = this.textObj.pages[this.pageIdxSelected].entities.findIndex(x => x.ent_id == ent.ent_id);
-            this.textObj.pages[this.pageIdxSelected].entities.splice(entTagIdx, 1);
-
-            console.log("Delete ent");
-            console.log(ent);
-          }
           
         }
         
@@ -888,7 +897,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
        classShowEnt = "showEnt";
      }
 
-     if (this.flagHidePerson && this.getEntHlImmutableTitle(ent._id) == "PER"){
+     if (this.flagHidePerson && this.getEntHlImmutableTitle(ent._id).toLowerCase() == "PER".toLowerCase()){
 
         let origLen = ent.value.length;
         let hidden_val = new Array( origLen ).fill( 1 ).map( ( _, i ) => String.fromCharCode( 65 + 23 ) ).join(""); 

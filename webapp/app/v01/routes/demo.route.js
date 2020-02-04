@@ -26,4 +26,7 @@ router.route('/tbody')
 router.route('/tner')
     .post(demoCtrl.processNERTags)
 
+router.route('/tner/demotext')
+    .get(demoCtrl.getDemoNERTestDataText)
+
 module.exports = router;

@@ -38,7 +38,15 @@ export class NavComponent implements AfterViewInit {
     public progressService : ProgressService
   ) {
 
-    this.authenticationService.currentUser.subscribe((x : any) => this.currentUserName = x.userName);
+    this.authenticationService.currentUser.subscribe((x : any) => {
+
+      if(x){
+        this.currentUserName = x.userName
+      }else{
+        this.currentUserName = "";
+      }
+      
+    });
   }
 
   ngAfterViewInit(){
