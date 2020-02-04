@@ -55,10 +55,18 @@ export class NavComponent implements AfterViewInit {
 
   execSearch(){
 
-    this.api.isLoading = true; 
+    if (this.api.searchQryString.length == 0){
+      this.api.flagHasSearched = false; 
+      return;
+    }
+
+    this.api.searchQryStringText = this.api.searchQryString;
+
+    this.progressService.loaderIsLoading();
 
     this.api.searchQueryHandler(this.api.searchQryString).then((res : any) =>{
 
+        /*
 
         if (typeof(res.data.search_result) == "undefined"){
           this.api.searchResults = [];
@@ -72,8 +80,23 @@ export class NavComponent implements AfterViewInit {
           this.api.flagHasSearched = true; 
         }
 
+        */ 
         
-        this.api.isLoading = false; 
+        res.data.documents.forEach(element => {
+          if (typeof(element.wfstatus_change) == "undefined"){
+            element.wfstatus_change = [];
+          }
+        });
+
+        this.api.searchResults = res.data.documents; 
+        this.api.lastSearchTime = res.data.search_time;
+        this.api.lastEmbedTime = res.data.embed_time; 
+        
+        this.api.flagHasSearched = true; 
+
+        this.progressService.loaderIsComplete();
+        
+        
 
     }).catch(err => {
       console.error(err);

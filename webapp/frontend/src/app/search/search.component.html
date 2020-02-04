@@ -24,32 +24,55 @@
     </div>
 
     <div class="search-meta">
-        Etwa 1.412.021 Ergebnisse (ST: {{api.lastSearchTime | number : '1.2-2'}} ms / ET: {{api.lastEmbedTime | number : '1.2-2'}} ms)
+        {{api.searchResults.length}} Ergebnisse für '{{api.searchQryStringText}}' in ({{api.lastSearchTime | number : '1.2-2'}} s)
     </div>
 
 </div>
 
-<div class="result-container"  *ngIf="api.flagHasSearched">
+<mat-card class="resultcard">
+    <mat-accordion >
+        <mat-expansion-panel *ngFor="let r of api.searchResults; let i = index;" [expanded]="api.searchResults.length == 1">
+            <mat-expansion-panel-header>
+            <mat-panel-title>
+                {{r._id}}
+            </mat-panel-title>
+            <mat-panel-description>
+                    {{r.pages.length}} Seiten //  WF: {{r.wfstatus}}
+            </mat-panel-description>
+            </mat-expansion-panel-header>
 
-    <div class="item card" *ngFor="let r of api.searchResults; let i = index;">
+            <div class="details">
+                <p>
+                    {{r.fileName}}
+                </p>
+                <p>
+                    {{r.patName}} / ({{r.patNummer}})
+                </p>
+            </div>
+            
+            <div class="wf">
+                <div *ngFor="let wf of r.wfstatus_change; let j = index;" class="item" 
+                [class.final]="wf.wfstatus == 5"
+                [class.hasRoute]="getIfWfUpdateHasRoute(wf)"
+                [class.bad]="wf.wfstatus < 0"
+                >
+                    <div class="status" *ngIf="!getIfWfUpdateHasRoute(wf)" [matTooltip]="getWfToolTip(wf)"> 
+                            {{wf.wfstatus}}
+                    </div>
 
-        <div class="header">
-            {{r._source.title}}
-        </div>
-
-        <div class="source">
-            {{r._type}}
-        </div>
-
-        <div class="body">
-            {{r._source.case_text}}
-        </div>
-
-        <div class="details">
-            Score: {{r._score | number : '1.2-2'}}
-        </div>
-
-    </div>
+                    <a  *ngIf="getIfWfUpdateHasRoute(wf)" 
+                        class="status" 
+                        mat-menu-item 
+                        [matTooltip]="getWfToolTip(wf)"
+                        [routerLink]="getWfRoute(wf)"
+                        [queryParams]="{ objId: r._id}" routerLinkActive="active">{{wf.wfstatus}}</a>
 
 
-</div>
+                    <mat-icon class="arrow" aria-hidden="false" aria-label="home icon" *ngIf="j<r.wfstatus_change.length-1">arrow_right_alt</mat-icon>
+                    
+                </div>
+            </div>
+
+        </mat-expansion-panel>
+    </mat-accordion>
+</mat-card>

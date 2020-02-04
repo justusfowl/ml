@@ -30,6 +30,7 @@ export class ApiService {
   navOpen : boolean = false; 
 
   searchQryString : string = "";
+  searchQryStringText : string = ""; 
   flagHasSearched : boolean = false; 
 
   searchResults : any[] = [];
