@@ -66,7 +66,7 @@ export class ProfileComponent implements OnInit {
       month = "0"+month;
     }
 
-    let today = new Date("01."+month +"."+year);
+    let today = new Date(year + "-" + month + "-01");
 
     return today
   }
