@@ -532,6 +532,25 @@ export class ApiService {
     });
   }
 
+  // ########## PROFILE AREA ##############
+
+  getMyTransactionAggs(){
+    const api = this;
+
+    return new Promise(function(resolve, reject) {
+      
+      api.http.get(api.apiURL + '/profile/transactionAgg').subscribe(
+        (data: any) => {
+          resolve(data)
+        },
+        error => {
+          api.handleAPIError(error);
+          reject(error)
+        }
+      )
+    });
+  }
+
   // ############ DEMO AREA ###############
 
   tagText(inputText, flagOnlyNLP=false){

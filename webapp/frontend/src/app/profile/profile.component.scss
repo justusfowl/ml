@@ -1,0 +1,66 @@
+.cards-container{
+    display: flex;
+}
+
+.income-card{
+    max-width: 300px;
+
+    .header{
+        justify-content: center;
+    }
+}
+
+.income{
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+
+    .figure{
+        font-size: 50px;
+    }
+    .unit{
+        margin-left: 10px;
+        font-size: 20px;
+    }
+}
+
+.date-info{
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .selected-date{
+        font-size: 45px;
+        color: #e0e0e0;
+        text-align: center;
+        padding: 10px;
+        margin: 10px;
+    }
+
+    .selected-date:hover{
+        /*
+        border: 1px solid #f2f2f2;
+        box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
+        border-radius: 4px;
+        color: #676363;
+        cursor: pointer;
+        */
+    }
+}
+
+.detail-card{
+    background-color: unset; 
+    box-shadow: unset;
+}
+
+.details{
+    table{
+        width: 100%; 
+    }
+
+    .detail-title{
+        flex-grow: 20;
+    }
+}
+

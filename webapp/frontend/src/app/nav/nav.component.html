@@ -76,7 +76,7 @@
           </button>
 
           <mat-menu #menu="matMenu">
-              <button mat-menu-item >{{currentUserName}}</button>
+              <button mat-menu-item routerLink="/profile" routerLinkActive="active" >{{currentUserName}}</button>
               
               <button mat-menu-item (click)="authenticationService.logout()">Logout</button>
               <div class="divider"></div>

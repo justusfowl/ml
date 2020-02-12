@@ -5,6 +5,7 @@ var demoRoutes = require('./demo.route.js');
 var medlangRoutes = require('./medlang.route.js');
 var wfRoutes = require('./wf.routes.js');
 var authRoutes = require('./auth.route.js');
+var profileRoutes = require('./profile.route');
 
 const config = require('../../config/config');
 
@@ -23,6 +24,8 @@ router.use('/demo',  [tokenValidator.verifyToken], demoRoutes);
 router.use('/medlang',  [tokenValidator.verifyToken], medlangRoutes); 
 
 router.use('/wf',  [tokenValidator.verifyToken], wfRoutes);
+
+router.use('/profile', [tokenValidator.verifyToken], profileRoutes);
 
 router.use('/auth', authRoutes);
 

@@ -1,0 +1,81 @@
+
+
+<div class="date-info" *ngIf="currentTransactionAgg">
+
+    <span class="selected-date">{{getDateFromTag(currentTransactionAgg.monthYear) | date:'MMM, y'}}</span>
+
+</div>
+
+<div class="cards-container" *ngIf="currentTransactionAgg">
+    <mat-card class="income-card" *ngFor="let wfstep of currentTransactionAgg.wfsteps">
+        <mat-card-header class="header">
+            <mat-card-title>Status</mat-card-title>
+            <mat-card-subtitle>{{wfstep.wfstatus}}</mat-card-subtitle>
+        </mat-card-header>
+
+       
+
+        <mat-card-content>
+
+            <div class="income">
+                    <div class="figure">
+                            {{wfstep.income | number:'1.0-2'}}
+                    </div>
+                    <div class="unit">
+                        €
+                    </div>
+            </div>
+           
+            <p class="totalChars">
+                    {{getWfStatusDescription(wfstep.wfstatus)}}
+            </p>
+        </mat-card-content>
+    </mat-card>
+</div>
+
+
+<mat-card class="detail-card">
+    <div class="transaction-details" *ngIf="currentTransactionAgg">
+            <mat-accordion>
+                <mat-expansion-panel *ngFor="let t of myTransactions; let i=index;">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title class="detail-title">
+                            {{getDateFromTag(t.monthYear) | date:'MMM, y'}}
+                        </mat-panel-title>
+                        <mat-panel-description>
+                            {{sumIncome(t) | number:'1.0-2'}} €
+                        </mat-panel-description>
+                    </mat-expansion-panel-header>
+                
+                    <div class="details">
+        
+                        <table >
+                            <tr>
+                                    <th>WF Status</th>
+                                    <th>Duration (Min)</th>
+                                    <th>Gesamt-Zeichen</th>
+                                    <th>Dokumente</th>
+                                    <th>Vergütet?</th>
+                            </tr>
+                            <tr *ngFor="let r of t.wfsteps; let j=index;" >
+                                    <td>{{r.wfstatus}}</td>
+                                    <td>
+                                        {{r.duration/60 | number:'1.0-0'}}
+                                    </td>
+                                    <td>
+                                        {{r.totalChar  | number:'1.0-0' }}
+                                    </td>
+                                    <td>
+                                            {{r.objects.length}}
+                                    </td>
+                                    <td>
+                                        <mat-icon aria-hidden="false" aria-label="Example home icon">close</mat-icon>
+                                    </td>
+                            </tr>
+                        </table>
+        
+                    </div>
+                </mat-expansion-panel>
+            </mat-accordion>
+        </div>
+</mat-card>

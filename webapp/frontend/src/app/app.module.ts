@@ -42,6 +42,7 @@ import { ColorPickerModule } from 'ngx-color-picker';
 import { JwtInterceptor } from './services/jwt.intercept';
 import { ErrorInterceptor } from './services/error.intercept';
 
+import { ProfileComponent } from './profile/profile.component';
 
 
 
@@ -56,6 +57,7 @@ import { ErrorInterceptor } from './services/error.intercept';
     SentencesComponent,
     LogsComponent,
     LabelComponent,
+    ProfileComponent,
     SettingsComponent, 
     NerlabelComponent, 
     LoginComponent,

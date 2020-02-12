@@ -12,7 +12,8 @@ import { SearchComponent } from './search/search.component';
 import { LogsComponent } from './admin/applogs/logs.component';
 import { LoginComponent } from './login/login.component';
 import { SentencesComponent } from './admin/sentences/sentences.component';
-import { AuthGuard } from './services/authguard'
+import { ProfileComponent } from './profile/profile.component';
+import { AuthGuard } from './services/authguard';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -21,6 +22,7 @@ const routes: Routes = [
   { path: 'stats', component: StatisticsComponent, canActivate: [AuthGuard] },
   { path: 'logs', component: LogsComponent, canActivate: [AuthGuard] },
   { path: 'nlp', component: NlpComponent, canActivate: [AuthGuard] },
+  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: 'settings', component: SettingsComponent, canActivate: [AuthGuard] },
   { path: 'admin/label', component: LabelComponent, canActivate: [AuthGuard] },
   { path: 'admin/speller', component: SpellerComponent, canActivate: [AuthGuard] },
