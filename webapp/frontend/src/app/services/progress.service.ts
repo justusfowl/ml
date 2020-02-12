@@ -33,7 +33,7 @@ export class ProgressService {
             this.url = "http://" + environment.apiBase + ":8000"
 
         }else{
-            this.url = "http://" + environment.apiBase
+            this.url = "https://" + environment.apiBase
         }
 
 
