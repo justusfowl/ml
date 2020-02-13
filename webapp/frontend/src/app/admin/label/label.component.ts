@@ -7,6 +7,7 @@ import { MatSnackBar, MatDrawer, MatSidenav } from '@angular/material';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NavDrawerService } from 'src/app/services/nav.service';
 import { ProgressService } from 'src/app/services/progress.service';
+import { AuthenticationService } from 'src/app/services/auth.service';
 
 
 @Component({
@@ -130,7 +131,9 @@ export class LabelComponent implements OnInit, AfterViewInit {
     private api: ApiService,
     public snackBar: MatSnackBar,
     private navService : NavDrawerService,
-    private sanitizer: DomSanitizer) {
+    private sanitizer: DomSanitizer, 
+    public auth: AuthenticationService
+    ) {
 
      } 
 

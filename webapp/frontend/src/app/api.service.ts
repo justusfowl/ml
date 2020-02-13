@@ -532,7 +532,47 @@ export class ApiService {
     });
   }
 
+
+  // ######### AUTH MAINTENANCE ###############
+
+
+  updateUser(user){
+    const api = this;
+
+    return new Promise(function(resolve, reject) {
+      
+      api.http.put(api.apiURL + '/auth/user', {"user":user}).subscribe(
+        (data: any) => {
+          resolve(data)
+        },
+        error => {
+          api.handleAPIError(error);
+          reject(error)
+        }
+      )
+    });
+  }
+
+
+  getUsers(){
+    const api = this;
+
+    return new Promise(function(resolve, reject) {
+      
+      api.http.get(api.apiURL + '/auth/user').subscribe(
+        (data: any) => {
+          resolve(data)
+        },
+        error => {
+          api.handleAPIError(error);
+          reject(error)
+        }
+      )
+    });
+  }
+
   // ########## PROFILE AREA ##############
+
 
   getMyTransactionAggs(){
     const api = this;

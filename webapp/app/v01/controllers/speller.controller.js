@@ -6,6 +6,8 @@ var request = require('request');
 
 var url = config.getMongoURL();
 
+var utilController = require('../util');
+
 
 function getObject(req, res){
 
@@ -72,8 +74,16 @@ function getObject(req, res){
                                 if (typeof(element.suggestions) == "undefined"){
                                     element.suggestions = [];
                                 }
+
+                                try{
+                                  element.base64String = utilController.base64_encode(element.path)
+                                }catch(err){
+                                  element.base64String = null;
+                                  console.log(err);
+                                }
                             
                             });
+
                         }
 
                         docs.lockTime = new Date();

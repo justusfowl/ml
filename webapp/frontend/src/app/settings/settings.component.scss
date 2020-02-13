@@ -36,3 +36,13 @@
 .status.online{
     background-color: green;
 }
+
+.users{
+    .roles-chip-list{
+        width: 100%; 
+        min-width: 400px;
+    }
+    .user-settings{
+        width: 100%; 
+    }
+}

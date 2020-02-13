@@ -5,9 +5,6 @@
     
     <div *ngIf="!flagIsNoDataAvailable">
         <div class="nerheader">
-
-            
-
             <div class="settings">
                 <div class="card">
                         <div class="content">
@@ -60,7 +57,7 @@
                         <button (click)="resetTextWithSuggestions()" mat-button type="button" class="reset-btn">
                             Seite zurücksetzen?
                         </button>
-                        <button (click)="prevPage()" mat-button type="button" disabled matTooltip="Korrekturen sind irreversibel." >
+                        <button (click)="prevPage()" mat-button type="button" disabled matTooltip="Korrekturen sind irreversibel." matTooltipPosition="bottom">
                             -
                         </button>
                     <div class="pageInfo">
@@ -69,12 +66,12 @@
 
                         <mat-menu #menu="matMenu">
                             <button mat-menu-item [matMenuTriggerFor]="viewObjMenu">Ansehen</button>
-                            <button mat-menu-item [matMenuTriggerFor]="execObjMenu">Workflow</button>
+                            <button *ngIf="auth.checkUIForRole('admin')" mat-menu-item [matMenuTriggerFor]="execObjMenu">Workflow</button>
                             <button mat-menu-item (click)="copyUrlToClipboard()">URL kopieren</button>
                         </mat-menu>
                         
                         <mat-menu #viewObjMenu="matMenu" >
-                                <a mat-menu-item routerLink="/admin/label" [queryParams]="{ objId: textObj._id}" routerLinkActive="active">Bbox label</a>
+                                <a *ngIf="auth.checkUIForRole('label')" mat-menu-item routerLink="/admin/label" [queryParams]="{ objId: textObj._id}" routerLinkActive="active">Bbox label</a>
                                 <a mat-menu-item routerLink="/logs" [queryParams]="{ objId: textObj._id}" routerLinkActive="active">Logs</a>
                         
                             </mat-menu>
@@ -108,6 +105,10 @@
                                 [innerHTML]="annotatedText">
                         </div>
                         <div id="sug-menu" (click)="selectSuggestion($event)">
+                        </div>
+
+                        <div class="img-container" [class.zoomed]="flagIsZoomed">
+                                <img [src]="pageViewImage" (click)="imgClick($event)">
                         </div>
                     </div>
     

@@ -261,7 +261,8 @@
     width: 15%;
     box-sizing: border-box;
     padding: 2px;
-
+    overflow: hidden;
+    
     .label{
         margin-right: 5px;
         font-size: 12px;

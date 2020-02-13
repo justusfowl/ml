@@ -64,7 +64,7 @@
                     </mat-menu>
                     
                     <mat-menu #viewObjMenu="matMenu" >
-                            <a mat-menu-item routerLink="/admin/label" [queryParams]="{ objId: textObj._id}" routerLinkActive="active">Bbox label</a>
+                            <a *ngIf="auth.checkUIForRole('label')" mat-menu-item routerLink="/admin/label" [queryParams]="{ objId: textObj._id}" routerLinkActive="active">Bbox label</a>
                             <a mat-menu-item routerLink="/logs" [queryParams]="{ objId: textObj._id}" routerLinkActive="active">Logs</a>
                     
                         </mat-menu>

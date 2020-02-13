@@ -40,6 +40,13 @@ export class AuthenticationService {
             }));
     }
 
+    register(userName, password){
+        return this.http.post<any>(`${this.api.apiURL}/auth/register`, { userName, password })
+        .pipe(map( (resp : any) => {
+            return;
+        }));
+    }
+
     logout() {
         // remove user from local storage and set current user to null
         localStorage.removeItem('userData');
@@ -52,6 +59,19 @@ export class AuthenticationService {
 
         if (this.currentUserValue) {
             return true;
+        }else{
+            return false;
+        }
+    }
+
+    checkUIForRole(reqRole){
+        if (this.isAuthorized()){
+            let roles = this.currentUserSubject.value.roles;
+            if (roles.indexOf(reqRole) != -1){
+                return true;
+            }else{
+                return false;
+            }
         }else{
             return false;
         }

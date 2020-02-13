@@ -100,6 +100,38 @@
     line-height: 30px;
 }
 
+.content .img-container{
+    position: relative;
+    max-height: 50vh;
+    overflow: hidden;
+    margin: 0px 40px 0px 40px;
+    width: 30vw;
+    display: flex;
+    justify-content: center;
+    padding: 2px;
+
+    img{
+        max-width: 50vw;
+        max-height: 50vh;
+    }
+
+    img:hover{
+        box-shadow: 0 2px 4px -1px rgba(0,0,0,.2), 0 4px 5px 0 rgba(0,0,0,.14), 0 1px 10px 0 rgba(0,0,0,.12);
+        cursor: pointer;
+    }
+
+}
+
+.img-container.zoomed{
+    border: 1px solid #3f51b580;
+    img{
+        box-shadow: 0 2px 4px -1px rgba(0,0,0,.2), 0 4px 5px 0 rgba(0,0,0,.14), 0 1px 10px 0 rgba(0,0,0,.12);
+    }
+}
+
+.textbody .content{
+    display: flex;
+}
 
 
 .entity{
@@ -429,3 +461,8 @@
         color: red; 
     }
 }
+
+
+
+
+

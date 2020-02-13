@@ -7,6 +7,7 @@ import { MatSnackBar, MatTooltip } from '@angular/material';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { ProgressService } from '../../services/progress.service';
+import { AuthenticationService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-sentences',
@@ -38,7 +39,8 @@ export class SentencesComponent implements OnInit {
     private appRef: ApplicationRef,
     public snackBar: MatSnackBar, 
     private route: ActivatedRoute, 
-    public progressService : ProgressService
+    public progressService : ProgressService, 
+    public auth: AuthenticationService
 
   ) {
 

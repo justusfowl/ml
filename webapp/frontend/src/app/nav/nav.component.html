@@ -6,33 +6,29 @@
       
     <mat-toolbar class="menu-item-top"></mat-toolbar>
     <mat-nav-list>
-      <a class="menu-item" mat-list-item routerLink="/search" routerLinkActive="active">
+      <a class="menu-item" mat-list-item routerLink="/search" routerLinkActive="active" *ngIf="authenticationService.checkUIForRole('admin')">
           <mat-icon  aria-hidden="false" >search</mat-icon>
       </a>
-      <a class="menu-item" mat-list-item routerLink="/home" routerLinkActive="active">
+      <a class="menu-item" mat-list-item routerLink="/home" routerLinkActive="active" *ngIf="authenticationService.checkUIForRole('admin')">
           <mat-icon  aria-hidden="false" >code</mat-icon>
       </a>
-      <!--
-      <a class="menu-item" mat-list-item routerLink="/nlp" routerLinkActive="active">
-          <mat-icon  aria-hidden="false" >memory</mat-icon>
-      </a>
-      -->
-      <a class="menu-item" mat-list-item  routerLink="/admin/label" [queryParams]="{ wf: true}" routerLinkActive="active">
+
+      <a class="menu-item" mat-list-item  routerLink="/admin/label" [queryParams]="{ wf: true}" routerLinkActive="active" *ngIf="authenticationService.checkUIForRole('label')">
           <mat-icon  aria-hidden="false" >gamepad</mat-icon>
       </a>
-      <a class="menu-item" mat-list-item  routerLink="/admin/speller" [queryParams]="{ wf: true}" routerLinkActive="active">
+      <a class="menu-item" mat-list-item  routerLink="/admin/speller" [queryParams]="{ wf: true}" routerLinkActive="active" *ngIf="authenticationService.checkUIForRole('speller')">
         <mat-icon  aria-hidden="false" >spellcheck</mat-icon>
       </a>
-      <a class="menu-item" mat-list-item  routerLink="/admin/nerlabel" [queryParams]="{ wf: true}"  routerLinkActive="active" >
+      <a class="menu-item" mat-list-item  routerLink="/admin/nerlabel" [queryParams]="{ wf: true}"  routerLinkActive="active" *ngIf="authenticationService.checkUIForRole('nerlabel')">
           <mat-icon  aria-hidden="false" >text_format</mat-icon>
-        </a>
-        <a class="menu-item" mat-list-item routerLink="/stats" routerLinkActive="active">
+      </a>
+        <a class="menu-item" mat-list-item routerLink="/stats" routerLinkActive="active"*ngIf="authenticationService.checkUIForRole('admin')">
           <mat-icon  aria-hidden="false" >bar_chart</mat-icon>
       </a>
-      <a class="menu-item" mat-list-item routerLink="/logs" routerLinkActive="active" >
+      <a class="menu-item" mat-list-item routerLink="/logs" routerLinkActive="active" *ngIf="authenticationService.checkUIForRole('admin')">
         <mat-icon  aria-hidden="false" >subject</mat-icon>
       </a>
-      <a class="menu-item" mat-list-item routerLink="/settings" routerLinkActive="active" >
+      <a class="menu-item" mat-list-item routerLink="/settings" routerLinkActive="active" *ngIf="authenticationService.checkUIForRole('admin')">
         <mat-icon  aria-hidden="false" >settings</mat-icon>
       </a>
 

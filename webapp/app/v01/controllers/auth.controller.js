@@ -47,7 +47,8 @@ function login(req, res){
     
                     let resp = {
                         "userName" : data.userName, 
-                        "userId" : data._id
+                        "userId" : data._id, 
+                        "roles" : data.roles
                     }
         
                     var token = jwt.sign(resp, config.auth.jwtsec, {
@@ -69,9 +70,6 @@ function login(req, res){
         console.error(error.stack);
         res.send(403, "Something went wrong logging in.");
     }
-
-
-    
 
 }
 
@@ -109,5 +107,84 @@ function registerUser ( req, res ){
 
 }
 
+function getUsers(req, res){
 
-module.exports = { login, registerUser }
+    // @TODO check for admin privileges 
+
+    try{
+
+        MongoClient.connect(url, function(err, db) {
+  
+            if (err) throw err;
+            
+            let dbo = db.db("medlabels");
+    
+            // Get the documents collection
+            const collection = dbo.collection('users');
+    
+            collection.find({}).toArray(
+              function(err, data){
+
+                data.forEach(element => {
+                    if (element.passPhrase){
+                        delete element.passPhrase;
+                    }
+
+                    if (!element.roles){
+                        element.roles = [];
+                    }
+                });
+        
+                res.json({"data" : data});
+              });
+            
+          });
+
+    }catch(error){
+        console.error(error.stack);
+        res.send(403, "Something went wrong getting the users.");
+    }
+}
+
+function updateUser(req, res){
+     // @TODO check for admin privileges 
+
+    let targetUser = req.body.user;
+    let targetUserId = targetUser._id;
+
+    if (targetUser._id){
+        delete targetUser._id;
+    }
+    
+     try{
+
+        MongoClient.connect(url, function(err, db) {
+  
+            if (err) throw err;
+            
+            let dbo = db.db("medlabels");
+
+            const collection = dbo.collection('users');
+
+            collection.updateOne(
+                {
+                    "_id" : ObjectID(targetUserId)
+                }, 
+                {
+                    $set: targetUser
+                },
+                function(err, docs){
+                    res.json({"message" : "ok"});
+                }
+            );
+                
+          });
+
+    }catch(error){
+        console.error(error.stack);
+        res.send(403, "Something went wrong getting the users.");
+    }
+
+}
+
+module.exports = { login, registerUser, getUsers, updateUser }

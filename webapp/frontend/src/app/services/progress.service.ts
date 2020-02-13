@@ -18,6 +18,7 @@ export class ProgressService {
 
     private globalSpinner : ElementRef;
     private globalBackdrop : ElementRef;
+    public flagPersistentError : boolean = false;
 
     public hbElement : any;
     public hbElementList : any;
@@ -142,14 +143,21 @@ export class ProgressService {
     }
 
     
-    backdropShow(msg=""){
+    backdropShow(msg="", flagPersistentError=false){
+
+        if (flagPersistentError){
+            this.flagPersistentError = true;
+        }
+        
         this.globalBackdropMsg = msg;
         this.globalBackdrop.nativeElement.classList.remove("hide")
     }
 
     backdropHide(){
-        this.globalBackdropMsg = "";
-        this.globalBackdrop.nativeElement.classList.add("hide")
+        if (!this.flagPersistentError){
+            this.globalBackdropMsg = "";
+            this.globalBackdrop.nativeElement.classList.add("hide")
+        }
     }
 
     loaderIsLoading(){

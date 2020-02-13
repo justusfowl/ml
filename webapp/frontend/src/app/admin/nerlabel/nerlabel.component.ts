@@ -315,10 +315,10 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
             // a text area has been selected
             text = window.getSelection().toString();
 
-            let textNoLinebreak = text.replace(/(\r\n|\n|\r)/g,"   ");
+            //let textNoLinebreak = text.replace(/(\r\n|\n|\r)/g,"   ");
 
             startIdx = textAnchorIndex + Math.min(sel.focusOffset,sel.anchorOffset); // textAnchorIndex + sel.anchorOffset;
-            endIdx = startIdx + textNoLinebreak.length;
+            endIdx = startIdx + text.length;
 
             if (typeof((sel as any).baseNode.classList) != "undefined"){
               if ((sel as any).baseNode.classList.contains("entity")){
@@ -333,12 +333,16 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
           text = (document as any).selection.createRange().text;
       }
 
-      if (!flagCtrlClick){
+      // only add the tag if Ctrl has NOT been pressed and if NOT all characters are line breaks
+      if (!flagCtrlClick ){
+
         this.selectedText = text;
+
         console.log("Add new tag with text: " + text ); 
   
         let newTag = this.makeTag(startIdx, endIdx, text); 
-        if (newTag){
+
+        if (newTag && ! /^[/\r|\n/]+$/.test(text)){
           this.addTag(newTag);
         }
         
@@ -405,7 +409,7 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
       iteration++;
 
       if (iteration >= maxIterations){
-        this.toastr.error("getWord()", "Es ist etwas mit dem Wort '" + text + "' schief gelaufen.", {timeOut: 6000});
+        console.error("getWord()", "Es ist etwas mit dem Wort '" + text + "' schief gelaufen.");
         resIdx = 0;
       }
 
@@ -784,9 +788,9 @@ export class NerlabelComponent implements OnInit, AfterViewInit, OnDestroy {
 
           text = text.substring(0, start) + s + text.substring(end,text.length)
 
-          let textNoLinebreak = ent.value.replace(/(\r\n|\n|\r)/g,"   ");          
+          // let textNoLinebreak = ent.value.replace(/(\r\n|\n|\r)/g,"   ");          
     
-          offset = offset + (s.length - textNoLinebreak.length);
+          offset = offset + (s.length - ent.value.length);
 
         }else{
 
