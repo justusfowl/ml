@@ -443,6 +443,8 @@ export class SpellerComponent implements OnInit {
           data.pages[self.pageIdxSelected].suggestions = self.sortSuggestions(data.pages[self.pageIdxSelected].suggestions);
           self.totalNumPages = data.pages.length; 
           self.annotatedText = self.constructHtml(data.pages);
+          this.flagIsZoomed = true;
+          this.imgClick(null);
           self.drawPdfPage();
           
           setTimeout(function(){
@@ -477,7 +479,11 @@ export class SpellerComponent implements OnInit {
     this.sortSuggestions();
     this.annotatedText = this.constructHtml(this.textObj.pages);
     this.addEvtChangeText(); 
+
+    this.flagIsZoomed = true;
+    this.imgClick(null);
     this.drawPdfPage();
+
    }
 
    sortSuggestions(suggestions?){
@@ -747,6 +753,13 @@ export class SpellerComponent implements OnInit {
             // this.api.isLoading = true;
             this.progressService.loaderIsLoading(); 
 
+            
+            if (typeof(this.textObj.pages) != "undefined"){
+              this.textObj.pages.forEach(element => {
+                delete element.base64String;
+              });
+            }
+
             this.api.approveSpellerObject(this.textObj).then(res => {
 
                 this.snackBar.open('Dokument bestätigt.', null, {
@@ -865,21 +878,24 @@ export class SpellerComponent implements OnInit {
   
   drawPdfPage(){
 
-    this.pageViewImage = 'data:image/jpg;base64,' + this.textObj.pages[this.pageIdxSelected].base64String
+    this.pageViewImage = 'data:image/jpg;base64,' + this.textObj.pages[this.pageIdxSelected].base64String;
+
 
   }
 
   imgClick(evt){
 
-    let point = evt.offsetX + "/" + evt.offsetY;
-
-    let midPointX = evt.target.width / 2;
-    let midPointY = evt.target.height / 2;
-
     if (this.flagIsZoomed){
       evt.target.setAttribute("style", "");
       this.flagIsZoomed = false;
     }else{
+
+      let point = evt.offsetX + "/" + evt.offsetY;
+
+      let midPointX = evt.target.width / 2;
+      let midPointY = evt.target.height / 2;
+
+
       evt.target.setAttribute("style", "transform: scale(1.5) translate(" + (midPointX-evt.offsetX) +"px, " + (midPointY-evt.offsetY) +"px);");
       this.flagIsZoomed = true;
     }
