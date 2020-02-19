@@ -443,8 +443,7 @@ export class SpellerComponent implements OnInit {
           data.pages[self.pageIdxSelected].suggestions = self.sortSuggestions(data.pages[self.pageIdxSelected].suggestions);
           self.totalNumPages = data.pages.length; 
           self.annotatedText = self.constructHtml(data.pages);
-          this.flagIsZoomed = true;
-          this.imgClick(null);
+          this.resetZoom();
           self.drawPdfPage();
           
           setTimeout(function(){
@@ -480,8 +479,7 @@ export class SpellerComponent implements OnInit {
     this.annotatedText = this.constructHtml(this.textObj.pages);
     this.addEvtChangeText(); 
 
-    this.flagIsZoomed = true;
-    this.imgClick(null);
+    this.resetZoom();
     this.drawPdfPage();
 
    }
@@ -883,6 +881,12 @@ export class SpellerComponent implements OnInit {
 
   }
 
+  resetZoom(){
+    let prevImg = document.getElementById("prevImage");
+    prevImg.setAttribute("style", "");
+    this.flagIsZoomed = false;
+  }
+
   imgClick(evt){
 
     if (this.flagIsZoomed){
@@ -894,7 +898,6 @@ export class SpellerComponent implements OnInit {
 
       let midPointX = evt.target.width / 2;
       let midPointY = evt.target.height / 2;
-
 
       evt.target.setAttribute("style", "transform: scale(1.5) translate(" + (midPointX-evt.offsetX) +"px, " + (midPointY-evt.offsetY) +"px);");
       this.flagIsZoomed = true;

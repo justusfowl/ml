@@ -3,7 +3,7 @@ var amqp = require('amqplib/callback_api');
 var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
 var request = require('request');
-
+const path = require('path');
 var url = config.getMongoURL();
 
 var utilController = require('../util');
@@ -76,8 +76,17 @@ function getObject(req, res){
                                 }
 
                                 try{
-                                  element.base64String = utilController.base64_encode(element.path)
+
+                                  if (config.env == "development"){
+                                    let fileName = path.basename(element.path);
+                                    let devPath = "Y:\\tmp\\" + fileName;
+                                    element.base64String = utilController.base64_encode(devPath);
+                                  }else{
+                                    element.base64String = utilController.base64_encode(element.path);
+                                  }
+                                  
                                 }catch(err){
+
                                   element.base64String = null;
                                   console.log(err);
                                 }
